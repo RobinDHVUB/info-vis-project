@@ -1,7 +1,7 @@
 # Information Visualization: Project
 Project of Group 8 for the course Information Visualization at VUB
 
-## Group 8
+## Group 8: Monty Python and the Three WISE Men
 
 | Name                      | Student number                | Email address                                  |
 | :---                      | :---                          | :---                                           |
