@@ -8,7 +8,7 @@ COPY ./requirements.txt /app/requirements.txt
 WORKDIR /app
 
 # install the dependencies and packages in the requirements file
-RUN apt update && apt upgrade && pip install --upgrade pip
+RUN apt update && apt upgrade
 RUN pip install --no-cache-dir -r requirements.txt
 
 # copy all local content to the image
