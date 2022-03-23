@@ -1,10 +1,25 @@
 #!/bin/bash
 
-# Download subject data
-if ! test -f data/raw/sub1; then
-    mkdir data/raw/sub1
-    wget -P data/raw "http://openfmri.s3.amazonaws.com/tarballs/ds117_R0.1.1_sub001_raw.tgz"
-    tar xvzf data/raw/ds117_R0.1.1_sub001_raw.tgz data/raw
-    mv data/raw/ds117_R0.1.1_sub001_raw/MEG/* data/raw/sub1
-    rm -rf data/raw/ds117_R0.1.1_sub001_raw data/raw/*.tgz
+if [ ! -d ./data ]; then
+    mkdir data
 fi
+if [ ! -d ./data/raw ]; then
+    mkdir data/raw
+fi
+
+# Download subject data
+for subject in 001 002 003 004 005 006 007 008 009 010 011 012 013 014 015 016 017 018 019
+do 
+    if [ ! -d data/raw/sub${subject} ]; then
+        mkdir data/raw/sub${subject}
+        if [ "$subject" == 019 ]; then
+            wget -c "http://openfmri.s3.amazonaws.com/tarballs/ds117_R0.1.1_sub${subject}_raw.tgz" -O- | tar -C $PWD/data/raw/sub${subject} -xvzf - sub${subject}/MEG/*sss.fif
+            mv data/raw/sub${subject}/sub${subject}/MEG/* data/raw/sub${subject}
+            rm -rf data/raw/sub${subject}/sub${subject}
+        else 
+            wget -c "http://openfmri.s3.amazonaws.com/tarballs/ds117_R0.1.1_sub${subject}_raw.tgz" -O- | tar -C $PWD/data/raw/sub${subject} -xvzf - ds117/sub${subject}/MEG/*sss.fif
+            mv data/raw/sub${subject}/ds117/sub${subject}/MEG/* data/raw/sub${subject}
+            rm -rf data/raw/sub${subject}/ds117
+        fi 
+    fi
+done

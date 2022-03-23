@@ -1,9 +1,15 @@
 import mne
 import os
-from mne_bids import BIDSPath, read_raw_bids
 
-bids_path = BIDSPath(root="data/raw", datatype="eeg")
+# Create processed folder
+os.mkdir("data/competition/processed")
 
-# Read raw
-raw = read_raw_bids(bids_path)
-print(raw.info['subject_info'])
+# Loop over subjects
+for subject_folder in os.listdir("data/raw"):
+
+    # Loop over runs
+    for run_id, run_file in enumerate(os.listdir("data/raw/" + subject_folder)):
+
+        # Read raw
+        raw = mne.io.read_raw_fif("data/raw/" + subject_folder + "/" + run_file)
+        print(raw.info)
