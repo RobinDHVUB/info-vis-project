@@ -12,4 +12,14 @@ for subject_folder in os.listdir("data/raw"):
 
         # Read raw
         raw = mne.io.read_raw_fif("data/raw/" + subject_folder + "/" + run_file)
+
+        # Pick MEG and EEG
+
+        # Resample according to Shannon-Nyquist and highest freq band
+
+        # Bandpass filter between lowest and highest of freq bands
+
+        # ICA
+
+        # Save
         print(raw.info)
