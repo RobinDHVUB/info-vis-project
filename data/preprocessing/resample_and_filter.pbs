@@ -25,4 +25,4 @@ parallel -j $SLURM_NTASKS srun -N1 -n1 -c1 --exclusive python resample_and_filte
 wait
 
 # Archive
-tar -zcvf /data/brussel/102/vsc10248/resampled_and_filtered.tar.gz /data/brussel/102/vsc10248/data/processed
+tar cvf - /data/brussel/102/vsc10248/data/processed | gzip -9 - > /data/brussel/102/vsc10248/resampled_and_filtered.tar.gz
