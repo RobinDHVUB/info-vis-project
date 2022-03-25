@@ -1,0 +1,28 @@
+#!/bin/bash
+#SBATCH --job-name=preproc
+#SBATCH --time=6:00:00
+#SBATCH --ntasks=19
+
+module load Python/3.9.5-GCCcore-10.3.0
+module load parallel/20210622-GCCcore-10.3.0
+
+# Create processed folder
+if [ ! -d /data/brussel/102/vsc10248/data ]; then
+    mkdir /data/brussel/102/vsc10248/data
+else
+    echo "Processed folder exists, clear first"
+    exit 0
+fi
+if [ ! -d /data/brussel/102/vsc10248/data/processed ]; then
+    mkdir /data/brussel/102/vsc10248/data/processed
+else
+    echo "Processed folder exists clear first"
+    exit 0
+fi
+
+# Queue the tasks
+parallel -j $SLURM_NTASKS srun -N1 -n1 -c1 --exclusive python resample_and_filter.py ::: $(ls -1 /scratch/brussel/102/vsc10248/data/raw)
+wait
+
+# Archive
+tar -zcvf /data/brussel/102/vsc10248/resampled_and_filtered.tar.gz /data/brussel/102/vsc10248/data/processed
