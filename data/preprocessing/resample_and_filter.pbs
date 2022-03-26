@@ -10,13 +10,13 @@ module load parallel/20210622-GCCcore-10.3.0
 if [ ! -d /data/brussel/102/vsc10248/data ]; then
     mkdir /data/brussel/102/vsc10248/data
 else
-    echo "Processed folder exists, clear first"
+    echo "processed folder exists, clear first"
     exit 0
 fi
 if [ ! -d /data/brussel/102/vsc10248/data/processed ]; then
     mkdir /data/brussel/102/vsc10248/data/processed
 else
-    echo "Processed folder exists clear first"
+    echo "processed folder exists clear first"
     exit 0
 fi
 

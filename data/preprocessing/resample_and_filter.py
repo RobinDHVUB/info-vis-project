@@ -14,7 +14,6 @@ def process_subject(subject_folder):
 
         # Pick MEG and EEG
         raw.pick_types(meg='mag', eeg=True, stim=True)
-        print(raw)
 
         # Resample according to Shannon-Nyquist and highest freq band
         raw.resample(250)
