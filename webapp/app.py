@@ -38,28 +38,25 @@ def get_patients():
     return jsonify(results)
 
 
-@app.route('/patient/EEG_MEG', methods=['GET'])
-def get_patient_data():
+
+# http://localhost:5000/patient/EEG_MEG/[1,2,3]/[4,5,6]?id=0
+@app.route('/patient/EEG_MEG/<EEG>/<MEG>', methods=['GET'])
+def get_patient_data(EEG, MEG):
     if 'id' in request.args:
         id = request.args['id']
 
     else:
         return "Error: No id field provided. Please provide patient id"
 
-    if 'EEG' in request.args:
-        EEG_channels = request.args.getlist('EEG')
 
-    else:
-        return "Error: No EEG field provided. Please provide patient EEG channel numbers"
-
-    if 'MEG' in request.args:
-        MEG_channels = request.args.getlist('MEG')
-
-    else:
-        return "Error: No MEG field provided. Please provide patient MEG channel numbers"
 
     patient_id = "{0:03}".format(int(id))
     path_to_patient = f"..\\data\\ICA_processed\\sub{patient_id}"
+
+    print(EEG)
+    print(MEG)
+
+
 
 
 
