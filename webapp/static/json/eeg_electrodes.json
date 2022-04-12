@@ -1,0 +1,84 @@
+[
+        {"name":"Fpz", "location" : {"x":0.50, "y":0.10}},      
+        {"name":"AFz", "location" : {"x":0.50, "y":0.20}},
+        {"name":"Fz", "location": {"x":0.50, "y":0.30}},
+        {"name":"FCz", "location": {"x":0.50, "y":0.40}},
+        {"name":"Cz", "location": {"x":0.50, "y":0.50}},
+        {"name":"CPz", "location":{"x":0.50, "y":0.60}},
+        {"name":"Pz", "location":{"x":0.50, "y":0.70}},
+        {"name":"POz", "location":{"x":0.50, "y":0.80}},
+        {"name":"Oz", "location":{"x":0.50, "y":0.90}},
+      
+        {"name":"T7", "location": {"x":0.10, "y":0.50}},
+        {"name":"C5", "location": {"x":0.20, "y":0.50}},
+        {"name":"C3", "location": {"x":0.30, "y":0.50}},
+        {"name":"C1", "location": {"x":0.40, "y":0.50}},
+        {"name":"C2" , "location": {"x" : 0.60, "y" : 0.50}},
+        {"name":"C4", "location": {"x":0.70, "y":0.50}},
+        {"name":"C6", "location": {"x":0.80, "y":0.50}},
+        {"name":"T8", "location": {"x":0.90, "y":0.50}},
+
+        {"name":"Fp1", "location": {"x":0.378, "y":0.121}},
+        {"name":"AF7", "location": {"x":0.262, "y":0.181}},
+        {"name":"F7", "location": {"x":0.177, "y":0.266}},
+        {"name":"FT7", "location": {"x":0.122, "y":0.377}},
+
+        {"name":"Fp2", "location": {"x":0.622, "y":0.121}},
+        {"name":"AF8", "location": {"x":0.738, "y":0.181}},
+        {"name":"F8", "location": {"x":0.823, "y":0.266}},
+        {"name":"FT8", "location": {"x":0.878, "y":0.377}},
+
+        {"name":"O1", "location": {"x":0.378, "y":0.879}},
+        {"name":"PO7", "location": {"x":0.262, "y":0.819}},
+        {"name":"P7", "location": {"x":0.177, "y":0.734}},
+        {"name":"TP7", "location": {"x":0.122, "y":0.623}},
+
+        {"name":"O2", "location": {"x":0.622, "y":0.879}},
+        {"name":"PO8", "location": {"x":0.738, "y":0.819}},
+        {"name":"P8", "location": {"x":0.823, "y":0.734}},
+        {"name":"TP8", "location": {"x":0.878, "y":0.623}},
+
+        {"name":"AF3", "location": {"x":0.377, "y":0.200}},
+        {"name":"F5", "location": {"x":0.252, "y":0.284}},
+        {"name":"FC5", "location": {"x":0.216, "y":0.390}},
+        {"name":"F3", "location": {"x":0.333, "y":0.294}},
+        {"name":"FC3", "location": {"x":0.311, "y":0.395}},
+        {"name":"F1", "location": {"x":0.418, "y":0.300}},
+        {"name":"FC1", "location": {"x":0.405, "y":0.402}},
+
+        {"name":"AF4", "location": {"x":0.623, "y":0.200}},
+        {"name":"F6", "location": {"x":0.748, "y":0.284}},
+        {"name":"FC6", "location": {"x":0.784, "y":0.390}},
+        {"name":"F4", "location": {"x":0.667, "y":0.294}},
+        {"name":"FC4", "location": {"x":0.689, "y":0.395}},
+        {"name":"F2", "location": {"x":0.582, "y":0.300}},
+        {"name":"FC2", "location": {"x":0.595, "y":0.402}},
+
+        {"name":"PO4", "location": {"x":0.623, "y":0.800}},
+        {"name":"P6", "location": {"x":0.748, "y":0.716}},
+        {"name":"CP6", "location": {"x":0.784, "y":0.610}},
+        {"name":"P4", "location": {"x":0.667, "y":0.706}},
+        {"name":"CP4", "location": {"x":0.689, "y":0.605}},
+        {"name":"P2", "location": {"x":0.582, "y":0.700}},
+        {"name":"CP2", "location": {"x":0.595, "y":0.598}},
+
+        {"name":"PO3", "location": {"x":0.377, "y":0.800}},
+        {"name":"P5", "location": {"x":0.252, "y":0.716}},
+        {"name":"CP5", "location": {"x":0.216, "y":0.610}},
+        {"name":"P5", "location": {"x":0.333, "y":0.706}},
+        {"name":"CP3", "location": {"x":0.311, "y":0.605}},
+        {"name":"P3", "location": {"x":0.418, "y":0.700}},
+        {"name":"CP1", "location": {"x":0.405, "y":0.598}},
+
+        {"name":"F9", "location": {"x":0.082, "y":0.225}},
+        {"name":"FT9", "location": {"x":0.024, "y":0.345}},
+
+        {"name":"F10", "location": {"x":0.918, "y":0.225}},
+        {"name":"FT10", "location": {"x":0.976, "y":0.345}},
+
+        {"name":"P10", "location": {"x":0.918, "y":0.775}},
+        {"name":"TP10", "location": {"x":0.976, "y":0.655}},
+
+        {"name":"P10", "location": {"x":0.082, "y":0.775}},
+        {"name":"TP10", "location": {"x":0.024, "y":0.655}}
+]
