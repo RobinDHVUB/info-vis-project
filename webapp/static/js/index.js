@@ -1,73 +1,8 @@
 drawEEGElectrodeSelector();
 
-// TODO: should we just make the whole component in JS, also the input checkboxes?
-d3.selectAll("#eeg-selection-checkboxes input").on("change", function(d){
-
-    // available electrode types
-    const available_values = ["visual", "motor", "sensory"]
-
-    const isChecked = d3.select(this).property("checked")
-    const boxValue = d3.select(this).property("value")
-
-    // clear selection
-    d3.selectAll("#eeg-selection-container .node-group").classed("selected", false)
-
-    // select all electrodes for which a checkbox is checked
-    checked = []
-    var boxes = d3.selectAll('#eeg-selection-checkboxes input[type="checkbox"]:checked')
-    boxes.each(function() {
-        checked.push(this.value)
-    });
-    available_values.forEach(function(val){
-        if (checked.includes('eeg-'+val)) {
-            d3.selectAll("#eeg-selection-container .eeg-"+val).classed("selected", true)
-        }
-    })
-
-    // select all electrodes that were manually selected
-    new_manual_selection = []
-    manual_selection.forEach(function(val) {
-        if (!val.classed(boxValue)) {
-            val.classed("selected", true)
-            new_manual_selection.push(val)
-        }
-    })
-
-    // update current selection
-    manual_selection = new_manual_selection
-    current_selection = d3.selectAll("#eeg-selection-container .node-group.selected")
-})
-
-var manual_selection = []
-var current_selection = d3.selectAll("#eeg-selection-container .node-group.selected")
-d3.selectAll(".eeg-input-container").on("mouseover", function(){
-    current_selection = d3.selectAll("#eeg-selection-container .node-group.selected")
-    const isChecked = d3.select(this).select("input").property("checked")
-    const boxValue = d3.select(this).select("input").property("value")
-
-    d3.selectAll("#eeg-selection-container .node-group." + boxValue).classed("selected", !isChecked)
-}).on("mouseout", function(){
-        d3.selectAll("#eeg-selection-container .node-group").classed("selected", false)
-        current_selection.classed("selected", true)
-})
-
-
-d3.select(".eeg-all-btn").on("click", function(){
-    d3.selectAll("#eeg-selection-container .node-group").classed("selected", true)
-    d3.selectAll("#eeg-selection-checkboxes input").property("checked", true)
-
-    current_selection = d3.selectAll("#eeg-selection-container .node-group.selected")
-})
-d3.select(".eeg-reset-btn").on("click", function(){
-    d3.selectAll("#eeg-selection-container .node-group").classed("selected", false)
-    d3.selectAll("#eeg-selection-checkboxes input").property("checked", false)
-
-    manual_selection = []
-    current_selection = d3.selectAll("#eeg-selection-container .node-group.selected")
-})
-
 function drawEEGElectrodeSelector()
 {
+    // general sizing info of figure
     const ear_size = 25
     const nose_height = 40
     const electrode_size = 15
@@ -134,7 +69,7 @@ function drawEEGElectrodeSelector()
             .attr("stroke-width", 2)
             .attr("fill", "none");
 
-    // add a horizontal line
+    // add a horizontal midline
     svg.append('line')
     .attr('x1', 0)
     .attr('y1', height/2)
@@ -144,7 +79,7 @@ function drawEEGElectrodeSelector()
     .attr('stroke', 'black')
     .attr("stroke-dasharray", ("3, 3"))
 
-    // add a vertical line
+    // add a vertical midline
     svg.append('line')
     .attr('x1', width/2)
     .attr('y1', 0)
@@ -171,7 +106,7 @@ function drawEEGElectrodeSelector()
         .selectAll("g")
         .data(electrodes)
 
-        /*Create and place the "blocks" containing the circle and the text */
+        /* Generate the nodes */
         var elemEnter = elem.enter()
         .append("g")
         .classed("node-group", true)
@@ -213,13 +148,13 @@ function drawEEGElectrodeSelector()
             d3.select(this).classed("hovering", false)
         });
 
-        /*Create the circle for each block */
-        var circleInner = elemEnter.append("circle")
+        /* Generate the circles for the nodes */
+        elemEnter.append("circle")
         .attr("r", electrode_size)
         .attr("stroke", "black")
         .attr("fill", "yellow")
 
-        /* Create the text for each block */
+        /* Generate the text in the nodes */
         elemEnter.append("text")
         .text(function(d) {
             return d.name
@@ -231,8 +166,77 @@ function drawEEGElectrodeSelector()
     {
         console.log(error)
     });
-}
 
+    // CHECKBOXES
+    // TODO: should we just make the whole component in JS, also the HTML for input checkboxes?
+
+    // keep track of manual and current selections
+    var manual_selection = []
+    var current_selection = d3.selectAll("#eeg-selection-container .node-group.selected")
+
+    d3.selectAll("#eeg-selection-checkboxes input").on("change", function(d){
+
+        // available electrode types
+        const available_values = ["visual", "motor", "sensory"]
+
+        const isChecked = d3.select(this).property("checked")
+        const boxValue = d3.select(this).property("value")
+
+        // clear selection
+        d3.selectAll("#eeg-selection-container .node-group").classed("selected", false)
+
+        // select all electrodes for which a checkbox is checked
+        checked = []
+        var boxes = d3.selectAll('#eeg-selection-checkboxes input[type="checkbox"]:checked')
+        boxes.each(function() {
+            checked.push(this.value)
+        });
+        available_values.forEach(function(val){
+            if (checked.includes('eeg-'+val)) {
+                d3.selectAll("#eeg-selection-container .eeg-"+val).classed("selected", true)
+            }
+        })
+
+        // select all electrodes that were manually selected
+        new_manual_selection = []
+        manual_selection.forEach(function(val) {
+            if (!val.classed(boxValue)) {
+                val.classed("selected", true)
+                new_manual_selection.push(val)
+            }
+        })
+
+        // update current selection
+        manual_selection = new_manual_selection
+        current_selection = d3.selectAll("#eeg-selection-container .node-group.selected")
+    })
+
+    d3.selectAll(".eeg-input-container").on("mouseover", function(){
+        current_selection = d3.selectAll("#eeg-selection-container .node-group.selected")
+        const isChecked = d3.select(this).select("input").property("checked")
+        const boxValue = d3.select(this).select("input").property("value")
+
+        d3.selectAll("#eeg-selection-container .node-group." + boxValue).classed("selected", !isChecked)
+    }).on("mouseout", function(){
+            d3.selectAll("#eeg-selection-container .node-group").classed("selected", false)
+            current_selection.classed("selected", true)
+    })
+
+
+    d3.select(".eeg-all-btn").on("click", function(){
+        d3.selectAll("#eeg-selection-container .node-group").classed("selected", true)
+        d3.selectAll("#eeg-selection-checkboxes input").property("checked", true)
+
+        current_selection = d3.selectAll("#eeg-selection-container .node-group.selected")
+    })
+    d3.select(".eeg-reset-btn").on("click", function(){
+        d3.selectAll("#eeg-selection-container .node-group").classed("selected", false)
+        d3.selectAll("#eeg-selection-checkboxes input").property("checked", false)
+
+        manual_selection = []
+        current_selection = d3.selectAll("#eeg-selection-container .node-group.selected")
+    })
+}
 
 function letsgo() 
 {

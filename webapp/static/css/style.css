@@ -2,8 +2,9 @@ body {
     background-color: lightgrey;
 }
 
-#eeg-selection-container {
-    width: 40%;
+#eeg-selection-container, #emg-selection-container {
+    /*width: 40%;*/
+    display:inline-block;
 }
 
 /* EEG electrode selection */
@@ -38,7 +39,7 @@ body {
 .eeg-visual circle {
     fill: #B4D8EC;
 }
-#eeg-visual-container {
+#eeg-visual-container, #emg-visual-container {
     background-color: #B4D8EC;
     border-radius: 30%;
     display: inline-block;
@@ -48,7 +49,7 @@ body {
 .eeg-motor circle {
     fill: #B6CF9D;
 }
-#eeg-motor-container {
+#eeg-motor-container, #emg-motor-container {
     background-color: #B6CF9D;
     border-radius: 30%;
     display: inline-block;
@@ -62,14 +63,14 @@ label {
 .eeg-sensory circle {
     fill: #F7A6B6;
 }
-#eeg-sensory-container {
+#eeg-sensory-container, #emg-sensory-container {
     background-color: #F7A6B6;
     border-radius: 30%;
     display: inline-block;
     padding: 5px;
 }
 
-#eeg-selection-checkboxes {
+#eeg-selection-checkboxes, #emg-selection-checkboxes {
     text-align: center;
 }
 
@@ -82,4 +83,9 @@ label {
     -moz-user-select: none; /* Firefox */
     -ms-user-select: none; /* IE10+/Edge */
     user-select: none; /* Standard */
+}
+
+.emg-img {
+    margin-top: 40px;
+    margin-bottom: 25px;
 }
