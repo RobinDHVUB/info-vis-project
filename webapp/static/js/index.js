@@ -33,10 +33,10 @@ d3.selectAll("#eeg-selection-checkboxes input").on("change", function(d){
 })
 
 var manual_selection = []
-var current_selection = []
+var current_selection = d3.selectAll("#eeg-selection-container .node-group.selected")
 d3.selectAll(".eeg-input-container").on("mouseover", function(){
-    const isChecked = d3.select(this).select("input").property("checked")
     current_selection = d3.selectAll("#eeg-selection-container .node-group.selected")
+    const isChecked = d3.select(this).select("input").property("checked")
     const boxValue = d3.select(this).select("input").property("value")
     if (boxValue == 'eeg-all') {
         d3.selectAll("#eeg-selection-container .node-group").classed("selected", !isChecked)
@@ -59,7 +59,7 @@ d3.select(".eeg-reset-btn").on("click", function(){
     d3.selectAll("#eeg-selection-checkboxes input").property("checked", false)
 
     manual_selection = []
-    current_selection = []
+    current_selection = d3.selectAll("#eeg-selection-container .node-group.selected")
 })
 
 function drawEEGElectrodeSelector()
