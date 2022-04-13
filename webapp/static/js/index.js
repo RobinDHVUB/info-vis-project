@@ -1,8 +1,68 @@
+drawEEGElectrodeSelector();
 
+// TODO: should we just make the whole component in JS, also the input checkboxes?
+d3.selectAll("#eeg-selection-checkboxes input").on("change", function(d){
 
-draw_head();
+    const available_values = ["visual", "motor", "sensory"]
 
-function draw_head()
+    const isChecked = d3.select(this).property("checked")
+    const boxValue = d3.select(this).property("value")
+
+    checked = []
+    var boxes = d3.selectAll('#eeg-selection-checkboxes input[type="checkbox"]:checked')
+    boxes.each(function() {
+        checked.push(this.value)
+    });
+
+    if (checked.includes('eeg-all')) {
+        d3.selectAll("#eeg-selection-container .node-group").classed("selected", true)
+    }
+    else {
+        d3.selectAll("#eeg-selection-container .node-group").classed("selected", false)
+        available_values.forEach(function(val){
+            if (checked.includes('eeg-'+val)) {
+                d3.selectAll("#eeg-selection-container .eeg-"+val).classed("selected", true)
+            }
+        })
+    }
+
+    manual_selection.forEach(function(val) {
+        val.classed("selected", true)
+    })
+    current_selection = d3.selectAll("#eeg-selection-container .node-group.selected")
+})
+
+var manual_selection = []
+var current_selection = []
+d3.selectAll(".eeg-input-container").on("mouseover", function(){
+    const isChecked = d3.select(this).select("input").property("checked")
+    current_selection = d3.selectAll("#eeg-selection-container .node-group.selected")
+    const boxValue = d3.select(this).select("input").property("value")
+    if (boxValue == 'eeg-all') {
+        d3.selectAll("#eeg-selection-container .node-group").classed("selected", !isChecked)
+    } 
+    else {
+        d3.selectAll("#eeg-selection-container .node-group." + boxValue).classed("selected", !isChecked)
+    }
+    if (isChecked) {
+        manual_selection.forEach(function(val) {
+            val.classed("selected", true)
+        })
+    }
+}).on("mouseout", function(){
+        d3.selectAll("#eeg-selection-container .node-group").classed("selected", false)
+        current_selection.classed("selected", true)
+})
+
+d3.select(".eeg-reset-btn").on("click", function(){
+    d3.selectAll("#eeg-selection-container .node-group").classed("selected", false)
+    d3.selectAll("#eeg-selection-checkboxes input").property("checked", false)
+
+    manual_selection = []
+    current_selection = []
+})
+
+function drawEEGElectrodeSelector()
 {
     const ear_size = 25
     const nose_height = 40
@@ -11,7 +71,7 @@ function draw_head()
     const margin = {top: 25+nose_height, right: 25+ear_size, bottom: 25, left: 25+ear_size};
 
 
-    const svg = d3.select(".container")
+    const svg = d3.select("#eeg-selection-container")
                   .append("svg")
                   .attr("class","eeg_head")
                   .attr("width", width + margin.left + margin.right + 2*ear_size)
@@ -34,7 +94,7 @@ function draw_head()
     svg.append("path")
     .attr("transform", "translate(0," + height/2 + ")")
     .attr("d", d3.arc()
-      .innerRadius( 0 )
+      .innerRadius( ear_size )
       .outerRadius( ear_size )
       .startAngle( 3.14 )     // angle is in radian (pi = 3.14 = bottom).
       .endAngle( 6.28 )       // 2*pi = 6.28 = top
@@ -47,7 +107,7 @@ function draw_head()
     svg.append("path")
     .attr("transform", "translate("+ width +"," + height/2 + ")")
     .attr("d", d3.arc()
-        .innerRadius( 0 )
+        .innerRadius( ear_size )
         .outerRadius( ear_size )
         .startAngle( -3.14 ) 
         .endAngle( -6.28 )  
@@ -111,27 +171,38 @@ function draw_head()
         var elemEnter = elem.enter()
         .append("g")
         .classed("node-group", true)
+        .each(function(d) {
+            const electrodeName = d.name.toLowerCase()
+            this.classList.add(electrodeName)
+            this.classList.add(d.types.map(i => 'eeg-' + i).join(" "))
+        })
+        .attr("data-electrode", d => d.name.toLowerCase())
         .attr("transform", function(d) {
-            console.log(d.location.y)
           return "translate(" + d.location.x*width + ","+d.location.y*height+")"
         })
         .on("click", 
         function(){
-            var temp = d3.select(this).select("circle.clicked")
-            if (temp.empty()) {
-                d3.select(this).select("circle:not(.clicked)").classed("clicked", true).attr("fill", "blue")
+            selected = d3.select(this).classed("selected")
+            d3.select(this).classed("selected", !selected)
+            if (!selected) {
+                manual_selection.push(d3.select(this))
             }
             else {
-                d3.select(this).select("circle.clicked").classed("clicked", false).attr("fill", "yellow")
+                current_this = d3.select(this)
+                manual_selection = manual_selection.filter(function(ele){ 
+                    return ele.attr("data-electrode") != current_this.attr("data-electrode"); 
+                });
             }
+
+            d3.select(this).classed("hovering", false)
         })
         .on("mouseover", 
         function(){
-            d3.select(this).select("circle").attr("fill", "blue")
+            d3.select(this).classed("hovering", true)
         })
         .on("mouseout",
         function(){
-            d3.select(this).select("circle:not(.clicked)").attr("fill", "yellow")
+            d3.select(this).classed("hovering", false)
         });
 
         /*Create the circle for each block */
@@ -153,33 +224,14 @@ function draw_head()
         console.log(error)
     });
 }
-              
-function drawExample(shape) {
-    if (shape == 'circle') {
-        var squareSelection = d3.select("svg.border");
 
-        var circleSelection = squareSelection.selectAll('circle')
 
-        if (circleSelection.empty()) {
-            squareSelection.append("circle")
-            .attr("cx", 25)
-            .attr("cy", 25)
-            .attr("r", 25)
-            .style("fill", "purple");
-        }
-        else {
-            var xcoo = circleSelection.filter(function(d, i, list) {
-                console.log(d)
-                console.log(i)
-                console.log(list)
-                return i === list.length - 1;
-            }).attr('cx');
-
-            squareSelection.append("circle")
-            .attr("cx", (2*25 + parseInt(xcoo)))
-            .attr("cy", 25)
-            .attr("r", 25)
-            .style("fill", "yellow");
-        }
-    }
+function letsgo() 
+{
+    const values = []
+    d3.selectAll('#eeg-selection-container .node-group.selected').each(function() {
+        values.push(d3.select(this).attr("data-electrode"))
+    });
+    
+    console.log(values)
 }

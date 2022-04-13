@@ -1,3 +1,85 @@
 body {
     background-color: lightgrey;
 }
+
+#eeg-selection-container {
+    width: 40%;
+}
+
+/* EEG electrode selection */
+.node-group {
+    cursor: pointer;
+}
+
+.node-group > circle {
+    fill: yellow;
+}
+
+.node-group > circle {
+    fill: yellow;
+}
+
+.node-group.hovering.selected > circle {
+    stroke-width: 1;
+}
+
+.node-group.hovering.selected > text {
+    font-weight: normal;
+}
+
+.node-group.selected > circle, .node-group.hovering:not(.selected) > circle {
+    stroke-width: 5;
+}
+
+.node-group.selected > text, .node-group.hovering:not(.selected) > text {
+    font-weight: bold;
+}
+
+.eeg-visual circle {
+    fill: #B4D8EC;
+}
+#eeg-visual-container {
+    background-color: #B4D8EC;
+    border-radius: 30%;
+    display: inline-block;
+    padding: 5px;
+}
+
+.eeg-motor circle {
+    fill: #B6CF9D;
+}
+#eeg-motor-container {
+    background-color: #B6CF9D;
+    border-radius: 30%;
+    display: inline-block;
+    padding: 5px;
+}
+
+label {
+    margin: 0;
+}
+
+.eeg-sensory circle {
+    fill: #F7A6B6;
+}
+#eeg-sensory-container {
+    background-color: #F7A6B6;
+    border-radius: 30%;
+    display: inline-block;
+    padding: 5px;
+}
+
+#eeg-selection-checkboxes {
+    text-align: center;
+}
+
+.eeg-reset-btn {
+    cursor: pointer;
+}
+
+.node-group text {
+    -webkit-user-select: none; /* Safari */        
+    -moz-user-select: none; /* Firefox */
+    -ms-user-select: none; /* IE10+/Edge */
+    user-select: none; /* Standard */
+}
