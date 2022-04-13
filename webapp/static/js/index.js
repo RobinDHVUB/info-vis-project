@@ -105,7 +105,7 @@ function drawEEGElectrodeSelector()
         .y(function(d) { return d.y; })
         .curve(d3.curveBasis);
 
-    var lineData = [ { "x": width/2-25,   "y": 1}, { "x": width/2,  "y": -40}, { "x": width/2+25,  "y": 1}];
+    var lineData = [ { "x": width/2-ear_size,   "y": 1}, { "x": width/2,  "y": -nose_height}, { "x": width/2+ear_size,  "y": 1}];
 
     svg.append("path")
             .attr("d", bezierLine(lineData))
