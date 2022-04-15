@@ -1,7 +1,5 @@
 {% extends 'base.html' %} {% block content %}
 
-
-
   <div class="row">
     <div class="col-2" id="subject-selection-container">
       {% include 'subject-selection.html' %}
@@ -17,13 +15,119 @@
     <button onclick="letsgo()">GO</button>
 <script src="/static/js/index.js" charset="utf-8"></script>
 
-{{ script|safe }}
+    {{ script|safe }}
 
 <script>
+function updateTable(newdata) {
+  var table = d3.select("#subject-selection-container table tbody");
+
+  var rows = table.selectAll("tbody tr")
+    .data(newdata, function (d) {return d.id;});
+
+  rows.enter()
+    .append('tr')
+    .selectAll("td")
+    .data(function (d) {return [d.id, d.age, d.gender];})
+    .enter()
+    .append("td")
+    .text(function(d) { return d; });
+
+  rows.exit().remove();
+}
+
+function updateSelect(newdata) {
+  var select = d3.select("#subject-selection select");
+
+  var options = select.selectAll("option")
+    .data(newdata, function (d) {return d.id;});
+
+  options.enter()
+    .append('option')
+    .text(function(d) {return "Subject " + d.id + " (" + d.gender + ", " + d.age + ")"})
+
+  options.exit().remove();
+}
+
+function addSlider(data) {
+    // Range
+  var sliderRange = d3
+    .sliderBottom()
+    .min(d3.min(data, d => d.age))
+    .max(d3.max(data, d => d.age))
+    .width(300)
+    .tickFormat(d3.format(',d'))
+    .ticks(5)
+     .step(1)
+    .default([0, 20])
+    .fill('#2196f3')
+          .on('onchange', val => {
+            bottom_val = val[0]
+            top_val = val[1]
+
+      new_data = data.filter(function(d) {
+        return d.age >= bottom_val && d.age <= top_val
+      });
+
+      updateSelect(new_data)
+    });
+
+  var gRange = d3
+    .select('div#slider-range')
+    .append('svg')
+    .attr('width', 500)
+    .attr('height', 100)
+    .append('g')
+    .attr('transform', 'translate(30,30)');
+
+  gRange.call(sliderRange);
+}
+
 $(document).ready(function() {
-    var slider = new Slider('#ex2', {})
-    $('.js-example-basic-multiple').select2();
-});</script>
+
+d3.json("static/json/subjects.json").then(function(subjects)
+{
+  addSlider(subjects)
+
+  var select_data = new Set(subjects)
+  var table_data = new Set()
+
+  updateSelect(subjects)
+
+ // $('.js-example-basic-multiple').select2()
+
+  d3.select("#add-selection").on("click", function(){
+    var new_data = d3.selectAll("#subject-selection option:checked").data()
+
+    new_data.forEach(function (el) {
+      table_data.add(el)
+      select_data.delete(el)
+    })
+
+    updateTable(table_data)
+    updateSelect(select_data)
+  })
+
+  d3.selectAll("#subject-gender input").on("change", function(d) {
+    chosen_gender = this.value
+    console.log(chosen_gender)
+    if (chosen_gender !== 'all') {
+      new_data = d3.selectAll("#subject-selection option").data().filter(function(d) {
+        console.log(d.gender)
+        console.log(chosen_gender)
+        return d.gender === chosen_gender
+      });
+      updateSelect(new_data)
+    }
+  })
+
+}).catch(function(error)
+{
+    console.log(error)
+});
+
+});
+
+</script>
 
 
 

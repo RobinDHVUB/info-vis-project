@@ -1,34 +1,44 @@
-    <h3>Add subjects</h3>
+<h3>Add subjects</h3>
+<div id="subject-gender">
     <div class="form-check">
-      <input class="form-check-input" type="radio" name="gender" id="all" checked>
+      <input class="form-check-input" type="radio" name="gender" id="all" value="all" checked>
       <label class="form-check-label" for="all">
         All
       </label>
     </div>
     <div class="form-check">
-      <input class="form-check-input" type="radio" name="gender" id="male">
+      <input class="form-check-input" type="radio" name="gender" id="male" value="m">
       <label class="form-check-label" for="male">
         Male
       </label>
     </div>
     <div class="form-check">
-      <input class="form-check-input" type="radio" name="gender" id="female">
+      <input class="form-check-input" type="radio" name="gender" id="female" value="f">
       <label class="form-check-label" for="female">
         Female
       </label>
     </div>
+</div>
 
-<input id="ex2"
-       type="text"
-       class="span2"
-       value=""
-       data-slider-min="10"
-       data-slider-max="1000"
-       data-slider-step="5"
-       data-slider-value="[250,450]"/>
+<div id="subject-age">
+    <div id="slider-range"></div>
+</div>
 
-<select class="js-example-basic-multiple" name="states[]" multiple="multiple">
-  <option value="AL">Alabama</option>
-    ...
-  <option value="WY">Wyoming</option>
-</select>
+<div id="subject-selection">
+    <select class="js-example-basic-multiple" name="states[]" multiple="multiple">
+    </select><br>
+    <button id="add-selection">Add selected objects</button>
+</div>
+
+<div id="subject-results">
+    <table>
+        <thead>
+            <tr>
+                <th>Subject</th>
+                <th>Age</th>
+                <th>Gender</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+</div>
