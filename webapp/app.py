@@ -85,37 +85,5 @@ def show_data():
     return jsonify(results)
 
 
-
-# http://localhost:5000/patient/EEG_MEG/[1,2,3]/[4,5,6]?id=0
-@app.route('/patient/EEG_MEG/<EEG>/<MEG>', methods=['GET'])
-def get_patient_data(EEG, MEG):
-    if 'id' in request.args:
-        id = request.args['id']
-
-    else:
-        return "Error: No id field provided. Please provide patient id"
-
-
-
-
-
-    print(EEG)
-    print(MEG)
-
-
-
-
-
-    """
-    call the correct channels, return template with those channels that are shown
-    """
-
-    results = []
-
-
-    # return render_template('template', patients = results)
-    return jsonify(results)
-
-
 if __name__ == "__main__":
     app.run(debug=True, host='localhost', port=5000)
