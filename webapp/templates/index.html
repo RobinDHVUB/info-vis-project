@@ -1,15 +1,20 @@
 {% extends 'base.html' %} {% block content %}
-<p>{{ paragraph_title }}</p>
-<div id="subject-selection-container">
-    {% include 'subject-selection.html' %}
-</div>
-<div id="eeg-selection-container">
-    {% include 'eeg-selection.html' %}
-</div>
-<div id="emg-selection-container">
-    {% include 'emg-selection.html' %}
-</div>
-<button onclick="letsgo()">GO</button>
+
+
+
+  <div class="row">
+    <div class="col-2" id="subject-selection-container">
+      {% include 'subject-selection.html' %}
+    </div>
+    <div class="col-5" id="eeg-selection-container">
+      {% include 'eeg-selection.html' %}
+    </div>
+    <div class="col-5" id="emg-selection-container">
+      {% include 'emg-selection.html' %}
+    </div>
+  </div>
+
+    <button onclick="letsgo()">GO</button>
 <script src="/static/js/index.js" charset="utf-8"></script>
 
     {{ script|safe }}
@@ -19,5 +24,8 @@ $(document).ready(function() {
     var slider = new Slider('#ex2', {})
     $('.js-example-basic-multiple').select2();
 });</script>
+
+
+
 
 {% endblock %}
