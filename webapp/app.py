@@ -1,7 +1,10 @@
+import os
+
 from flask import Flask, render_template, request, jsonify
 
 from bokeh.client import pull_session
 from bokeh.embed import server_document
+import mne
 import ast
 
 app = Flask(__name__)
@@ -13,10 +16,12 @@ def index():
 
 
     # generate a script to load the customized session
-    script = server_document(url='http://localhost:5006/bokeh_app', arguments={"eeg":"fp,p2,f4"})
+    #script = server_document(url='http://localhost:5006/bokeh_app', arguments={"eeg":"fp,p2,f4"})
+
+
 
     return render_template('index.html',
-                           script=script,
+                           #script=script,
                            title="Info Viz Example",
                            paragraph_title="Testing123")
 
@@ -73,8 +78,10 @@ def show_data():
 
     results = []
 
-    # patient_id = "{0:03}".format(int(id))
-    # path_to_patient = f"..\\data\\ICA_processed\\sub{patient_id}"
+    patient_id = "{0:03}".format(int(id[0]))
+    parent_dir = os.path.abspath(os.pardir)
+    path_to_patient = parent_dir + f"\\data\\ICA_processed\\sub{patient_id}\\0.fif"
+
 
 
     print(EEG.split(","))
@@ -82,7 +89,12 @@ def show_data():
     # print(ast.literal_eval(MEG))
 
     # return render_template('template', patients = results)
-    return jsonify(results)
+
+    script = server_document(url='http://localhost:5006/bokeh_app', arguments={"eeg": "fp,p2,f4"})
+    return render_template('index.html',
+                           script=script,
+                           title="Info Viz Example",
+                           paragraph_title="Testing123")
 
 
 if __name__ == "__main__":

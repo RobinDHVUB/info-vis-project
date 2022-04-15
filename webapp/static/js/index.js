@@ -213,5 +213,6 @@ function letsgo()
     });
     
     console.log(values);
-    location.href = `http://localhost:5000/data?id=0&id=1&MEG=[1,2,3,4]&EEG=${values}`;
+    /* location.href = `http://localhost:5000/data?id=1&MEG=[1,2,3,4]&EEG=${values}`; */
+    location.href = `http://localhost:5006/bokeh_app`;
 }
