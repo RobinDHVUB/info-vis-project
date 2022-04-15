@@ -206,13 +206,19 @@ function drawEEGElectrodeSelector()
 
 function letsgo() 
 {
-    const values = []
-    d3.selectAll('#eeg-selection-container .node-group.selected').each(function() {
-        values.push(d3.select(this).attr("data-electrode"))
-
+    var eeg_values = []
+    d3.selectAll('#eeg-selection-container .node-group.selected').data().forEach(function(d) {
+        eeg_values.push(d.name)
     });
-    
-    console.log(values);
-    /* location.href = `http://localhost:5000/data?id=1&MEG=[1,2,3,4]&EEG=${values}`; */
+
+    var subject_ids = []
+    d3.selectAll('#subject-results tr').select("td").data().forEach(function(d) {
+        subject_ids.push(d.id)
+    });
+
+    console.log(eeg_values)
+    console.log(subject_ids)
+
+    /* location.href = `http://localhost:5000/data?id=1&MEG=[1,2,3,4]&EEG=${eeg_values}`; */
     location.href = `http://localhost:5006/bokeh_app`;
 }
