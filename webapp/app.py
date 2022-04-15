@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request, jsonify
 
 from bokeh.client import pull_session
-from bokeh.embed import server_session
+from bokeh.embed import server_document
 
 app = Flask(__name__)
 
@@ -9,15 +9,15 @@ app = Flask(__name__)
 @app.route('/index', methods=['GET'])
 def index():
     # pull a new session from a running Bokeh server
-    with pull_session(url="http://localhost:5006/bokeh_app") as session:
 
-        # generate a script to load the customized session
-        script = server_session(session_id=session.id, url='http://localhost:5006/bokeh_app')
 
-        return render_template('index.html',
-                               script=script,
-                               title="Info Viz Example",
-                               paragraph_title="Testing123")
+    # generate a script to load the customized session
+    script = server_document(url='http://localhost:5006/bokeh_app', arguments={"eeg":"fp,p2,f4"})
+
+    return render_template('index.html',
+                           script=script,
+                           title="Info Viz Example",
+                           paragraph_title="Testing123")
 
 
 patients = [
