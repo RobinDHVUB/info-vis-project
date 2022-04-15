@@ -209,7 +209,9 @@ function letsgo()
     const values = []
     d3.selectAll('#eeg-selection-container .node-group.selected').each(function() {
         values.push(d3.select(this).attr("data-electrode"))
+
     });
     
-    console.log(values)
+    console.log(values);
+    location.href = `http://localhost:5000/data?id=0&id=1&MEG=[1,2,3,4]&EEG=${values}`;
 }

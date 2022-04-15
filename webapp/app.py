@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, jsonify
 
 from bokeh.client import pull_session
 from bokeh.embed import server_document
+import ast
 
 app = Flask(__name__)
 
@@ -49,6 +50,40 @@ def get_patients():
     # return render_template('template', patients = results)
     return jsonify(results)
 
+@app.route('/data', methods=['GET'])
+def show_data():
+    if 'id' in request.args:
+        id = request.args.getlist('id')
+
+    else:
+        return "Error: No id field provided. Please provide patient id"
+
+    if 'MEG' in request.args:
+        MEG = request.args.get('MEG')
+
+    else:
+        return "Error: No MEG field provided. Please provide patient MEG"
+
+
+    if 'EEG' in request.args:
+        EEG = request.args.get('EEG')
+
+    else:
+        return "Error: No EEG field provided. Please provide patient EEg"
+
+    results = []
+
+    # patient_id = "{0:03}".format(int(id))
+    # path_to_patient = f"..\\data\\ICA_processed\\sub{patient_id}"
+
+
+    print(EEG.split(","))
+    # print(ast.literal_eval(EEG))
+    # print(ast.literal_eval(MEG))
+
+    # return render_template('template', patients = results)
+    return jsonify(results)
+
 
 
 # http://localhost:5000/patient/EEG_MEG/[1,2,3]/[4,5,6]?id=0
@@ -62,8 +97,7 @@ def get_patient_data(EEG, MEG):
 
 
 
-    patient_id = "{0:03}".format(int(id))
-    path_to_patient = f"..\\data\\ICA_processed\\sub{patient_id}"
+
 
     print(EEG)
     print(MEG)
