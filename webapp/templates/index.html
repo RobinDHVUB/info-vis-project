@@ -21,7 +21,7 @@
     {{ script|safe }}
 
 <script>
-function updateTable(newdata) {
+function updateTable(newdata, deletionCallback) {
   var table = d3.select("#subject-selection-container table tbody");
 
   var rows = table.selectAll("tbody tr")
@@ -30,11 +30,17 @@ function updateTable(newdata) {
   var temp = rows.enter()
     .append('tr')
     .selectAll("td")
-    .data(function (d) {return [d.id, d.age, d.gender];})
+
+
+    temp.data(function (d) {return [d.id, d.age, d.gender];})
     .enter()
     .append("td")
     .text(function(d) { return d; })
 
+    temp.data(function(d) {return d.id;}).enter().append("td").text("X").on("click", function(d) {
+      var tempos = d3.select(this).data()[0]
+      deletionCallback(tempos)
+    })
 
   rows.exit().remove();
 }
@@ -142,7 +148,7 @@ d3.json("static/json/subjects.json").then(function(subjects)
       select_data.delete(el)
     })
 
-    updateTable(table_data)
+    updateTable(table_data, delCallback)
     updateSelect(select_data)
   })
 
@@ -150,6 +156,21 @@ d3.json("static/json/subjects.json").then(function(subjects)
     console.log("euhm")
       updateSelect(select_data)
   })
+
+  function delCallback(id_to_return) {
+    console.log("ok")
+    var element = undefined
+    table_data.forEach(function (el) {
+      console.log(el)
+      if (el.id === id_to_return) {
+        element = el
+      }
+    })
+    table_data.delete(element)
+    select_data.add(element)
+    updateTable(table_data)
+    updateSelect(select_data)
+  }
 
 }).catch(function(error)
 {
