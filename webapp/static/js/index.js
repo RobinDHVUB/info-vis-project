@@ -50,14 +50,14 @@ function drawEEGElectrodeSelector()
     const ear_size = 25
     const nose_height = 40
     const electrode_size = 15
-    const width = 512, height = 512;
+    const width = 450, height = 450;
     const margin = {top: 25+nose_height, right: 25+ear_size, bottom: 25, left: 25+ear_size};
 
 
     const svg = d3.select("#eeg-selection-container")
                   .append("svg")
                   .attr("class","eeg_head")
-                  .attr("width", width + margin.left + margin.right + 2*ear_size)
+                  .attr("width", width + margin.left + margin.right)
                   .attr("height", height + margin.top + margin.bottom)
                   .append("g")
                   .attr("transform", "translate(" + margin.left +","+ margin.top +")");

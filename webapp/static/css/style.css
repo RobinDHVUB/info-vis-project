@@ -5,6 +5,7 @@ body {
 #eeg-selection-container, #emg-selection-container {
     /*width: 40%;*/
     display:inline-block;
+    text-align: center;
 }
 
 /* EEG electrode selection */
@@ -95,4 +96,12 @@ label {
 
 table {
     width: 100%;
+}
+
+.eeg-head {
+    display: inline-block;
+}
+
+#eeg-selection-container {
+    text-align: center;
 }
