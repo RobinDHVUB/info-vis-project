@@ -25,7 +25,7 @@ args = curdoc().session_context.request.arguments
 """
 Hardcoded path to patient
 """
-TOOLS = 'save,pan,box_zoom,reset'
+TOOLS = 'save,xpan,wheel_zoom, reset'
 parent_dir = os.path.abspath(os.pardir)
 path_to_patient = parent_dir + f"\\data\\ICA_processed\\sub001\\0.fif"
 mne_result = mne.io.read_raw_fif(path_to_patient)
@@ -33,7 +33,6 @@ mne_result = mne.io.read_raw_fif(path_to_patient)
 start = 200
 step = 3000
 current = 200
-x = range(current)
 max_len = len(mne_result.get_data()[0, :])
 
 
@@ -47,8 +46,8 @@ def start_eeg(channels=[0]):
                 y=mne_result.get_data()[channel, :start]))
         sources.append(source)
 
-        p = figure(title="Year-wise total number of crimes", y_axis_type="linear", plot_height=400,
-                   tools=TOOLS, plot_width=800, output_backend="canvas", x_range=(100, 200))
+        p = figure(title="Year-wise total number of crimes", plot_height=300,
+                   tools=TOOLS, plot_width=600, output_backend="canvas", x_range=(100, 200))
         p.xaxis.axis_label = 'Year'
         p.yaxis.axis_label = 'Total Crimes'
         p.line(x='x', y='y', line_color="purple", line_width=3, source=source)
@@ -60,7 +59,7 @@ def start_eeg(channels=[0]):
     return sources, channels
 
 
-sources, channels = start_eeg([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19])
+sources, channels = start_eeg([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19])
 
 a = 1
 
@@ -81,7 +80,7 @@ def update_callback():
     global a
     global current
     global sources
-    new_current = current + (a * step)
+    new_current = current + step
     for source, channel, idx in zip(sources, channels, range(len(channels))):
         new_mne_data = mne_result.get_data()[channel, current:new_current]
         x = np.arange(current, new_current, 1)
@@ -102,4 +101,4 @@ button.on_click(reset_data)
 # put the button and plot in a layout and add to the document
 # curdoc().add_root(column(p2, p3, p4, p5, p6, p7, p8))
 curdoc().add_root(column(button))
-pc_id = curdoc().add_periodic_callback(update_callback, 5000)
+pc_id = curdoc().add_periodic_callback(update_callback, 3000)
