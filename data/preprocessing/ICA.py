@@ -1,6 +1,13 @@
 import mne
 import os
 from mne.preprocessing import ICA
+import matplotlib.pyplot as plt
+
+
+# Verify if processed folder exists
+if not os.path.isdir("data/processed"):
+    print("Processed data not found, process first!")
+    quit()
 
 # Create ICA-processed folder
 if os.path.isdir("data/ICA_processed"):
@@ -10,7 +17,7 @@ else:
     os.mkdir("data/ICA_processed")
 
 # Log file
-with open('data/ICA_processed/excluded_comps.txt', 'w') as f:
+with open("data/ICA_processed/excluded_comps.txt", "w") as f:
 
     # Loop over subjects
     for subject_folder in os.listdir("data/processed"):
@@ -19,26 +26,29 @@ with open('data/ICA_processed/excluded_comps.txt', 'w') as f:
         os.mkdir("data/ICA_processed/" + subject_folder)
 
         # Loop over runs
-        for run_id, run_file in enumerate(os.listdir("data/processed/" + subject_folder)):
+        for run_id, run_file in enumerate(
+            os.listdir("data/processed/" + subject_folder)
+        ):
 
             # Read raw
-            raw = mne.io.read_raw_fif("data/processed/" + subject_folder + "/" + run_file)
+            raw = mne.io.read_raw_fif(
+                "data/processed/" + subject_folder + "/" + run_file
+            )
 
-            ica = ICA(n_components=20, max_iter='auto', random_state=97)
+            ica = ICA(n_components=20, max_iter="auto", random_state=97)
             ica.fit(raw)
 
             # Plotting components
             raw.load_data()
             ica.plot_sources(raw, show_scrollbars=True, block=True)
 
-
             # Ask for components to exclude
             string_input = input("Components to exclude (comma separated): ")
             to_exclude = [int(comp) for comp in string_input.split(",")]
 
             # Plotting reconstructions if needed
-            ica.plot_overlay(raw, exclude=to_exclude, picks='eeg')
-            ica.plot_overlay(raw, exclude=to_exclude, picks='mag')
+            ica.plot_overlay(raw, exclude=to_exclude, picks="eeg")
+            ica.plot_overlay(raw, exclude=to_exclude, picks="mag")
 
             # Applying repair
             ica.exclude = to_exclude
