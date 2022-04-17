@@ -3,3 +3,4 @@ data/processed
 data/ICA_processed
 data/metadata
 **/*.tar.gz
+**/.idea

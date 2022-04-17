@@ -1,12 +1,11 @@
 import mne
 import os
 from mne.preprocessing import ICA
-import matplotlib.pyplot as plt
 
 
 # Verify if processed folder exists
 if not os.path.isdir("data/processed"):
-    print("Processed data not found, process first!")
+    print("processed data not found, process first!")
     quit()
 
 # Create ICA-processed folder
