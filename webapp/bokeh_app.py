@@ -46,10 +46,10 @@ def start_eeg(channels=[0]):
                 y=mne_result.get_data()[channel, :start]))
         sources.append(source)
 
-        p = figure(title="Year-wise total number of crimes", plot_height=300,
+        p = figure(title="Electrode_name", plot_height=300,
                    tools=TOOLS, plot_width=600, output_backend="canvas", x_range=(100, 200))
-        p.xaxis.axis_label = 'Year'
-        p.yaxis.axis_label = 'Total Crimes'
+        p.xaxis.axis_label = 'samples'
+        p.yaxis.axis_label = 'µV'
         p.line(x='x', y='y', line_color="purple", line_width=3, source=source)
 
         obj_list.append(p)
