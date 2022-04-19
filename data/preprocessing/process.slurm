@@ -19,7 +19,7 @@ else
 fi
 
 # Queue the tasks
-parallel --delay 0.2 -j $SLURM_NTASKS --joblog runtask.log --resume srun -n1 -n4 python process.py {} ::: $(ls -1 /scratch/brussel/102/vsc10248/data/raw)
+parallel --delay 0.2 -j $SLURM_NTASKS --joblog runtask.log --resume srun -n1 -c4 python process.py {} ::: $(ls -1 /scratch/brussel/102/vsc10248/data/raw)
 wait
 
 # Archive
