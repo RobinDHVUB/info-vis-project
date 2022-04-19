@@ -7,6 +7,9 @@
 module load Python/3.9.5-GCCcore-10.3.0
 module load parallel/20210622-GCCcore-10.3.0
 
+# Cwd
+cd ~/info-vis-project
+
 # Create processed folder
 if [ ! -d /data/brussel/102/vsc10248/data ]; then
     mkdir /data/brussel/102/vsc10248/data
