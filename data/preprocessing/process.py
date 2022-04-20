@@ -25,7 +25,8 @@ def process_subject(subject_folder, raw_folder, processed_folder):
 
         # Read raw
         raw = mne.io.read_raw_fif(
-            raw_folder + "/data/raw/" + subject_folder + "/" + run_file
+            raw_folder + "/data/raw/" + subject_folder + "/" + run_file,
+            preload=True
         )
 
         # Do once
