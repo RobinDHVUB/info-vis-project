@@ -4,8 +4,8 @@
 #SBATCH --ntasks=19
 #SBATCH --cpus-per-task=4
 
-module load Python/3.9.5-GCCcore-10.3.0
-module load parallel/20210622-GCCcore-10.3.0
+module load Python/3.9.6-GCCcore-11.2.0
+module load parallel/20210722-GCCcore-11.2.0
 
 # Cwd
 cd ~/info-vis-project
