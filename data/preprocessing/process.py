@@ -5,19 +5,19 @@ import json
 import numpy
 
 
-def process_subject(subject_folder):
+def process_subject(subject_folder, raw_folder, processed_folder):
 
     # Make folder for subject
-    os.mkdir("/data/brussel/102/vsc10248/data/processed/" + subject_folder)
+    os.mkdir(processed_folder +"/data/processed/" + subject_folder)
 
     # Loop over runs
     for run_id, run_file in enumerate(
-        os.listdir("/scratch/brussel/102/vsc10248/data/raw/" + subject_folder)
+        os.listdir(raw_folder + "/data/raw/" + subject_folder)
     ):
 
         # Make folder for run
         os.mkdir(
-            "/data/brussel/102/vsc10248/data/processed/"
+            processed_folder + "data/processed/"
             + subject_folder
             + "/run"
             + str(run_id)
@@ -25,7 +25,7 @@ def process_subject(subject_folder):
 
         # Read raw
         raw = mne.io.read_raw_fif(
-            "/scratch/brussel/102/vsc10248/data/raw/" + subject_folder + "/" + run_file
+            raw_folder + "/data/raw/" + subject_folder + "/" + run_file
         )
 
         # Do once
@@ -34,7 +34,7 @@ def process_subject(subject_folder):
             # Get and save subject metadata
             # See: https://mne.tools/dev/generated/mne.Info.html
             with open(
-                "data/processed/" + subject_folder + "/info.json", "w"
+                processed_folder + "/data/processed/" + subject_folder + "/info.json", "w"
             ) as outfile:
                 json.dump(raw.info["subject_info"], outfile)
 
@@ -42,15 +42,15 @@ def process_subject(subject_folder):
             meg_coords = mne.channels.find_layout(raw.info, ch_type="mag").pos
             meg_names = mne.channels.find_layout(raw.info, ch_type="mag").names
             numpy.save(
-                "data/processed/" + subject_folder + "/meg_coords.npy", meg_coords
+                processed_folder + "/data/processed/" + subject_folder + "/meg_coords.npy", meg_coords
             )
-            numpy.save("data/processed/" + subject_folder + "/meg_names.npy", meg_names)
+            numpy.save(processed_folder + "/data/processed/" + subject_folder + "/meg_names.npy", meg_names)
 
         # Get and save EEG coords and names (can vary per run)
         eeg_coords = mne.channels.find_layout(raw.info, ch_type="eeg").pos
         eeg_names = mne.channels.find_layout(raw.info, ch_type="eeg").names
         numpy.save(
-            "data/processed/"
+            processed_folder + "/data/processed/"
             + subject_folder
             + "/run"
             + str(run_id)
@@ -58,7 +58,7 @@ def process_subject(subject_folder):
             eeg_coords,
         )
         numpy.save(
-            "data/processed/"
+            processed_folder + "/data/processed/"
             + subject_folder
             + "/run"
             + str(run_id)
@@ -87,31 +87,29 @@ def process_subject(subject_folder):
         ecg_indices, ecg_scores = ica.find_bads_ecg(
             raw, method="correlation", threshold="auto"
         )  # Use ECG to find bad components
-        ica.exclude = eog_indices + ecg_indices
-        ica.fit(raw)  # Apply
-
-        # Plot ICA comps for first 10 seconds
-        plot = ica.plot_sources(raw, stop=10, show_scrollbars=False)
+        plot = ica.plot_sources(raw, stop=10, show_scrollbars=False) # Plot ICA comps for first 10 seconds
         plot.savefig(
-            "/data/brussel/102/vsc10248/data/processed/"
+            processed_folder + "/data/processed/"
             + subject_folder
             + "/run"
             + str(run_id)
             + "/ICA.pdf"
         )
+        ica.exclude = eog_indices + ecg_indices
+        ica.fit(raw)  # Apply
 
         # Pick MEG, EEG and stim channels
         raw.pick_types(meg="mag", eeg=True, stim=True)
 
         # Save
         raw.save(
-            "/data/brussel/102/vsc10248/data/processed/"
+            processed_folder + "/data/processed/"
             + subject_folder
-            + "/"
+            + "/run"
             + str(run_id)
-            + "/raw.fif"
+            + "/processed.fif"
         )
 
 
 if __name__ == "__main__":
-    process_subject(str(sys.argv[1]))
+    process_subject(*[str(arg) for arg in sys.argv])

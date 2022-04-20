@@ -21,9 +21,9 @@ else
     exit 0
 fi
 
-# Queue the tasks
-parallel --delay 0.2 -j $SLURM_NTASKS --joblog runtask.log --resume srun -n1 -c4 python process.py {} ::: $(ls -1 /scratch/brussel/102/vsc10248/data/raw)
+# Queue the tasks                                                                                     # v directory where data/raw is # v directory where data/processed will be
+parallel --delay 0.2 -j $SLURM_NTASKS --joblog runtask.log --resume srun -n1 -c4 python process.py {} /scratch/brussel/102/vsc10248 /data/brussel/102/vsc10248 ::: $(ls -1 /scratch/brussel/102/vsc10248/data/raw)
 wait
 
 # Archive
-tar -Jcvf processed.tar.gz -C /data/brussel/102/vsc10248/data ./processed 
+tar -Jcvf processed.tar.xz -C /data/brussel/102/vsc10248/data ./processed 
