@@ -17,7 +17,7 @@ def process_subject(subject_folder, raw_folder, processed_folder):
 
         # Make folder for run
         os.mkdir(
-            processed_folder + "data/processed/"
+            processed_folder + "/data/processed/"
             + subject_folder
             + "/run"
             + str(run_id)
