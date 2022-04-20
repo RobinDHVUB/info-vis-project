@@ -26,4 +26,4 @@ parallel --delay 0.2 -j $SLURM_NTASKS --joblog runtask.log --resume srun -N1 -n1
 wait                                                                                                                                    # ^ directory where data/processed will be                                                                                                                                    
 
 # Archive
-tar -Jcvf processed.tar.xz -C /data/brussel/102/vsc10248/data processed 
+tar -Jcvf /data/brussel/102/vsc10248/data/processed.tar.xz -C /data/brussel/102/vsc10248/data processed 
