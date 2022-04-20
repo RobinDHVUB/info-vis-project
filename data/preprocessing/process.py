@@ -80,6 +80,7 @@ def process_subject(subject_folder, raw_folder, processed_folder):
 
         # ICA
         ica = mne.preprocessing.ICA(n_components=16, max_iter="auto", random_state=97)
+        ica.fit(raw)
         ica.exclude = []
         eog_indices, eog_scores = ica.find_bads_eog(
             raw
@@ -96,7 +97,7 @@ def process_subject(subject_folder, raw_folder, processed_folder):
             + "/ICA.pdf"
         )
         ica.exclude = eog_indices + ecg_indices
-        ica.fit(raw)  # Apply
+        ica.apply(raw) # Apply
 
         # Pick MEG, EEG and stim channels
         raw.pick_types(meg="mag", eeg=True, stim=True)
@@ -112,4 +113,4 @@ def process_subject(subject_folder, raw_folder, processed_folder):
 
 
 if __name__ == "__main__":
-    process_subject(*[str(arg) for arg in sys.argv])
+    process_subject(*[str(arg) for arg in sys.argv[1:]])
