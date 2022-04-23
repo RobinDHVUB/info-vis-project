@@ -31,7 +31,7 @@ def save_meg_coords_and_names():
 def save_eeg_names():
     """
     Extracts the EEG channel names from the first run of the first subject (which is fine since they
-    are the same for every subject and run)
+    are the same for every subject and run), the EEG 3D coords are extracted during preprocessing as they are run specific
     """
 
     # Extract

@@ -95,4 +95,8 @@ def show_data():
 
 
 if __name__ == "__main__":
+    from data.parse import parse_meg_coords, parse_meg_names
+
+    print(parse_meg_names())
+    print(parse_meg_coords())
     app.run(debug=True, host="0.0.0.0", port=5000)
