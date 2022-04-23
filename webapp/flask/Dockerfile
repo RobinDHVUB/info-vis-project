@@ -12,7 +12,7 @@ EXPOSE 5000
 
 # Install the dependencies and packages in the requirements file
 RUN apt update -y && apt upgrade -y
-COPY webapp/flask/requirements.txt /app
+COPY flask/requirements.txt /app
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Start the FLASK app

@@ -1,0 +1,19 @@
+services:
+  flaskapp:
+    build:
+      context: .
+      dockerfile: flask/Dockerfile
+    volumes:
+      - './flask:/app'
+      - '../data:/app/data:ro'
+    ports:
+      - '5000:5000'
+  bokehapp:
+    build:
+      context: .
+      dockerfile: bokeh/Dockerfile
+    volumes:
+      - './bokeh:/app'
+      - '../data:/app/data:ro'
+    ports:
+      - '5006:5006'
