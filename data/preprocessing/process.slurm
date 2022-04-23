@@ -26,7 +26,7 @@ parallel --delay 0.2 -j $SLURM_NTASKS --joblog runtask.log --resume srun -N1 -n1
 wait                                                                                                                                                       # ^ directory where data/processed will be                                                                                                                                    
 
 # Extract MEG coords and names
-python data/preprocessing/extract_meg_coords.py
+python data/preprocessing/extract_fixed_channel_coords_and_names.py
 
 # Archive
 tar -Jcvf /data/brussel/102/vsc10248/data/processed.tar.xz -C /data/brussel/102/vsc10248/data processed 
