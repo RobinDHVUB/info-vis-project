@@ -220,5 +220,5 @@ function letsgo()
     console.log(subject_ids)
 
     /* location.href = `http://localhost:5000/data?id=1&MEG=[1,2,3,4]&EEG=${eeg_values}`; */
-    location.href = `http://localhost:5006/bokeh_app`;
+    location.href = `http://localhost:5006/app`;
 }

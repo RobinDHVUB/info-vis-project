@@ -21,9 +21,12 @@ else
     exit 0
 fi
 
-# Queue the tasks                                                                                                            # v directory where data/raw is 
+# Queue the preprocessing tasks                                                                                              # v directory where data/raw is 
 parallel --delay 0.2 -j $SLURM_NTASKS --joblog runtask.log --resume srun -N1 -n1 -c4 python data/preprocessing/process.py {} /scratch/brussel/102/vsc10248 /data/brussel/102/vsc10248 ::: $(ls -1 /scratch/brussel/102/vsc10248/data/raw)
 wait                                                                                                                                                       # ^ directory where data/processed will be                                                                                                                                    
+
+# Extract MEG coords and names
+python data/preprocessing/extract_meg_coords.py
 
 # Archive
 tar -Jcvf /data/brussel/102/vsc10248/data/processed.tar.xz -C /data/brussel/102/vsc10248/data processed 

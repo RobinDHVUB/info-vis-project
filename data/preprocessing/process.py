@@ -6,9 +6,15 @@ import numpy
 
 
 def process_subject(subject_folder, raw_folder, processed_folder):
+    """
+    Processes and saves the data for the given subject's run
+    """
 
     # Make folder for subject
-    os.mkdir(processed_folder +"/data/processed/" + subject_folder)
+    os.mkdir(processed_folder + "/data/processed/" + subject_folder)
+
+    # Define subject number
+    subject_id = [s for s in subject_folder.split() if s.isdigit()][0]
 
     # Loop over runs
     for run_id, run_file in enumerate(
@@ -17,16 +23,16 @@ def process_subject(subject_folder, raw_folder, processed_folder):
 
         # Make folder for run
         os.mkdir(
-            processed_folder + "/data/processed/"
-            + subject_folder
+            processed_folder
+            + "/data/processed/subject"
+            + subject_id
             + "/run"
             + str(run_id)
         )
 
         # Read raw
         raw = mne.io.read_raw_fif(
-            raw_folder + "/data/raw/" + subject_folder + "/" + run_file,
-            preload=True
+            raw_folder + "/data/raw/" + subject_folder + "/" + run_file, preload=True
         )
 
         # Do once
@@ -35,36 +41,24 @@ def process_subject(subject_folder, raw_folder, processed_folder):
             # Get and save subject metadata
             # See: https://mne.tools/dev/generated/mne.Info.html
             with open(
-                processed_folder + "/data/processed/" + subject_folder + "/info.json", "w"
+                processed_folder
+                + "/data/processed/subject"
+                + subject_id
+                + "/info.json",
+                "w",
             ) as outfile:
                 json.dump(raw.info["subject_info"], outfile)
 
-            # Get and save MEG coords and names (fixed for every run)
-            meg_coords = mne.channels.find_layout(raw.info, ch_type="mag").pos
-            meg_names = mne.channels.find_layout(raw.info, ch_type="mag").names
-            numpy.save(
-                processed_folder + "/data/processed/" + subject_folder + "/meg_coords.npy", meg_coords
-            )
-            numpy.save(processed_folder + "/data/processed/" + subject_folder + "/meg_names.npy", meg_names)
-
-        # Get and save EEG coords and names (can vary per run)
+        # Get and save EEG coords (can vary per run)
         eeg_coords = mne.channels.find_layout(raw.info, ch_type="eeg").pos
-        eeg_names = mne.channels.find_layout(raw.info, ch_type="eeg").names
         numpy.save(
-            processed_folder + "/data/processed/"
-            + subject_folder
+            processed_folder
+            + "/data/processed/subject"
+            + subject_id
             + "/run"
             + str(run_id)
             + "/eeg_coords.npy",
             eeg_coords,
-        )
-        numpy.save(
-            processed_folder + "/data/processed/"
-            + subject_folder
-            + "/run"
-            + str(run_id)
-            + "/eeg_names.npy",
-            eeg_names,
         )
 
         # Correct EOG and ECG channel names
@@ -89,24 +83,28 @@ def process_subject(subject_folder, raw_folder, processed_folder):
         ecg_indices, ecg_scores = ica.find_bads_ecg(
             raw, method="correlation", threshold="auto"
         )  # Use ECG to find bad components
-        plot = ica.plot_sources(raw, stop=10, show_scrollbars=False) # Plot ICA comps for first 10 seconds
+        plot = ica.plot_sources(
+            raw, stop=10, show_scrollbars=False
+        )  # Plot ICA comps for first 10 seconds
         plot.savefig(
-            processed_folder + "/data/processed/"
-            + subject_folder
+            processed_folder
+            + "/data/processed/subject"
+            + subject_id
             + "/run"
             + str(run_id)
             + "/ICA.pdf"
         )
         ica.exclude = eog_indices + ecg_indices
-        ica.apply(raw) # Apply
+        ica.apply(raw)  # Apply
 
         # Pick MEG, EEG and stim channels
         raw.pick_types(meg="mag", eeg=True, stim=True)
 
         # Save
         raw.save(
-            processed_folder + "/data/processed/"
-            + subject_folder
+            processed_folder
+            + "/data/processed/subject"
+            + subject_id
             + "/run"
             + str(run_id)
             + "/processed.fif"
