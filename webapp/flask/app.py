@@ -90,7 +90,7 @@ def show_data():
 
     # return render_template('template', patients = results)
 
-    script = server_document(url='http://localhost:5006/bokeh_app', arguments={"eeg": "fp,p2,f4"})
+    script = server_document(url='http://localhost:5006/app', arguments={"eeg": "fp,p2,f4"})
     return render_template('index.html',
                            script=script,
                            title="Info Viz Example",
