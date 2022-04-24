@@ -42,7 +42,7 @@ def save_eeg_names(processed_folder):
     raw = mne.io.read_raw_fif(
         processed_folder + "/data/processed/subject1/run1/processed.fif"
     )
-    names = mne.channels.find_layout(raw.info, ch_type="eeg").names
+    names = [name for name in raw.info["ch_names"] if "EEG" in name]
 
     # Save
     numpy.save(processed_folder + "data/processed/eeg_names.npy", names)
