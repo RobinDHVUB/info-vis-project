@@ -14,7 +14,7 @@ def process_subject(subject_folder, raw_folder, processed_folder):
     os.mkdir(processed_folder + "/data/processed/" + subject_folder)
 
     # Define subject number
-    subject_id = [s for s in subject_folder.split() if s.isdigit()][0]
+    subject_id = str(int(subject_folder[-2:]))
 
     # Loop over runs
     for run_id, run_file in enumerate(
@@ -27,7 +27,7 @@ def process_subject(subject_folder, raw_folder, processed_folder):
             + "/data/processed/subject"
             + subject_id
             + "/run"
-            + str(run_id)
+            + str(run_id + 1)
         )
 
         # Read raw
@@ -56,7 +56,7 @@ def process_subject(subject_folder, raw_folder, processed_folder):
             + "/data/processed/subject"
             + subject_id
             + "/run"
-            + str(run_id)
+            + str(run_id + 1)
             + "/eeg_coords.npy",
             eeg_coords,
         )
@@ -91,7 +91,7 @@ def process_subject(subject_folder, raw_folder, processed_folder):
             + "/data/processed/subject"
             + subject_id
             + "/run"
-            + str(run_id)
+            + str(run_id + 1)
             + "/ICA.pdf"
         )
         ica.exclude = eog_indices + ecg_indices
@@ -106,7 +106,7 @@ def process_subject(subject_folder, raw_folder, processed_folder):
             + "/data/processed/subject"
             + subject_id
             + "/run"
-            + str(run_id)
+            + str(run_id + 1)
             + "/processed.fif"
         )
 
