@@ -50,7 +50,7 @@ def process_subject(subject_folder, raw_folder, processed_folder):
                 json.dump(raw.info["subject_info"], outfile)
 
         # Get and save EEG coords (can vary per run)
-        eeg_coords = mne.channels.find_layout(raw.info, ch_type="eeg").pos
+        eeg_coords = [ch["loc"][:3] for ch in raw.info["chs"] if "EEG" in ch["ch_name"]]
         numpy.save(
             processed_folder
             + "/data/processed/subject"

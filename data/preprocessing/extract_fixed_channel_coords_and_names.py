@@ -1,7 +1,7 @@
-from concurrent.futures import process
 import mne
 import sys
 import numpy
+import os
 
 
 def save_meg_coords_and_names(processed_folder):
@@ -42,12 +42,9 @@ def save_eeg_names(processed_folder):
     raw = mne.io.read_raw_fif(
         processed_folder + "/data/processed/subject1/run1/processed.fif"
     )
-    names = [name for name in raw.info["ch_names"] if "EEG" in name]
+    names = [ch["ch_name"] for ch in raw.info["chs"] if "EEG" in ch["ch_name"]]
+    print(names)
+    print(len(names))
 
     # Save
-    numpy.save(processed_folder + "data/processed/eeg_names.npy", names)
-
-
-if __name__ == "__main__":
-    save_meg_coords_and_names(str(sys.argv[1]))
-    save_eeg_names(str(sys.argv[1]))
+    numpy.save(processed_folder + "/data/processed/eeg_names.npy", names)
