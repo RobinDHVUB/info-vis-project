@@ -243,5 +243,5 @@ function startAnalysis()
     console.log(meg_channels)
 
     /* location.href = `http://localhost:5000/data?id=1&MEG=[1,2,3,4]&EEG=${eeg_values}`; */
-    //location.href = `http://localhost:5006/app`;
+    location.href = `http://localhost:5006/app?id=` + subject_ids + `&EEG=` + eeg_channels + `&MEG=` + meg_channels;
 }
