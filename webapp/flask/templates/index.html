@@ -1,181 +1,621 @@
 {% extends 'base.html' %} {% block content %}
 
   <div class="row">
-    <div class="col-2" id="subject-selection-container">
-      <h3>SUBJECTS</h3>
+    <div class="col-3 selection-container" id="subject-selection-container">
+      <h3>SUBJECT</h3>
       {% include 'subject-selection.html' %}
     </div>
-    <div class="col-5" id="eeg-selection-container">
+    <div class="col-4 selection-container" id="eeg-selection-container">
       <h3>EEG</h3>
       {% include 'eeg-selection.html' %}
     </div>
-    <div class="col-5" id="emg-selection-container">
+    <div class="col-4 selection-container" id="meg-selection-container">
       <h3>MEG</h3>
       {% include 'meg-selection.html' %}
     </div>
   </div>
 
-    <button onclick="letsgo()">GO</button>
 <script src="/static/js/index.js" charset="utf-8"></script>
 
     {{ script|safe }}
 
 <script>
-function updateTable(newdata, deletionCallback) {
+/*function updateTable(newdata) {
   var table = d3.select("#subject-selection-container table tbody");
 
   var rows = table.selectAll("tbody tr")
     .data(newdata, function (d) {return d.id;});
 
-  var temp = rows.enter()
+  var cells = rows.enter()
     .append('tr')
     .selectAll("td")
 
-
-    temp.data(function (d) {return [d.id, d.age, d.gender];})
+  cells.data(function (d) {return [d.id, d.age, d.sex, d.hand];})
     .enter()
     .append("td")
     .text(function(d) { return d; })
 
-    temp.data(function(d) {return d.id;}).enter().append("td").text("X").on("click", function(d) {
-      var tempos = d3.select(this).data()[0]
-      deletionCallback(tempos)
-    })
-
   rows.exit().remove();
-}
+}*/
 
 function updateSelect(newdata) {
-  var select = d3.select("#subject-selection select");
-  slider_bot = d3.selectAll(".slider .parameter-value").data()[0].value
-  slider_top = d3.selectAll(".slider .parameter-value").data()[1].value
-  chosen_gender = d3.select("#subject-gender input:checked").attr("value")
+  var slider_bot = d3.selectAll(".slider .parameter-value").data()[0].value
+  var slider_top = d3.selectAll(".slider .parameter-value").data()[1].value
+  var chosen_sex = d3.select("#subject-sex input:checked").attr("value")
+  var chosen_hand = d3.select("#subject-hand input:checked").attr("value")
 
   newdata = Array.from(newdata).filter(function(d) {
-    return d.age >= slider_bot && d.age <= slider_top && (d.gender === chosen_gender || chosen_gender === 'all')
+    return d.age >= slider_bot && d.age <= slider_top
+            && (d.sex === chosen_sex || chosen_sex === 'all')
+            && (d.hand === chosen_hand || chosen_hand === 'all')
   })
 
+  var select = d3.select("#subject-selection select");
+
   var options = select.selectAll("option")
-    .data(newdata, function (d) {return d.id;});
+    .data(newdata, function (d) {
+      return d.id;
+    });
 
   options.enter()
     .append('option')
-    .text(function(d) {return "Subject " + d.id + " (" + d.gender + ", " + d.age + ")"})
+    .text(function(d) {
+      var sex = d.sex === 'm' ? 'male' : 'female'
+      var hand = d.hand === 'l' ? 'left' : 'right'
+      return "Subject " + d.id + ": " + sex + ", " + d.age + ", " + hand
+    })
 
   options.exit().remove();
+
+  var firstOption = d3.select("#subject-selection select option")
+  firstOption.property("checked", true);
 }
 
-function addSlider(data) {
-    // Range
-  var sliderRange = d3
-    .sliderBottom()
-    .min(d3.min(data, d => d.age))
-    .max(d3.max(data, d => d.age))
-    .width(200)
-    .tickFormat(d3.format(',d'))
-    .ticks(5)
-    .step(1)
-    .default([d3.min(data, d => d.age), 20])
-    .fill('#2196f3')
-          .on('onchange', d => updateSelect(select_data));
+function visualizeMEG(meg_names, meg_types, meg_selected, meg_coords, mesh_coords)
+{
+    var meg0111 = undefined
+    var meg0131 = undefined
+    var meg0141 = undefined
 
-  var gRange = d3
-    .select('div#slider-range')
-    .append('svg')
-    .attr('width', 300)
-    .attr('height', 100)
-    .append('g')
-    .attr('transform', 'translate(30,30)');
+    var meg0121 = undefined
+    var meg1511 = undefined
 
-  gRange.call(sliderRange);
+    var meg_selected = []
+    for (var i = 0; i < meg_selection.length; i++) {
+      if (meg_selection[i]) {
+        meg_selected[i]=1
+      }
+      else {
+        meg_selected[i]=0.7
+      }
+
+      if (meg_names[i] === "MEG0111") {
+          meg0111 = i
+      }
+      else if (meg_names[i] === "MEG0131") {
+          meg0131 = i
+      }
+      else if (meg_names[i] === "MEG0141") {
+          meg0141 = i
+      }
+      else if (meg_names[i] === "MEG0121") {
+          meg0121 = i
+      }
+    }
+
+    var graphDiv = document.getElementById('megPlot')
+
+    var meg_x = meg_coords[0]
+    var meg_y = meg_coords[1]
+    var meg_z = meg_coords[2]
+
+    var mesh_x = mesh_coords[0]
+    var mesh_y = mesh_coords[1]
+    var mesh_z = mesh_coords[2]
+
+    var trace1 = {
+      x: meg_x,
+      y: meg_y,
+      z: meg_z,
+      mode: 'markers',
+      hovertemplate: '%{text}<extra></extra>',
+      text: meg_names,
+      marker: {
+        symbol: 'circle',
+        size: 12,
+        color: meg_types,
+        opacity: meg_selection,
+        line: {
+          color: 'white',
+          width: 1
+        },
+      },
+      type: 'scatter3d'
+    };
+
+    // Plotting the mesh
+    var trace2=
+    {
+      hoverinfo:'skip',
+      opacity:1,
+      color: 'rgb(300,100,200)',
+      type: 'mesh3d',
+      x: mesh_x,
+      y: mesh_y,
+      z: mesh_z,
+    }
+
+   /* var trace3=
+    {
+      hoverinfo:'skip',
+      opacity:1,
+      color: 'rgb(300,100,200)',
+      type: 'mesh3d',
+      x: [mesh_x[meg0111], mesh_x[meg0131], mesh_x[meg0141], mesh_x[meg0121]],
+      y: [mesh_y[meg0111], mesh_y[meg0131], mesh_y[meg0141], mesh_y[meg0121]],
+      z: [mesh_z[meg0111], mesh_z[meg0131], mesh_z[meg0141], mesh_z[meg0121]],
+      i: [0,0],
+      j: [2,1],
+      k: [3,2]
+    }*/
+
+    var data = [trace1,trace2];//,trace3];
+    var layout = {
+      margin: {
+        l: 0,
+        r: 0,
+        b: 0,
+        t: 0
+      },
+      width: 400,
+      height: 400,
+      scene:{
+        bgcolor: '#fff',
+        xaxis: {
+          title: '',
+          showgrid: false,
+          zeroline: false,
+          showline: false,
+          autotick: false,
+          ticks: '',
+          showticklabels: false,
+          showspikes: false,
+          fixedrange: true
+      },
+      yaxis: {
+        title: '',
+        ticks: '',
+        showline: false,
+        zeroline: false,
+        showgrid: false,
+          showticklabels: false,
+          showspikes: false,
+                  fixedrange: true
+        },
+      zaxis: {
+        title: '',
+        ticks: '',
+        showline: false,
+        zeroline: false,
+        showgrid: false,
+          showticklabels: false,
+          showspikes: false,
+                  fixedrange: true
+        }
+      }
+    };
+
+    Plotly.react(graphDiv, data, layout, {displayModeBar: false});
+}
+
+function visualizeEEG(eeg_names, eeg_types, eeg_selection, eeg_coords, mesh_coords, keepCamera)
+{
+    var eeg_x = eeg_coords[0]
+    var eeg_y = eeg_coords[1]
+    var eeg_z = eeg_coords[2]
+
+    var mesh_x = mesh_coords[0]
+    var mesh_y = mesh_coords[1]
+    var mesh_z = mesh_coords[2]
+
+    var eeg_selected_x = []
+    var eeg_selected_y = []
+    var eeg_selected_z = []
+    var eeg_selected_names = []
+    var eeg_selected_types = []
+
+    var eeg_nonselected_x = []
+    var eeg_nonselected_y = []
+    var eeg_nonselected_z = []
+    var eeg_nonselected_names = []
+    var eeg_nonselected_types = []
+
+    var eeg_selected = []
+    for (var i = 0; i < eeg_selection.length; i++) {
+      if (eeg_selection[i]) {
+        eeg_selected_x.push(eeg_x[i])
+        eeg_selected_y.push(eeg_y[i])
+        eeg_selected_z.push(eeg_z[i])
+        eeg_selected_names.push(eeg_names[i])
+        eeg_selected_types.push(eeg_types[i])
+      }
+      else {
+        eeg_nonselected_x.push(eeg_x[i])
+        eeg_nonselected_y.push(eeg_y[i])
+        eeg_nonselected_z.push(eeg_z[i])
+        eeg_nonselected_names.push(eeg_names[i])
+        eeg_nonselected_types.push(eeg_types[i])
+      }
+    }
+
+
+  var trace_non = {
+      x: eeg_nonselected_x,
+      y: eeg_nonselected_y,
+      z: eeg_nonselected_z,
+      mode: 'markers',
+      hovertemplate: '%{text}<extra></extra>',
+      text: eeg_nonselected_names,
+      marker: {
+        symbol: 'circle',
+        size: 12,
+        color: eeg_nonselected_types,
+        opacity: 1,
+        line: {
+          color: 'white',
+          width: 1
+        },
+      },
+      type: 'scatter3d'
+    };
+
+  var trace_sel = {
+      x: eeg_selected_x,
+      y: eeg_selected_y,
+      z: eeg_selected_z,
+      mode: 'markers',
+      hovertemplate: '%{text}<extra></extra>',
+      text: eeg_selected_names,
+      marker: {
+        symbol: 'circle',
+        size: 14,
+        color: eeg_selected_types,
+        opacity: 1,
+        line: {
+          color: 'black',
+          width: 1
+        },
+      },
+      type: 'scatter3d'
+    };
+
+
+    var graphDiv = document.getElementById('eegPlot')
+
+    console.log(eeg_selected)
+
+    var trace1 = {
+      x: eeg_x,
+      y: eeg_y,
+      z: eeg_z,
+      mode: 'markers',
+      hovertemplate: '%{text}<extra></extra>',
+      text: eeg_names,
+      marker: {
+        symbol: 'circle',
+        size: 12,
+        color: eeg_types,
+        opacity: 1,
+        line: {
+          color: 'black',
+          width: 1
+        },
+      },
+      type: 'scatter3d'
+    };
+
+    // Plotting the mesh
+    var trace2=
+    {
+      hoverinfo:'skip',
+      opacity:1,
+      color: 'rgb(300,100,200)',
+      type: 'mesh3d',
+      x: mesh_x,
+      y: mesh_y,
+      z: mesh_z,
+    }
+
+    var cameraValue = defaultCameraScene["camera"]
+    if (keepCamera) {
+      cameraValue = cameraScene["camera"]
+    }
+
+    var data = [trace_non, trace_sel,trace2];
+    var layout = {
+      showlegend: false,
+      margin: {
+        l: 0,
+        r: 0,
+        b: 0,
+        t: 0
+      },
+      width: 400,
+      height: 400,
+      scene:{
+        camera: cameraValue,
+        bgcolor: '#fff',
+        xaxis: {
+          title: '',
+          showgrid: false,
+          zeroline: false,
+          showline: false,
+          autotick: false,
+          ticks: '',
+          showticklabels: false,
+          showspikes: false
+      },
+      yaxis: {
+        title: '',
+        ticks: '',
+        showline: false,
+        zeroline: false,
+        showgrid: false,
+          showticklabels: false,
+          showspikes: false,
+        },
+      zaxis: {
+        title: '',
+        ticks: '',
+        showline: false,
+        zeroline: false,
+        showgrid: false,
+          showticklabels: false,
+          showspikes: false
+        }
+      }
+    };
+
+    Plotly.react(graphDiv, data, layout, {displayModeBar: false, scrollZoom: false});
+
+function eventTriggeredHandler(data) {
+  console.log("ok")
+  cameraScene={
+    camera: {
+      center:data["scene.camera"]["center"],
+      eye: data["scene.camera"]["eye"],
+      projection: data["scene.camera"]["projection"],
+      up: data["scene.camera"]["up"],
+    }
+
+  }
+  console.log(data["scene.camera"])
+  console.log("no")
+}
+
+graphDiv.on('plotly_relayout', eventTriggeredHandler);
+
+}
+
+defaultCameraScene = {
+  camera: {
+    up: {
+      x: 0,
+      y: 0,
+      z: 1
+    },
+    center: {
+      x: 0,
+      y: 0,
+      z: 0
+    },
+    eye: {
+      x: 1.25,
+      y: 1.25,
+      z: 1.25
+    },
+  },
+}
+
+cameraScene = {
+  camera: {
+    up: {
+      x: 0,
+      y: 0,
+      z: 1
+    },
+    center: {
+      x: 0,
+      y: 0,
+      z: 0
+    },
+    eye: {
+      x: 1.25,
+      y: 1.25,
+      z: 1.25
+    },
+  },
 }
 
 $(document).ready(function() {
+  d3.json("static/json/subject_data.json").then(function(data)
+  {
 
-d3.json("static/json/subjects.json").then(function(subjects)
-{
-    // slider
-      // Range
-  data = subjects
-  var sliderRange = d3
-    .sliderBottom()
-    .min(d3.min(data, d => d.age))
-    .max(d3.max(data, d => d.age))
-    .width(200)
-    .tickFormat(d3.format(',d'))
-    .ticks(5)
-    .step(1)
-    .default([d3.min(data, d => d.age), 20])
-    .fill('#2196f3')
-          .on('onchange', d => updateSelect(select_data));
+    // names
+    eeg_names = data["eeg_names"]
+    meg_names = data["meg_names"]
 
-  var gRange = d3
-    .select('div#slider-range')
-    .append('svg')
-    .attr('width', 300)
-    .attr('height', 100)
-    .append('g')
-    .attr('transform', 'translate(30,30)');
+    // types
+    eeg_types = data["eeg_types"]
+    meg_types = data["meg_types"]
 
-  gRange.call(sliderRange);
-
-
-  var select_data = new Set(subjects)
-  var table_data = new Set()
-
-  /*var sliderChange = val => {
-    bottom_val = val[0]
-    top_val = val[1]
-
-    new_data = Array.from(select_data).filter(function (d) {
-      return d.age >= bottom_val && d.age <= top_val
-    });
-
-    updateSelect(new_data)
-  }
-
-  addSlider(subjects, sliderChange)*/
-
-  updateSelect(subjects)
-
- // $('.js-example-basic-multiple').select2()
-
-  d3.select("#add-selection").on("click", function(){
-    var new_data = d3.selectAll("#subject-selection option:checked").data()
-
-    new_data.forEach(function (el) {
-      table_data.add(el)
-      select_data.delete(el)
-    })
-
-    updateTable(table_data, delCallback)
-    updateSelect(select_data)
-  })
-
-  d3.selectAll("#subject-gender input").on("change", function(d) {
-    console.log("euhm")
-      updateSelect(select_data)
-  })
-
-  function delCallback(id_to_return) {
-    console.log("ok")
-    var element = undefined
-    table_data.forEach(function (el) {
-      console.log(el)
-      if (el.id === id_to_return) {
-        element = el
+    eeg_colors = []
+    for (var i = 0; i < eeg_types.length; i++) {
+      if (eeg_types[i] === "visual") {
+        eeg_colors[i] = "red"
       }
-    })
-    table_data.delete(element)
-    select_data.add(element)
-    updateTable(table_data)
-    updateSelect(select_data)
-  }
+      else if (eeg_types[i] === "motory") {
+        eeg_colors[i] = "blue"
+      }
+      else {
+        eeg_colors[i] = "orange"
+      }
+    }
 
-}).catch(function(error)
-{
-    console.log(error)
-});
+    eeg_selection = Array(eeg_types.length).fill().map(_ => false)
+    meg_selection = Array(meg_types.length).fill().map(_ => false)
+
+    meg_types = data["meg_types"]
+    meg_colors = []
+    for (var i = 0; i < meg_types.length; i++) {
+      if (meg_types[i] === "visual") {
+        meg_colors[i] = "red"
+      }
+      else if (meg_types[i] === "motory") {
+        meg_colors[i] = "blue"
+      }
+      else {
+        meg_colors[i] = "orange"
+      }
+    }
+
+    // meg_coords
+    meg_coords = data["meg_coords"]
+    meg_mesh_coords = data["meg_mesh_coords"]
+
+    // subject data
+    subjects=data["subjects"]
+
+    // data to show
+    selectData = new Set(subjects)
+    selectedSubject = undefined
+
+    // Gender input (Start)
+    d3.selectAll("#subject-sex input").on("change", function(d) {
+        updateSelect(selectData)
+        handleSubjectChange()
+    })
+    // Gender input (End)
+
+    // Hand input (Start)
+    d3.selectAll("#subject-hand input").on("change", function(d) {
+        updateSelect(selectData)
+      handleSubjectChange()
+    })
+    // Hand input (End)
+
+    // Age slider (Start)
+    var sliderRange = d3
+      .sliderBottom()
+      .min(d3.min(subjects, d => d.age))
+      .max(d3.max(subjects, d => d.age))
+      .width(200)
+      .tickFormat(d3.format(',d'))
+      .ticks(5)
+      .step(1)
+      .default([d3.min(subjects, d => d.age), d3.max(subjects, d => d.age)])
+      .fill('#2196f3')
+            .on('onchange', function(d) {
+              updateSelect(selectData);
+              handleSubjectChange();
+            })
+
+    var gRange = d3
+      .select('div#age-slider-range')
+      .append('svg')
+      .attr('width', 300)
+      .attr('height', 50)
+      .append('g')
+      .attr('transform', 'translate(20,10)');
+
+    gRange.call(sliderRange);
+
+    // Age slider (End)
+
+    function checkAnalysis() {
+      if ((typeof selectedSubject === 'undefined') ||
+              (d3.selectAll("#eeg-checkbox-container input:checked").empty()
+              && d3.selectAll("#meg-checkbox-container input:checked").empty())) {
+        d3.select("#startAnalysis").classed("disabled", true)
+        d3.select(".analysis-wrapper").attr('data-bs-original-title', "Please select a subject and signal(s) first.")
+      }
+      else {
+        d3.select("#startAnalysis").classed("disabled", false)
+        d3.select(".analysis-wrapper").attr('data-bs-original-title', "Analyze the selected signals.");
+      }
+    }
+
+    // EEG selection
+    d3.selectAll("#eeg-checkbox-container input").on("change", function(d) {
+      const isChecked = d3.select(this).property("checked")
+      const boxValue = d3.select(this).property("value")
+
+      for (var i = 0; i < eeg_types.length; i++) {
+        if (eeg_types[i] === boxValue) {
+          eeg_selection[i] = isChecked
+        }
+      }
+
+      console.log(selectedSubject)
+
+      visualizeEEG(eeg_names, eeg_colors, eeg_selection, selectedSubject.eeg_coords, selectedSubject.mesh_coords, true)
+      checkAnalysis()
+    })
+
+    d3.selectAll("#meg-checkbox-container input").on("change", function(d) {
+      const isChecked = d3.select(this).property("checked")
+      const boxValue = d3.select(this).property("value")
+
+      for (var i = 0; i < meg_types.length; i++) {
+        if (meg_types[i] === boxValue) {
+          meg_selection[i] = isChecked
+        }
+      }
+
+      visualizeMEG(meg_names, meg_colors, meg_selection, meg_coords, meg_mesh_coords)
+      checkAnalysis()
+    })
+
+    function handleSubjectChange() {
+      var selectedOption = d3.selectAll("#subject-selection option:checked");
+
+      if (selectedOption.empty()){
+        selectedSubject = undefined
+        Plotly.purge(document.getElementById('eegPlot'))
+        Plotly.purge(document.getElementById('megPlot'))
+        d3.selectAll('#eeg-checkbox-container label').classed("disabled", true)
+        d3.selectAll('#meg-checkbox-container label').classed("disabled", true)
+      }
+      else {
+                //updateTable(newData)
+
+        var newData = selectedOption.data();
+        if ((typeof selectedSubject === 'undefined') || (selectedSubject["id"] !== newData[0]["id"])) {
+          selectedSubject = newData[0]
+
+          d3.selectAll('#eeg-checkbox-container label').classed("disabled", false)
+          d3.selectAll('#meg-checkbox-container label').classed("disabled", false)
+
+          /* TODO: add mesh coords*/
+          visualizeEEG(eeg_names, eeg_colors, eeg_selection, selectedSubject.eeg_coords, selectedSubject.mesh_coords, false)
+          visualizeMEG(meg_names, meg_colors, meg_selection, meg_coords, meg_mesh_coords)
+          //updateMEG(newData)
+        }
+      }
+
+      checkAnalysis()
+    }
+
+    updateSelect(subjects)
+    handleSubjectChange()
+
+    d3.select('#subject-selector')
+      .on('change', handleSubjectChange);
+
+  }).catch(function(error)
+  {
+      console.log(error)
+  });
 
 });
 

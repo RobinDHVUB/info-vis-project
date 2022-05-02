@@ -1,4 +1,48 @@
-// drawEEGElectrodeSelector();
+drawEEGElectrodeSelector();
+
+// CHECKBOXES
+// TODO: should we just make the whole component in JS, also the HTML for input checkboxes?
+
+// keep track of the current selection (for hovering behavior)
+var current_selection = d3.selectAll("#eeg-selection-container .node-group.selected")
+
+d3.selectAll("#eeg-selection-checkboxes input").on("change", function(d){
+
+    // available electrode types
+    const available_values = ["visual", "motor", "sensory"]
+
+    const isChecked = d3.select(this).property("checked")
+    const boxValue = d3.select(this).property("value")
+
+    d3.selectAll("#eeg-selection-container .node-group.eeg-"+boxValue).classed("selected", !isChecked)
+
+    // update current selection
+    current_selection = d3.selectAll("#eeg-selection-container .node-group.selected")
+})
+
+d3.selectAll(".eeg-input-container").on("mouseover", function(){
+    current_selection = d3.selectAll("#eeg-selection-container .node-group.selected")
+    const isChecked = d3.select(this).select("input").property("checked")
+    const boxValue = d3.select(this).select("input").property("value")
+
+    d3.selectAll("#eeg-selection-container .node-group." + boxValue).classed("selected", !isChecked)
+}).on("mouseout", function(){
+        d3.selectAll("#eeg-selection-container .node-group").classed("selected", false)
+        current_selection.classed("selected", true)
+})
+
+d3.select(".eeg-all-btn").on("click", function(){
+    d3.selectAll("#eeg-selection-container .node-group").classed("selected", true)
+    d3.selectAll("#eeg-selection-checkboxes input").property("checked", true)
+
+    current_selection = d3.selectAll("#eeg-selection-container .node-group.selected")
+})
+d3.select(".eeg-reset-btn").on("click", function(){
+    d3.selectAll("#eeg-selection-container .node-group").classed("selected", false)
+    d3.selectAll("#eeg-selection-checkboxes input").property("checked", false)
+
+    current_selection = d3.selectAll("#eeg-selection-container .node-group.selected")
+})
 
 function drawEEGElectrodeSelector()
 {
@@ -158,90 +202,23 @@ function drawEEGElectrodeSelector()
     {
         console.log(error)
     });
-
-    // CHECKBOXES
-    // TODO: should we just make the whole component in JS, also the HTML for input checkboxes?
-
-    // keep track of the current selection (for hovering behavior)
-    var current_selection = d3.selectAll("#eeg-selection-container .node-group.selected")
-
-    d3.selectAll("#eeg-selection-checkboxes input").on("change", function(d){
-
-        // available electrode types
-        const available_values = ["visual", "motor", "sensory"]
-
-        const isChecked = d3.select(this).property("checked")
-        const boxValue = d3.select(this).property("value")
-
-        d3.selectAll("#eeg-selection-container .node-group.eeg-"+boxValue).classed("selected", !isChecked)
-
-        // update current selection
-        current_selection = d3.selectAll("#eeg-selection-container .node-group.selected")
-    })
-
-    d3.selectAll(".eeg-input-container").on("mouseover", function(){
-        current_selection = d3.selectAll("#eeg-selection-container .node-group.selected")
-        const isChecked = d3.select(this).select("input").property("checked")
-        const boxValue = d3.select(this).select("input").property("value")
-
-        d3.selectAll("#eeg-selection-container .node-group." + boxValue).classed("selected", !isChecked)
-    }).on("mouseout", function(){
-            d3.selectAll("#eeg-selection-container .node-group").classed("selected", false)
-            current_selection.classed("selected", true)
-    })
-
-    d3.select(".eeg-all-btn").on("click", function(){
-        d3.selectAll("#eeg-selection-container .node-group").classed("selected", true)
-        d3.selectAll("#eeg-selection-checkboxes input").property("checked", true)
-
-        current_selection = d3.selectAll("#eeg-selection-container .node-group.selected")
-    })
-    d3.select(".eeg-reset-btn").on("click", function(){
-        d3.selectAll("#eeg-selection-container .node-group").classed("selected", false)
-        d3.selectAll("#eeg-selection-checkboxes input").property("checked", false)
-
-        current_selection = d3.selectAll("#eeg-selection-container .node-group.selected")
-    })
 }
 
-function startAnalysis()
+function letsgo() 
 {
-    /*var eeg_values = []
+    var eeg_values = []
     d3.selectAll('#eeg-selection-container .node-group.selected').data().forEach(function(d) {
         eeg_values.push(d.name)
-    });*/
+    });
 
     var subject_ids = []
-    d3.selectAll("#subject-selection option:checked").data().forEach(function(d) {
+    d3.selectAll('#subject-results tr').select("td").data().forEach(function(d) {
         subject_ids.push(d.id)
     });
 
-    console.log(eeg_selection)
-
-    eeg_channels = []
-    for (var i = 0; i < eeg_selection.length; i++) {
-        if (eeg_selection[i]) {
-          eeg_channels.push(eeg_names[i])
-        }
-    }
-
-    meg_channels = []
-    for (var i = 0; i < meg_selection.length; i++) {
-        if (meg_selection[i]) {
-          meg_channels.push(meg_names[i])
-        }
-    }
-
-    const s = JSON.stringify({
-        "subject": subject_ids[0],
-        "eeg": eeg_channels,
-        "meg": meg_channels
-    });
-
-    console.log(eeg_channels)
+    console.log(eeg_values)
     console.log(subject_ids)
-    console.log(meg_channels)
 
     /* location.href = `http://localhost:5000/data?id=1&MEG=[1,2,3,4]&EEG=${eeg_values}`; */
-    //location.href = `http://localhost:5006/app`;
+    location.href = `http://localhost:5006/app`;
 }

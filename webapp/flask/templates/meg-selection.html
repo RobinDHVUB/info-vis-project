@@ -1,17 +1,16 @@
-    <div id="emg-selection-checkboxes">
-        <div id="emg-visual-container" class="emg-input-container">
-            <input type="checkbox" id="emg-visual" name="emg-visual" value="emg-visual">
-            <label for="emg-visual">Visual</label>
-        </div>
-        <div id="emg-motor-container" class="emg-input-container">
-            <input type="checkbox" id="emg-motor" name="emg-motor" value="emg-motor">
-            <label for="emg-motor">Motory</label>
-        </div>
-        <div id="emg-sensory-container" class="emg-input-container">
-            <input type="checkbox" id="emg-sensory" name="emg-sensory" value="emg-sensory">
-            <label for="emg-sensory">Sensory</label>
-        </div><br>
-        <!--<div class="emg-all-btn" style="display:inline-block; text-decoration:underline;">select all</div>
-        <div class="emg-reset-btn" style="display:inline-block; text-decoration:underline;">clear all</div>-->
-        <div class="emg-img"><img src="/static/images/meg-img.png" width="512" height="512"></div>
+<div class="filter-wrapper">
+    <div class="form-label">Select Cortex</div>
+
+    <div id="meg-checkbox-container" class="checkboxes-wrapper">
+        <input type="checkbox" class="btn-check meg-visual" id="btn-meg-visual" value="visual" autocomplete="off">
+        <label class="btn btn-outline-primary meg-visual shadow-none disabled" for="btn-meg-visual">Visual</label>
+
+        <input type="checkbox" class="btn-check meg-motory" id="btn-meg-motory" value="motory" autocomplete="off">
+        <label class="btn btn-outline-primary meg-motory shadow-none disabled" for="btn-meg-motory">Motory</label>
+
+        <input type="checkbox" class="btn-check meg-sensory" id="btn-meg-sensory" value="sensory" autocomplete="off">
+        <label class="btn btn-outline-primary meg-sensory shadow-none disabled" for="btn-meg-sensory">Sensory</label>
     </div>
+
+    <div id='megPlot'><!-- meg plot will be drawn inside this DIV --></div>
+</div>

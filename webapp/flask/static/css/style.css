@@ -1,107 +1,181 @@
 body {
-    background-color: lightgrey;
+    background-color: #D3D3D3;
 }
 
-#eeg-selection-container, #emg-selection-container {
-    /*width: 40%;*/
-    display:inline-block;
+/* custom navbar */
+/*.navbar-brand {
+    background-color: white;
+    padding: 5px;
+    padding-right: 10px;
+    border-radius: 5px;
+}
+
+.navbar-brand span {
+    color: black;
+}*/
+
+.navbar {
+    min-width:1000px;
+    margin-bottom: 20px;
+}
+
+/* wrapper */
+.main-wrapper {
+    min-width:1000px;
+    width:95%;
+    margin:0 auto;
+}
+
+/* subject selection */
+
+.selection-container {
     text-align: center;
 }
 
-/* EEG electrode selection */
-.node-group {
-    cursor: pointer;
+div.filter-wrapper {
+    -webkit-box-shadow: 0 0 10px rgba(46, 84, 129, .3);
+    -moz-box-shadow: 0 0 10px rgba(46, 84, 129, .3);
+    box-shadow: 0 0 10px rgba(46, 84, 129, .3);
+    border: solid 1px #839bb7;
+    outline: none;
+    -webkit-transition: border linear .2s,
+    box-shadow linear .2s;
+    -moz-transition: border linear .2s,
+    box-shadow linear .2s;
+    transition: border linear .2s, box-shadow linear .2s;
+
+    padding: 20px;
+
+    background-color: white;
+    text-align: left;
 }
 
-.node-group > circle {
-    fill: yellow;
-}
-
-.node-group > circle {
-    fill: yellow;
-}
-
-.node-group.hovering.selected > circle {
-    stroke-width: 1;
-}
-
-.node-group.hovering.selected > text {
-    font-weight: normal;
-}
-
-.node-group.selected > circle, .node-group.hovering:not(.selected) > circle {
-    stroke-width: 5;
-}
-
-.node-group.selected > text, .node-group.hovering:not(.selected) > text {
-    font-weight: bold;
-}
-
-.eeg-visual circle {
-    fill: #B4D8EC;
-}
-#eeg-visual-container, #emg-visual-container {
-    background-color: #B4D8EC;
-    border-radius: 30%;
-    display: inline-block;
-    padding: 5px;
-}
-
-.eeg-motor circle {
-    fill: #B6CF9D;
-}
-#eeg-motor-container, #emg-motor-container {
-    background-color: #B6CF9D;
-    border-radius: 30%;
-    display: inline-block;
-    padding: 5px;
-}
-
-label {
-    margin: 0;
-}
-
-.eeg-sensory circle {
-    fill: #F7A6B6;
-}
-#eeg-sensory-container, #emg-sensory-container {
-    background-color: #F7A6B6;
-    border-radius: 30%;
-    display: inline-block;
-    padding: 5px;
-}
-
-#eeg-selection-checkboxes, #emg-selection-checkboxes {
+div.selection-container h3 {
+    width: 100%;
     text-align: center;
+    font-size: 1.2em;
+    font-weight: 600;
+    text-transform: uppercase;
 }
 
-.eeg-reset-btn {
-    cursor: pointer;
+.filter-group {
+    margin-bottom: 0.5rem;
 }
 
-.node-group text {
-    -webkit-user-select: none; /* Safari */        
-    -moz-user-select: none; /* Firefox */
-    -ms-user-select: none; /* IE10+/Edge */
-    user-select: none; /* Standard */
+div.form-label {
+    color: #444;
+    font-weight: 600;
 }
 
-.emg-img {
-    margin-top: 40px;
-    margin-bottom: 25px;
-}
-
-
-/*change later: temporary*/
-
-table {
+#subject-sex .btn-group, #subject-hand .btn-group {
     width: 100%;
 }
 
-.eeg-head {
+.selector-help {
+    font-style: italic;
     display: inline-block;
+    font-size: 0.8em;
+    margin-left: 0.5rem;
 }
 
-#eeg-selection-container {
+/* EEG plot */
+#eegPlot {
+    display: inline-block;
+    height: 400px;
+    width: 400px;
+}
+
+#eeg-selection-container label.eeg-visual {
+    color: red;
+    border-color: red;
+}
+
+#eeg-selection-container .filter-wrapper {
     text-align: center;
+}
+
+#eeg-selection-container label.btn {
+    min-width: 100px;
+}
+
+#eeg-selection-container .eeg-visual.btn-check:checked+.btn-outline-primary,
+#eeg-selection-container .eeg-visual.btn-outline-primary:hover {
+    color: #fff;
+    background-color: red;
+    border-color: red;
+}
+
+#eeg-selection-container label.eeg-motory {
+    color: blue;
+    border-color: blue;
+}
+
+#eeg-selection-container .eeg-motory.btn-check:checked+.btn-outline-primary,
+#eeg-selection-container .eeg-motory.btn-outline-primary:hover {
+    color: #fff;
+    background-color: blue;
+    border-color: blue;
+}
+
+#eeg-selection-container label.eeg-sensory {
+    color: orange;
+    border-color: orange;
+}
+
+#eeg-selection-container .eeg-sensory.btn-check:checked+.btn-outline-primary,
+#eeg-selection-container .eeg-sensory.btn-outline-primary:hover {
+    color: #fff;
+    background-color: orange;
+    border-color: orange;
+}
+
+/* MEG plot */
+#megPlot {
+    display: inline-block;
+    height: 400px;
+    width: 400px;
+}
+
+#meg-selection-container label.meg-visual {
+    color: red;
+    border-color: red;
+}
+
+#meg-selection-container .filter-wrapper {
+    text-align: center;
+}
+
+#meg-selection-container label.btn {
+    min-width: 100px;
+}
+
+#meg-selection-container .meg-visual.btn-check:checked+.btn-outline-primary,
+#meg-selection-container .meg-visual.btn-outline-primary:hover {
+    color: #fff;
+    background-color: red;
+    border-color: red;
+}
+
+#meg-selection-container label.meg-motory {
+    color: blue;
+    border-color: blue;
+}
+
+#meg-selection-container .meg-motory.btn-check:checked+.btn-outline-primary,
+#meg-selection-container .meg-motory.btn-outline-primary:hover {
+    color: #fff;
+    background-color: blue;
+    border-color: blue;
+}
+
+#meg-selection-container label.meg-sensory {
+    color: orange;
+    border-color: orange;
+}
+
+#meg-selection-container .meg-sensory.btn-check:checked+.btn-outline-primary,
+#meg-selection-container .meg-sensory.btn-outline-primary:hover {
+    color: #fff;
+    background-color: orange;
+    border-color: orange;
 }

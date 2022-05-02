@@ -21,8 +21,8 @@ def index():
     return render_template(
         "index.html",
         # script=script,
-        title="Info Viz Example",
-        paragraph_title="Testing123",
+        title="A multi-subject, multi-modal human neuroimaging dataset",
+        title_url="https://www.nature.com/articles/sdata20151"
     )
 
 
@@ -95,8 +95,8 @@ def show_data():
 
 
 if __name__ == "__main__":
-    from data.parse import parse_meg_coords, parse_meg_names
+    #from data.parse import parse_meg_coords, parse_meg_names
 
-    print(parse_meg_names())
-    print(parse_meg_coords())
+    #print(parse_meg_names())
+    #print(parse_meg_coords())
     app.run(debug=True, host="0.0.0.0", port=5000)

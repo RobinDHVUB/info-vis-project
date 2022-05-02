@@ -1,16 +1,16 @@
-    <div id="eeg-selection-checkboxes">
-        <div id="eeg-visual-container" class="eeg-input-container">
-            <input type="checkbox" id="eeg-visual" name="eeg-visual" value="eeg-visual">
-            <label for="eeg-visual">Visual</label>
-        </div>
-        <div id="eeg-motor-container" class="eeg-input-container">
-            <input type="checkbox" id="eeg-motor" name="eeg-motor" value="eeg-motor">
-            <label for="eeg-motor">Motory</label>
-        </div>
-        <div id="eeg-sensory-container" class="eeg-input-container">
-            <input type="checkbox" id="eeg-sensory" name="eeg-sensory" value="eeg-sensory">
-            <label for="eeg-sensory">Sensory</label>
-        </div><br>
-        <!--<div class="eeg-all-btn" style="display:inline-block; text-decoration:underline;">select all</div>
-        <div class="eeg-reset-btn" style="display:inline-block; text-decoration:underline;">clear all</div>-->
+<div class="filter-wrapper">
+    <div class="form-label">Select Cortex</div>
+
+    <div id="eeg-checkbox-container" class="checkboxes-wrapper">
+        <input type="checkbox" class="btn-check eeg-visual" id="btn-eeg-visual" value="visual" autocomplete="off">
+        <label class="btn btn-outline-primary eeg-visual shadow-none disabled" for="btn-eeg-visual">Visual</label>
+
+        <input type="checkbox" class="btn-check eeg-motory" id="btn-eeg-motory" value="motory" autocomplete="off">
+        <label class="btn btn-outline-primary eeg-motory shadow-none disabled" for="btn-eeg-motory">Motory</label>
+
+        <input type="checkbox" class="btn-check eeg-sensory" id="btn-eeg-sensory" value="sensory" autocomplete="off">
+        <label class="btn btn-outline-primary eeg-sensory shadow-none disabled" for="btn-eeg-sensory">Sensory</label>
     </div>
+
+    <div id='eegPlot'><!-- EEG plot will be drawn inside this DIV --></div>
+</div>

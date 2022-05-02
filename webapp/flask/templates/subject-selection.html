@@ -1,43 +1,57 @@
-<div id="subject-gender">
-    <div class="form-check">
-      <input class="form-check-input" type="radio" name="gender" id="all" value="all" checked>
-      <label class="form-check-label" for="all">
-        All
-      </label>
+<div class="filter-wrapper">
+    <div id="subject-sex" class="filter-group">
+        <div class="form-label">Filter on Sex</div>
+        <div class="btn-group" role="group" aria-label="Basic radio toggle button group">
+          <input type="radio" class="btn-check" name="sex" id="male" autocomplete="off" value="m">
+          <label class="btn btn-outline-primary" for="male">Male</label>
+
+          <input type="radio" class="btn-check" name="sex" id="all-sex" autocomplete="off" value="all" checked>
+          <label class="btn btn-outline-primary" for="all-sex">All</label>
+
+          <input type="radio" class="btn-check" name="sex" id="female" autocomplete="off" value="f">
+          <label class="btn btn-outline-primary" for="female">Female</label>
+        </div>
     </div>
-    <div class="form-check">
-      <input class="form-check-input" type="radio" name="gender" id="male" value="m">
-      <label class="form-check-label" for="male">
-        Male
-      </label>
+
+    <div id="subject-hand" class="filter-group">
+        <div class="form-label">Filter on Handedness</div>
+        <div class="btn-group" role="group" aria-label="Basic radio toggle button group">
+          <input type="radio" class="btn-check" name="hand" id="left" autocomplete="off" value="l">
+          <label class="btn btn-outline-primary" for="left">Left</label>
+
+          <input type="radio" class="btn-check" name="hand" id="all-hand" autocomplete="off" value="all" checked>
+          <label class="btn btn-outline-primary" for="all-hand">All</label>
+
+          <input type="radio" class="btn-check" name="hand" id="right" autocomplete="off" value="r">
+          <label class="btn btn-outline-primary" for="right">Right</label>
+        </div>
     </div>
-    <div class="form-check">
-      <input class="form-check-input" type="radio" name="gender" id="female" value="f">
-      <label class="form-check-label" for="female">
-        Female
-      </label>
+
+    <div id="subject-age" class="filter-group">
+        <div class="form-label">Filter on Age</div>
+        <!--<input type="text" id="sampleSlider" />-->
+        <div id="age-slider-range"></div>
     </div>
+
+    <div id="subject-selection">
+        <div class="form-label">Select subject</div>
+        <select id="subject-selector" class="form-select" aria-label="Default select example">
+        </select>
+        <span class="selector-help"><sup>*</sup> Subject ID: Sex, Age, Handedness</span>
+    </div>
+
+    <!--<div id="subject-selected">
+        <table>
+            <thead>
+                <tr>
+                    <th>Subject</th>
+                    <th>Age</th>
+                    <th>Sex</th>
+                    <th>Handedness</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>-->
 </div>
 
-<div id="subject-age">
-    <div id="slider-range"></div>
-</div>
-
-<div id="subject-selection">
-    <select class="js-example-basic-multiple" name="states[]" multiple="multiple">
-    </select><br>
-    <button id="add-selection">Add selected objects</button>
-</div>
-
-<div id="subject-results">
-    <table>
-        <thead>
-            <tr>
-                <th>Subject</th>
-                <th>Age</th>
-                <th>Gender</th>
-            </tr>
-        </thead>
-        <tbody></tbody>
-    </table>
-</div>
