@@ -7,12 +7,9 @@ import pandas
 
 
 def build_subjects_file():
-    """
-    TODO: add doc
-    """
 
     # Read first run of first subject
-    raw = mne.io.read_raw_file(
+    raw = mne.io.read_raw_fif(
         "/scratch/brussel/102/vsc10248/data/processed/subject1/run1/processed.fif"
     )
 
@@ -90,7 +87,6 @@ def build_subjects_file():
         # Define subject number
         subject_id = int(subject_folder.removeprefix("subject"))
 
-        print(subject_id)
         # gather all subject specific info
         with open(
             "/scratch/brussel/102/vsc10248/data/processed/" + subject_folder + "/info.json",
