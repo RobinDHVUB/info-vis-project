@@ -6,14 +6,14 @@ import json
 import pandas
 
 
-def build_subjects_file(processed_folder):
+def build_subjects_file():
     """
     TODO: add doc
     """
 
     # Read first run of first subject
-    raw = mne.io.read_raw_fif(
-        processed_folder + "/data/processed/subject1/run1/processed.fif"
+    raw = mne.io.read_raw_file(
+        "/scratch/brussel/102/vsc10248/data/processed/subject1/run1/processed.fif"
     )
 
     """
@@ -62,7 +62,7 @@ def build_subjects_file(processed_folder):
 
     # Read given metadata
     metadata = pandas.read_csv(
-        processed_folder + "/data/raw/participants.tsv", sep="\t", index_col=False
+        "/scratch/brussel/102/vsc10248/data/raw/participants.tsv", sep="\t", index_col=False
     )
     metadata = [item for item in metadata.T.to_dict().values()]
 
@@ -85,7 +85,7 @@ def build_subjects_file(processed_folder):
     subjects = []
 
     # Go over each subject folder and build an easily usable representation (for JS)
-    for subject_folder in sorted(os.listdir(processed_folder + "/data/processed")):
+    for subject_folder in sorted(os.listdir("/scratch/brussel/102/vsc10248/data/processed")):
 
         # Define subject number
         subject_id = int(subject_folder.removeprefix("subject"))
@@ -93,14 +93,13 @@ def build_subjects_file(processed_folder):
         print(subject_id)
         # gather all subject specific info
         with open(
-            processed_folder + "/data/processed/" + subject_folder + "/info.json",
+            "/scratch/brussel/102/vsc10248/data/processed/" + subject_folder + "/info.json",
             mode="rb",
         ) as info_file:
             subject_info = json.load(info_file)
 
             eeg_coords = numpy.load(
-                processed_folder
-                + "/data/processed/"
+                "/scratch/brussel/102/vsc10248/data/processed/"
                 + subject_folder
                 + "/run1/eeg_coords.npy"
             )
@@ -114,7 +113,6 @@ def build_subjects_file(processed_folder):
             mesh_y = mesh_coords[:, 1].tolist()
             mesh_z = mesh_coords[:, 2].tolist()
 
-            print(metadata[subject_id - 1]["age"])
             subjects.append(
                 {
                     "id": subject_id,
@@ -133,9 +131,9 @@ def build_subjects_file(processed_folder):
 
     # generate and save the JSON object with all subject info
     json_object = json.dumps(subject_data, indent=4)
-    with open(processed_folder + "/data/processed/subject_data.json", "w") as outfile:
+    with open("/scratch/brussel/102/vsc10248/data/processed/subject_data.json", "w") as outfile:
         outfile.write(json_object)
 
 
 if __name__ == "__main__":
-    build_subjects_file(str(sys.argv[1]))
+    build_subjects_file()

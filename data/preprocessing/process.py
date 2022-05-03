@@ -5,7 +5,7 @@ import json
 import numpy
 
 
-def process_subject(subject_folder, raw_folder, processed_folder):
+def process_subject(subject_folder):
     """
     Processes and saves the data for the given subject's run
     """
@@ -14,17 +14,16 @@ def process_subject(subject_folder, raw_folder, processed_folder):
     subject_id = str(int(subject_folder[-2:]))
 
     # Make subject folder
-    os.mkdir(processed_folder + "/data/processed/subject" + subject_id)
+    os.mkdir("/scratch/brussel/102/vsc10248/data/processed/subject" + subject_id)
 
     # Loop over runs
     for run_id, run_file in enumerate(
-        os.listdir(raw_folder + "/data/raw/" + subject_folder)
+        os.listdir("/scratch/brussel/102/vsc10248/data/raw/" + subject_folder)
     ):
 
         # Make folder for run
         os.mkdir(
-            processed_folder
-            + "/data/processed/subject"
+            "/scratch/brussel/102/vsc10248/data/processed/subject"
             + subject_id
             + "/run"
             + str(run_id + 1)
@@ -32,7 +31,8 @@ def process_subject(subject_folder, raw_folder, processed_folder):
 
         # Read raw
         raw = mne.io.read_raw_fif(
-            raw_folder + "/data/raw/" + subject_folder + "/" + run_file, preload=True
+            "/scratch/brussel/102/vsc10248/data/raw/" + subject_folder + "/" + run_file,
+            preload=True,
         )
 
         # Do once
@@ -41,8 +41,7 @@ def process_subject(subject_folder, raw_folder, processed_folder):
             # Get and save subject metadata
             # See: https://mne.tools/dev/generated/mne.Info.html
             with open(
-                processed_folder
-                + "/data/processed/subject"
+                "/scratch/brussel/102/vsc10248/data/processed/subject"
                 + subject_id
                 + "/info.json",
                 "w",
@@ -52,8 +51,7 @@ def process_subject(subject_folder, raw_folder, processed_folder):
         # Get and save EEG coords (can vary per run)
         eeg_coords = [ch["loc"][:3] for ch in raw.info["chs"] if "EEG" in ch["ch_name"]]
         numpy.save(
-            processed_folder
-            + "/data/processed/subject"
+            "/scratch/brussel/102/vsc10248/data/processed/subject"
             + subject_id
             + "/run"
             + str(run_id + 1)
@@ -88,8 +86,7 @@ def process_subject(subject_folder, raw_folder, processed_folder):
             raw, stop=10, show_scrollbars=False
         )  # Plot ICA comps for first 10 seconds
         plot.savefig(
-            processed_folder
-            + "/data/processed/subject"
+            "/scratch/brussel/102/vsc10248/data/processed/subject"
             + subject_id
             + "/run"
             + str(run_id + 1)
@@ -103,8 +100,7 @@ def process_subject(subject_folder, raw_folder, processed_folder):
 
         # Save
         raw.save(
-            processed_folder
-            + "/data/processed/subject"
+            "/scratch/brussel/102/vsc10248/data/processed/subject"
             + subject_id
             + "/run"
             + str(run_id + 1)
@@ -113,5 +109,4 @@ def process_subject(subject_folder, raw_folder, processed_folder):
 
 
 if __name__ == "__main__":
-    print("GOT HERE", flush=True)
-    process_subject(*[str(arg) for arg in sys.argv[1:]])
+    process_subject(str(sys.argv[1]))
