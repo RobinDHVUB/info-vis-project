@@ -41,14 +41,13 @@ current = 500
 
 runs_data = [parse_run(int(subject_id[0]), run, EEG_channels, MEG_channels) for run in [1, 1, 1, 1, 1, 1]]
 logger.info("logging...")
-logger.info(runs_data)
 
 
 def start_bokeh():
     EEG_plots = []
     MEG_plots = []
 
-    if len(EEG_channels) > 4:
+    if 2 > 1:
         for i in range(1, 7):
             if i == 1:
                 toolbar = "above"
@@ -68,7 +67,7 @@ def start_bokeh():
                     dict(
                         x=np.arange(0, current, 1),
                         y=EEG_data[channel][:start]))
-                EEG_p.line(x='x', y='y', line_width=3, source=source, line_color=color)
+                EEG_p.line(x='x', y='y', line_width=1, source=source, line_color=color)
 
             x_ticks_loc = [i * 145 for i in range(500)]
 
@@ -77,7 +76,7 @@ def start_bokeh():
             EEG_p.xaxis.major_label_overrides = dict(zip(x_ticks_loc, tick_labels))
             EEG_plots.append(EEG_p)
 
-    if len(MEG_channels) > 4:
+    if 1 > 2:
         for i in range(1, 7):
             if i == 1:
                 toolbar = "above"
@@ -94,7 +93,7 @@ def start_bokeh():
                            tools=TOOLS, output_backend="canvas", x_range=(100, 200), toolbar_location=toolbar)
             MEG_p.xaxis.axis_label = 'samples'
             MEG_p.yaxis.axis_label = 'µV'
-            MEG_p.line(x='x', y='y', line_color="purple", line_width=3)
+            MEG_p.line(x='x', y='y', line_color="purple", line_width=1)
             MEG_plots.append(MEG_p)
 
     curdoc().add_root(row(column(EEG_plots), column(MEG_plots), sizing_mode="scale_width"))
