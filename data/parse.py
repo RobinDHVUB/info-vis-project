@@ -76,11 +76,10 @@ def parse_run(subject, run, eeg_channels, meg_channels):
         "data/processed/subject" + str(subject) + "/run" + str(run) + "/processed.fif"
     )
     return (
-        raw.get_data(picks=eeg_channels, units="uV"),
-        raw.get_data(picks=meg_channels, units="fT"),
-        mne.find_events(raw, stim_channel=["STI101"]),
+        raw.get_data(picks=eeg_channels, units="uV") if len(eeg_channels) > 0 else [],
+        raw.get_data(picks=meg_channels, units="fT") if len(meg_channels) > 0 else [],
+        mne.find_events(raw, stim_channel=["STI101"], min_duration=2) if (len(eeg_channels) > 0 and len(meg_channels) > 0) else [],
     )
-
 
 # -----
 # WINDOWS
@@ -120,14 +119,9 @@ def parse_windows(subject, run, eeg_channels, meg_channels, tmin, tmax):
     )
 
 
-start = time.time()
-print(
-    [
-        parse_windows(
-            1, run, ["EEG001", "EEG002", "EEG003"], ["MEG0111"], -1, 1
-        )
-        for run in range(4, 5)
-    ]
-)
-end = time.time()
-print(end - start)
+# -----
+# PSD
+# -----
+
+
+#def parse_windows(subject, run, eeg_channels, meg_channels, tmin, tmax):
