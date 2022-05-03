@@ -1,5 +1,6 @@
 import mne
 import numpy
+import time
 
 # -----
 # MEG
@@ -27,7 +28,6 @@ def parse_meg_names():
 # -----
 # EEG
 # -----
-
 
 def parse_eeg_coords(subject, run):
     """
@@ -115,4 +115,19 @@ def parse_windows(subject, run, eeg_channels, meg_channels, tmin, tmax):
         preload=True,
     )
 
-    return windows.get_data(picks=eeg_channels, units="uV"), windows.get_data(picks=meg_channels, units="fT")
+    return windows.get_data(picks=eeg_channels, units="uV"), windows.get_data(
+        picks=meg_channels, units="fT"
+    )
+
+
+start = time.time()
+print(
+    [
+        parse_windows(
+            1, run, ["EEG001", "EEG002", "EEG003"], ["MEG0111"], -1, 1
+        )
+        for run in range(4, 5)
+    ]
+)
+end = time.time()
+print(end - start)
