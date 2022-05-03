@@ -95,11 +95,10 @@ def show_data():
 
 
 if __name__ == "__main__":
-<<<<<<< HEAD
+
     #from data.parse import parse_meg_coords, parse_meg_names
 
     #print(parse_meg_names())
     #print(parse_meg_coords())
-=======
->>>>>>> 42517ad (update)
+
     app.run(debug=True, host="0.0.0.0", port=5000)

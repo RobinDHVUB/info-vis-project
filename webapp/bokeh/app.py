@@ -12,8 +12,8 @@ import mne
 import numpy as np
 from bokeh.client import push_session
 from bokeh.io import show
-from bokeh.layouts import column, gridplot, row
-from bokeh.models import Button, ColumnDataSource, PanTool, Tabs, Panel, Range1d
+from bokeh.layouts import column, gridplot, row, layout
+from bokeh.models import Button, ColumnDataSource, PanTool, Tabs, Panel, Range1d, CheckboxButtonGroup, CustomJS
 from bokeh.palettes import RdYlBu3
 from bokeh.plotting import figure, curdoc
 import pandas as pd
@@ -42,8 +42,17 @@ start = 1000
 step = 3000
 current = 1000
 
-runs_data = [parse_run(int(subject_id[0]), run, EEG_channels, MEG_channels) for run in [1, 1, 1, 1, 1, 1]]
+runs_data = [parse_run(int(subject_id[0]), run, EEG_channels, MEG_channels) for run in range(1, 7)]
 logger.info("logging...")
+
+"""
+buttons
+"""
+
+LABELS = ["Normal", "PSD"]
+
+checkbox_button_group = CheckboxButtonGroup(labels=LABELS, active=[0])
+checkbox_button_group.on_click(print("ok"))
 
 
 def start_bokeh():
@@ -106,7 +115,7 @@ def start_bokeh():
 
             tabs.append(Panel(child=column(EEG_p, MEG_p, sizing_mode="stretch_both"), title=f'Run {i}'))
 
-    curdoc().add_root(Tabs(tabs=tabs))
+    curdoc().add_root(column(column(checkbox_button_group, sizing_mode="fixed"), column(children=[Tabs(tabs=tabs)], sizing_mode="stretch_both"), sizing_mode='stretch_width'))
     return EEG_sources, MEG_sources
 
 
@@ -148,6 +157,5 @@ def update_callback():
     a = a + 1
 
 
-# put the button and plot in a layout and add to the document
-# curdoc().add_root(column(p2, p3, p4, p5, p6, p7, p8))
+
 pc_id = curdoc().add_periodic_callback(update_callback, 3000)
