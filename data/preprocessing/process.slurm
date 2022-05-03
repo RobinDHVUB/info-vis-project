@@ -12,7 +12,7 @@ cd ~/info-vis-project
 
 # Create processed folder
 if [ ! -d /scratch/brussel/102/vsc10248/data ]; then
-    mkdir /data/brussel/102/vsc10248/data
+    mkdir /scratch/brussel/102/vsc10248/data
 fi
 if [ ! -d /scratch/brussel/102/vsc10248/data/processed ]; then
     mkdir /scratch/brussel/102/vsc10248/data/processed
