@@ -10,11 +10,11 @@ def process_subject(subject_folder, raw_folder, processed_folder):
     Processes and saves the data for the given subject's run
     """
 
-    # Make folder for subject
-    os.mkdir(processed_folder + "/data/processed/" + subject_folder)
-
     # Define subject number
     subject_id = str(int(subject_folder[-2:]))
+
+    # Make subject folder
+    os.mkdir(processed_folder + "/data/processed/subject" + subject_id)
 
     # Loop over runs
     for run_id, run_file in enumerate(
@@ -113,4 +113,5 @@ def process_subject(subject_folder, raw_folder, processed_folder):
 
 
 if __name__ == "__main__":
+    print("GOT HERE", flush=True)
     process_subject(*[str(arg) for arg in sys.argv[1:]])

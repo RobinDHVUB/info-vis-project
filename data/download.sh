@@ -63,7 +63,7 @@ mv data/raw/sub007/ data/raw/sub006
 mv data/raw/sub008/ data/raw/sub007
 mv data/raw/sub009/ data/raw/sub008
 mv data/raw/sub010/ data/raw/sub009
-mv data/raw/sub011/ data/raw/sub005
+mv data/raw/sub011/ data/raw/sub004
 mv data/raw/sub012/ data/raw/sub010
 mv data/raw/sub013/ data/raw/sub011
 mv data/raw/sub014/ data/raw/sub012
@@ -74,6 +74,6 @@ mv data/raw/sub019/ data/raw/sub016
 
 # Download metadata
 wget "https://s3.amazonaws.com/openneuro/ds000117/ds000117_R1.0.0/compressed/ds000117_R1.0.0_metadata.zip"
-unzip ds000117_R1.0.0_metadata.zip
-mv ds000117_R1.0.0_metadata/participants.tsv data/raw
-rm -rf ds000117_R1.0.0_metadata*
+unzip ds000117_R1.0.0zip
+mv ds000117_R1.0.0/participants.tsv data/raw
+rm -rf ds000117_R1.0.0*
