@@ -13,7 +13,8 @@ import numpy as np
 from bokeh.client import push_session
 from bokeh.io import show
 from bokeh.layouts import column, gridplot, row, layout
-from bokeh.models import Button, ColumnDataSource, PanTool, Tabs, Panel, Range1d, CheckboxButtonGroup, CustomJS
+from bokeh.models import Button, ColumnDataSource, PanTool, Tabs, Panel, Range1d, CheckboxButtonGroup, CustomJS, \
+    Spinner, Span
 from bokeh.palettes import RdYlBu3
 from bokeh.plotting import figure, curdoc
 import pandas as pd
@@ -54,6 +55,12 @@ LABELS = ["Normal", "PSD"]
 checkbox_button_group = CheckboxButtonGroup(labels=LABELS, active=[0])
 checkbox_button_group.on_click(print("ok"))
 
+spinner_min = Spinner(low=-1.5, high=0, step=0.1, value=-0.5, width=80)
+spinner_max = Spinner(low=0.1, high=1.5, step=0.1, value=0.5, width=80)
+
+checkbox_button_group_average = CheckboxButtonGroup(labels=["Average"])
+checkbox_button_group_average.on_click(print("ok"))
+
 
 def start_bokeh():
     tabs = []
@@ -72,14 +79,20 @@ def start_bokeh():
 
             EEG_data = runs_data[i - 1][0]
             MEG_data = runs_data[i - 1][1]
+            events = runs_data[i - 1][2]
 
             EEG_p = figure(title="EEG", plot_height=200, plot_width=1000,
                            tools=TOOLS, output_backend="canvas", x_range=(0, 500), toolbar_location="above")
             MEG_p = figure(title="MEG", plot_height=200, plot_width=1000,
                            tools=TOOLS, output_backend="canvas", x_range=EEG_p.x_range, toolbar_location=None)
 
+            EEG_p.toolbar.logo = None
+
             EEG_p.y_range = Range1d(-50, 50)
             MEG_p.y_range = Range1d(-1500, 1500)
+
+            vline = Span(location=0, dimension='height', line_color='red', line_width=145, line_alpha=0.2)
+            EEG_p.renderers.extend([vline])
 
             EEG_p.xaxis.axis_label = 'seconds'
             EEG_p.yaxis.axis_label = 'µV'
@@ -115,7 +128,10 @@ def start_bokeh():
 
             tabs.append(Panel(child=column(EEG_p, MEG_p, sizing_mode="stretch_both"), title=f'Run {i}'))
 
-    curdoc().add_root(column(column(checkbox_button_group, sizing_mode="fixed"), column(children=[Tabs(tabs=tabs)], sizing_mode="stretch_both"), sizing_mode='stretch_width'))
+    curdoc().add_root(column(
+        column(checkbox_button_group, sizing_mode="fixed"),
+        row(column(children=[spinner_min, spinner_max]), column(checkbox_button_group_average)),
+        column(children=[Tabs(tabs=tabs)], sizing_mode="stretch_both"), sizing_mode='stretch_width'))
     return EEG_sources, MEG_sources
 
 
