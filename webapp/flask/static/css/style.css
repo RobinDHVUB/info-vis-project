@@ -160,3 +160,19 @@ div.form-label {
     background-color: orange;
     border-color: orange;
 }
+
+/* loading screen */
+.loading-screen {
+    height: 100vh;
+}
+
+.loading-screen .spinner-border {
+    margin: 0;
+    position: absolute;
+    top: 50%;
+}
+
+/* bokeh */
+.bokeh-wrapper {
+    width: 100%;
+}

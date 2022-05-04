@@ -531,9 +531,35 @@ $(function () {
     $('[data-toggle="tooltip"]').tooltip()
 })
 
+/*
+Function to go back to subject selection
+*/
+function subjectSelectionPage() {
+    // hide the first page and "start analysis" button
+    d3.select(".main-wrapper").classed("d-none", false)
+    d3.select(".analysis-wrapper").classed("d-none", false)
+
+    // show the back button
+    d3.select(".back-btn-wrapper").classed("d-none", true)
+    d3.select("#backToSubjectSel").classed("disabled", true)
+    d3.select(".loading-screen").classed("d-none", true)
+    $(".bokeh-wrapper").html("");
+    $("script").last().remove()
+
+    // TODO: Close Bokeh socket!!!
+}
+
 /* Function to go to the signals analysis page */
 function startAnalysis()
 {
+    // hide the first page and "start analysis" button
+    d3.select(".main-wrapper").classed("d-none", true)
+    d3.select(".analysis-wrapper").classed("d-none", true)
+
+    // show the back button
+    d3.select(".back-btn-wrapper").classed("d-none", false)
+    d3.select(".loading-screen").classed("d-none", false)
+
     // get the selected subjects (there will only be one subject selected in our visualization)
     var subject_ids = []
     d3.selectAll("#subject-selection option:checked").data().forEach(function(d) {
@@ -566,12 +592,42 @@ function startAnalysis()
     console.log(subject_ids)
     console.log(meg_channels)
 
+    $.ajax({
+        type: 'POST',
+        url: "/data",
+        data: s,
+        dataType: 'html',
+        contentType: 'application/json',
+        success: function(data){
+            $( ".bokeh-wrapper" ).append(data);
+
+            /*
+              Since Bokeh doesn't fire an accessible event when all items are rendered, we can only check for the message
+              it emits once it's finished. We remove the loading screen spinner once all items are rendered.
+              This was based on: https://stackoverflow.com/questions/42794556/how-to-check-if-my-bokeh-server-application-is-completely-loaded-and-rendered
+             */
+            oldLog = console.log;
+            console.log = function (message) {
+                if (message.localeCompare('Bokeh items were rendered successfully') == 0) {
+                    d3.select("#backToSubjectSel").classed("disabled", false)
+                    d3.select(".loading-screen").classed("d-none", true)
+                    console.log = oldLog;
+                }
+                oldLog.apply(console, arguments);
+            };
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            console.log("nok")
+            console.log(xhr.status);
+            console.log(thrownError);
+        }
+    });
+
     // Go to Bokeh
 
     /* location.href = `http://localhost:5000/data?id=1&MEG=[1,2,3,4]&EEG=${eeg_values}`; */
-    location.href = `http://localhost:5006/app?id=` + subject_ids + `&EEG=` + eeg_channels + `&MEG=` + meg_channels;
+    //location.href = `http://localhost:5006/app?id=` + subject_ids + `&EEG=` + eeg_channels + `&MEG=` + meg_channels;
 }
-
 
 
 /*
