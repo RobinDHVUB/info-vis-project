@@ -351,9 +351,7 @@ function initializeVisualizations() {
         // show the (updated) 3D plot
         Plotly.react(graphDiv, data, layout, {displayModeBar: false, scrollZoom: false, responsive: true});
 
-        // TODO RD: nu hebben we te veel listeners
         // keep track of camera changes
-
         graphDiv.on('plotly_relayout', function(data) {
             return updateCameraScene(plotType, data)
         });
