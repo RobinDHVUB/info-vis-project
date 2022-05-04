@@ -96,7 +96,9 @@ function initializeVisualizations() {
     - plotType is expected to be 'eeg' or 'meg'
     */
     function updateCameraScene(plotType, data) {
-        if (plotType.includes('eeg') && (typeof data["scene.camera"] !== 'undefined')) {
+        if (plotType.includes('eeg')
+            && (typeof data !== 'undefined')
+            && (typeof data["scene.camera"] !== 'undefined')) {
             eegCameraScene={
                 camera: {
                     center:data["scene.camera"]["center"],
@@ -106,7 +108,9 @@ function initializeVisualizations() {
                 }
             }
         }
-        else if (plotType.includes('meg') && (typeof data["scene.camera"] !== 'undefined')) {
+        else if (plotType.includes('meg')
+            && (typeof data !== 'undefined')
+            && (typeof data["scene.camera"] !== 'undefined')) {
             megCameraScene={
                 camera: {
                     center:data["scene.camera"]["center"],
@@ -481,6 +485,10 @@ function initializeVisualizations() {
                 Plotly.purge(document.getElementById('megPlot'))
                 d3.selectAll('#eeg-checkbox-container label').classed("disabled", true)
                 d3.selectAll('#meg-checkbox-container label').classed("disabled", true)
+
+                // also reset the camera view to its default value
+                updateCameraScene("eeg", undefined)
+                updateCameraScene("meg", undefined)
             }
             else {
                 // if a subject is selected we update the 3D plots and enable selecting cortex checkboxes
