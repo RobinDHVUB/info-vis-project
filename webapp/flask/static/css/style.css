@@ -3,25 +3,12 @@ body {
 }
 
 /* custom navbar */
-/*.navbar-brand {
-    background-color: white;
-    padding: 5px;
-    padding-right: 10px;
-    border-radius: 5px;
-}
-
-.navbar-brand span {
-    color: black;
-}*/
-
 .navbar {
-    min-width:1000px;
-    margin-bottom: 20px;
+    margin-bottom: 10px;
 }
 
 /* wrapper */
 .main-wrapper {
-    min-width:1000px;
     width:95%;
     margin:0 auto;
 }
@@ -29,7 +16,9 @@ body {
 /* subject selection */
 
 .selection-container {
+    margin-top: 10px;
     text-align: center;
+    min-width: 300px;
 }
 
 div.filter-wrapper {
@@ -81,8 +70,7 @@ div.form-label {
 /* EEG plot */
 #eegPlot {
     display: inline-block;
-    height: 400px;
-    width: 400px;
+    width: 100%;
 }
 
 #eeg-selection-container label.eeg-visual {
@@ -92,10 +80,6 @@ div.form-label {
 
 #eeg-selection-container .filter-wrapper {
     text-align: center;
-}
-
-#eeg-selection-container label.btn {
-    min-width: 100px;
 }
 
 #eeg-selection-container .eeg-visual.btn-check:checked+.btn-outline-primary,
@@ -132,8 +116,7 @@ div.form-label {
 /* MEG plot */
 #megPlot {
     display: inline-block;
-    height: 400px;
-    width: 400px;
+    width: 100%;
 }
 
 #meg-selection-container label.meg-visual {
@@ -143,10 +126,6 @@ div.form-label {
 
 #meg-selection-container .filter-wrapper {
     text-align: center;
-}
-
-#meg-selection-container label.btn {
-    min-width: 100px;
 }
 
 #meg-selection-container .meg-visual.btn-check:checked+.btn-outline-primary,
