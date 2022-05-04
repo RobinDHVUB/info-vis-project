@@ -93,15 +93,20 @@ def parse_windows(subject, run, eeg_channels, meg_channels, event_ids, tmin, tma
         time to cut after the event  (must be <= maximum_max)
     ---
     output:
-        EEG windows AVG in microvolt (n_eeg_channels, n_samples)
-        EEG windows STD in microvolt (n_eeg_channels, n_samples)
-        MEG windows AVG in femtotesla (n_meg_channels, n_samples)
-        MEG windows STD in femtotesla (n_meg_channels, n_samples)
+        EEG windows AVG in microvolt    (n_eeg_channels, n_samples)
+        EEG windows STD in microvolt    (n_eeg_channels, n_samples)
+        EEG windows PSD                 (n_eeg_channels, n_frequencies (70))
+        MEG windows AVG in femtotesla   (n_meg_channels, n_samples)
+        MEG windows STD in femtotesla   (n_meg_channels, n_samples)
+        MEG windows PSD                 (n_meg_channels, n_frequencies (70))
     """
+
+    # Parse run
     raw = mne.io.read_raw_fif(
         "data/processed/subject" + str(subject) + "/run" + str(run) + "/processed.fif"
     )
 
+    # Window
     windows = mne.Epochs(
         raw,
         numpy.insert(extract_events(raw, event_ids), 1, 0, axis=1),
@@ -114,13 +119,17 @@ def parse_windows(subject, run, eeg_channels, meg_channels, event_ids, tmin, tma
     eeg_windows = windows.get_data(picks=eeg_channels, units="uV")
     meg_windows = windows.get_data(picks=meg_channels, units="fT")
 
-    return numpy.mean(eeg_windows, axis=0), numpy.std(eeg_windows, axis=0), numpy.mean(meg_windows, axis=0), numpy.std(meg_windows, axis=0)
+    # Average
+    eeg_windows_avg = numpy.mean(eeg_windows, axis=0)
+    meg_windows_avg = numpy.mean(meg_windows, axis=0)
 
+    # Standard deviation
+    eeg_windows_std = numpy.std(eeg_windows, axis=0)
+    meg_windows_std = numpy.std(meg_windows, axis=0)
 
-# -----
-# PSD
-# -----
+    # PSD
+    psd_estimator = mne.decoding.PSDEstimator(145, fmin=1, fmax=70)
+    eeg_windows_avg_psd = psd_estimator.transform(eeg_windows_avg)
+    meg_windows_avg_psd = psd_estimator.transform(meg_windows_avg)
 
-
-# def parse_windows(subject, run, eeg_channels, meg_channels, tmin, tmax):
-# 
+    return eeg_windows_avg, eeg_windows_std, eeg_windows_avg_psd, meg_windows_avg, meg_windows_std, meg_windows_avg_psd

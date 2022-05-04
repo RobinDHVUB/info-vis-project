@@ -82,21 +82,18 @@ def build_subjects_file():
     subjects = []
 
     # Go over each subject folder and build an easily usable representation (for JS)
-    for subject_folder in sorted(os.listdir("/scratch/brussel/102/vsc10248/data/processed")):
-
-        # Define subject number
-        subject_id = int(subject_folder.removeprefix("subject"))
+    for subject_id in sorted([int(subject_folder.removeprefix("subject")) for subject_folder in os.listdir("/scratch/brussel/102/vsc10248/data/processed")]):
 
         # gather all subject specific info
         with open(
-            "/scratch/brussel/102/vsc10248/data/processed/" + subject_folder + "/info.json",
+            "/scratch/brussel/102/vsc10248/data/processed/subject" + subject_id + "/info.json",
             mode="rb",
         ) as info_file:
             subject_info = json.load(info_file)
 
             eeg_coords = numpy.load(
-                "/scratch/brussel/102/vsc10248/data/processed/"
-                + subject_folder
+                "/scratch/brussel/102/vsc10248/data/processed/subject"
+                + subject_id
                 + "/run1/eeg_coords.npy"
             )
             mesh_coords = 0.95 * eeg_coords
