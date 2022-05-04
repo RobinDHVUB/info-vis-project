@@ -7,6 +7,10 @@ body {
     margin-bottom: 10px;
 }
 
+.navbar-brand {
+    white-space: normal;
+}
+
 /* wrapper */
 .main-wrapper {
     width:95%;
