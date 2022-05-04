@@ -425,16 +425,43 @@ function initializeVisualizations() {
         })
 
         // Initialize a slider for subject age filtering and update select options on change
-        var minLimit = (d3.min(subjects, d => d.age)/10 | 0) * 10
-        var maxLimit = (((d3.max(subjects, d => d.age) + 10)/10) | 0) * 10
+        const minAge = d3.min(subjects, d => d.age)
+        const maxAge = d3.max(subjects, d => d.age)
+
+        // we round of to the nearest 5 on the slider
+        var minLimit = 0
+        var maxLimit = 0
+
+        const lastDigitMin = Number(String(minAge).slice(-1))
+        if (lastDigitMin == 5) {
+            minLimit = minAge
+        }
+        else if (lastDigitMin < 5) {
+            minLimit = ((minAge/10) | 0) * 10
+        }
+        else {
+            minLimit = Number(String(minAge).slice(0, -1) + "5")
+        }
+
+        const lastDigitMax = Number(String(maxAge).slice(-1))
+        if (lastDigitMax == 5) {
+            maxLimit = maxAge
+        }
+        else if (lastDigitMax < 5) {
+            maxLimit = Number(String(maxAge).slice(0, -1) + "5")
+        }
+        else {
+            maxLimit = (((maxAge + 10)/10) | 0) * 10
+        }
+
         $("#ageSlider").ionRangeSlider({
-             type: "double",
-          min: minLimit,
-             max: maxLimit,
-             from: d3.min(subjects, d => d.age),
-             to: d3.max(subjects, d => d.age),
-             grid: true,
-            grid_num: ((maxLimit - minLimit) / 10) | 0,
+            type: "double",
+            min: minLimit,
+            max: maxLimit,
+            from: minAge,
+            to: maxAge,
+            grid: true,
+            grid_num: 3,
             step: 1,
             onChange: function (data) {
                  updateSelect(selectData);
