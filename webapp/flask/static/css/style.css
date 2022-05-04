@@ -67,6 +67,21 @@ div.form-label {
     margin-left: 0.5rem;
 }
 
+
+/* age slider */
+irs--flat .irs-handle>i:first-child {
+    background-color: #4e73df!important;
+}
+.irs--flat .irs-bar {
+    background-color: #4e73df!important;
+}
+.irs--flat .irs-from, .irs--flat .irs-to, .irs--flat .irs-single {
+    background-color: #4e73df!important;
+}
+.irs--flat .irs-from:before, .irs--flat .irs-to:before, .irs--flat .irs-single:before {
+    border-top-color: #4e73df!important;
+}
+
 /* EEG plot */
 #eegPlot {
     display: inline-block;
@@ -174,5 +189,13 @@ div.form-label {
 
 /* bokeh */
 .bokeh-wrapper {
-    width: 100%;
+    width: 100vw;
+}
+
+/* subject info */
+.subject-info {
+    margin-right: 1rem;
+    font-size: 1.25rem;
+    text-decoration: none;
+    white-space: nowrap;
 }

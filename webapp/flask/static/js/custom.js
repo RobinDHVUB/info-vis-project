@@ -44,10 +44,9 @@ function initializeVisualizations() {
 
     /* Function to update the subject select box based on the last filter values */
     function updateSelect(newdata) {
-
         // Get all filter values
-        var slider_bot = d3.selectAll(".slider .parameter-value").data()[0].value
-        var slider_top = d3.selectAll(".slider .parameter-value").data()[1].value
+        var slider_bot = $('#ageSlider').data("from")
+        var slider_top = $('#ageSlider').data("to")
         var chosen_sex = d3.select("#subject-sex input:checked").attr("value")
         var chosen_hand = d3.select("#subject-hand input:checked").attr("value")
 
@@ -423,35 +422,23 @@ function initializeVisualizations() {
             handleSubjectChange()
         })
 
-        // TODO RD: andere slider
-        // Age slider (Start)
-        var sliderRange = d3
-          .sliderBottom()
-          .min(d3.min(subjects, d => d.age))
-          .max(d3.max(subjects, d => d.age))
-          .width(200)
-          .tickFormat(d3.format(',d'))
-          .ticks(5)
-          .step(1)
-          .default([d3.min(subjects, d => d.age), d3.max(subjects, d => d.age)])
-          .fill('#2196f3')
-                .on('onchange', function(d) {
-                  updateSelect(selectData);
-                  handleSubjectChange();
-                })
-
-        var gRange = d3
-          .select('div#age-slider-range')
-          .append('svg')
-          .attr('width', 300)
-          .attr('height', 50)
-          .append('g')
-          .attr('transform', 'translate(20,10)');
-
-        gRange.call(sliderRange);
-
-        // Age slider (End)
-
+        // Initialize a slider for subject age filtering and update select options on change
+        var minLimit = (d3.min(subjects, d => d.age)/10 | 0) * 10
+        var maxLimit = (((d3.max(subjects, d => d.age) + 10)/10) | 0) * 10
+        $("#ageSlider").ionRangeSlider({
+             type: "double",
+          min: minLimit,
+             max: maxLimit,
+             from: d3.min(subjects, d => d.age),
+             to: d3.max(subjects, d => d.age),
+             grid: true,
+            grid_num: ((maxLimit - minLimit) / 10) | 0,
+            step: 1,
+            onChange: function (data) {
+                 updateSelect(selectData);
+                 handleSubjectChange();
+            },
+         });
 
         // update which EEG electrodes have been selected after checking one of the electrode checkboxes
         d3.selectAll("#eeg-checkbox-container input").on("change", function(d) {
@@ -526,10 +513,15 @@ function initializeVisualizations() {
     });
 };
 
-// Enable all bootstrap tooltips
-$(function () {
-    $('[data-toggle="tooltip"]').tooltip()
-})
+/*
+Function to create a String summary of the most important subject information
+*/
+function createSubjectInfo(subjectData) {
+    var sex = subjectData.sex === 'm' ? 'male' : 'female'
+    var hand = subjectData.hand === 'l' ? 'left-handed' : 'right-handed'
+
+    return "Subject " + subjectData.id + ": " + sex + ", " + subjectData.age + " years old, " + hand
+}
 
 /*
 Function to go back to subject selection
@@ -546,24 +538,22 @@ function subjectSelectionPage() {
     $(".bokeh-wrapper").html("");
     $("script").last().remove()
 
-    // TODO: Close Bokeh socket!!!
+    // replace the the subject info by the title
+    d3.select("#datasetUrl").classed("d-none", false)
+    d3.select("#subjectInfoSummary").classed("d-none", true)
+
+    // TODO: Close Bokeh connection/socket!!!
 }
 
 /* Function to go to the signals analysis page */
 function startAnalysis()
 {
-    // hide the first page and "start analysis" button
-    d3.select(".main-wrapper").classed("d-none", true)
-    d3.select(".analysis-wrapper").classed("d-none", true)
-
-    // show the back button
-    d3.select(".back-btn-wrapper").classed("d-none", false)
-    d3.select(".loading-screen").classed("d-none", false)
-
     // get the selected subjects (there will only be one subject selected in our visualization)
+    var subject = undefined
     var subject_ids = []
     d3.selectAll("#subject-selection option:checked").data().forEach(function(d) {
-        subject_ids.push(d.id)
+        subject = d;
+        subject_ids.push(d.id);
     });
 
     // get the selected EEG channels
@@ -592,6 +582,22 @@ function startAnalysis()
     console.log(subject_ids)
     console.log(meg_channels)
 
+    // hide the first page and "start analysis" button
+    d3.select(".main-wrapper").classed("d-none", true)
+    d3.select(".analysis-wrapper").classed("d-none", true)
+
+    // show the back button
+    d3.select(".back-btn-wrapper").classed("d-none", false)
+    d3.select(".loading-screen").classed("d-none", false)
+
+    // replace the title by the subject info
+    d3.select("#datasetUrl").classed("d-none", true)
+    d3.select("#subjectInfoSummary").classed("d-none", false)
+
+    // put the correct subjectInfo into the summary
+    console.log(d3.select("#subjectInfoSummary span"))
+    d3.select("#subjectInfoSummary span").html(createSubjectInfo(subject))
+
     $.ajax({
         type: 'POST',
         url: "/data",
@@ -599,8 +605,6 @@ function startAnalysis()
         dataType: 'html',
         contentType: 'application/json',
         success: function(data){
-            $( ".bokeh-wrapper" ).append(data);
-
             /*
               Since Bokeh doesn't fire an accessible event when all items are rendered, we can only check for the message
               it emits once it's finished. We remove the loading screen spinner once all items are rendered.
@@ -615,6 +619,9 @@ function startAnalysis()
                 }
                 oldLog.apply(console, arguments);
             };
+
+            // add the Bokeh plot to the page
+            $(".bokeh-wrapper").append(data);
         },
         error: function (xhr, ajaxOptions, thrownError) {
             console.log("nok")
@@ -629,6 +636,7 @@ function startAnalysis()
     //location.href = `http://localhost:5006/app?id=` + subject_ids + `&EEG=` + eeg_channels + `&MEG=` + meg_channels;
 }
 
+/* UNUSED FUNCTIONS */
 
 /*
 This function generates a standard 2D view of EEG electrodes using D3.
