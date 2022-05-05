@@ -45,16 +45,16 @@ def build_subjects_file():
         "temporal lobe (L)",  # MEG0121
         "temporal lobe (L)",  # MEG0131
         "temporal lobe (L)",  # MEG0141
-        "frontal lobe",  # MEG0211
-        "temporal lobe (L)",  # MEG0221
-        "frontal lobe",  # MEG0231
+        "temporal lobe (L)",  # MEG0211
+        "frontal lobe",  # MEG0221
+        "parietal lobe",  # MEG0231
         "temporal lobe (L)",  # MEG0241
         "frontal lobe",  # MEG0311
         "frontal lobe",  # MEG0321
         "frontal lobe",  # MEG0331
-        "temporal lobe (L)",  # MEG0341
-        "parietal lobe",  # MEG0411
-        "parietal lobe",  # MEG0421
+        "frontal lobe",  # MEG0341
+        "frontal lobe",  # MEG0411
+        "frontal lobe",  # MEG0421
         "parietal lobe",  # MEG0431
         "parietal lobe",  # MEG0441
         "frontal lobe",  # MEG0511
@@ -63,7 +63,7 @@ def build_subjects_file():
         "frontal lobe",  # MEG0541
         "frontal lobe",  # MEG0611
         "frontal lobe",  # MEG0621
-        "parietal lobe",  # MEG0631
+        "frontal lobe",  # MEG0631
         "frontal lobe",  # MEG0641
         "parietal lobe",  # MEG0711
         "parietal lobe",  # MEG0721
@@ -81,8 +81,8 @@ def build_subjects_file():
         "frontal lobe",  # MEG1041
         "frontal lobe",  # MEG1111
         "frontal lobe",  # MEG1121
-        "frontal lobe",  # MEG1131
-        "frontal lobe",  # MEG1141
+        "parietal lobe",  # MEG1131
+        "parietal lobe",  # MEG1141
         "frontal lobe",  # MEG1211
         "frontal lobe",  # MEG1221
         "frontal lobe",  # MEG1231
@@ -193,8 +193,8 @@ def build_subjects_file():
         "frontal lobe",  # EEG037
         "temporal lobe (R)",  # EEG038
         "temporal lobe (R)",  # EEG039
-        "temporal lobe (R)",  # EEG040
-        "temporal lobe (R)",  # EEG041
+        "temporal lobe (L)",  # EEG040
+        "temporal lobe (L)",  # EEG041
         "parietal lobe",  # EEG042
         "parietal lobe",  # EEG043
         "parietal lobe",  # EEG044
@@ -217,13 +217,13 @@ def build_subjects_file():
         "parietal lobe",  # EEG065
         "frontal lobe",  # EEG066
         "frontal lobe",  # EEG067
-        "frontal lobe",  # EEG068
-        "occopital lobe",  # EEG069
+        "parietal lobe",  # EEG068
+        "occipital lobe",  # EEG069
         "occipital lobe",  # EEG070
         "occipital lobe",  # EEG071
         "occipital lobe",  # EEG072
         "occipital lobe",  # EEG073
-        "occopital lobe",  # EEG074
+        "occipital lobe",  # EEG074
     ]
     eeg_types.extend(["motory" for _ in range(0, 10)])
     eeg_types.extend(["sensory" for _ in range(0, len(eeg_names) - 20)])
