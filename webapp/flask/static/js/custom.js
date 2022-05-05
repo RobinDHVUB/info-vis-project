@@ -178,15 +178,15 @@ function initializeVisualizations() {
     - keepCamera is a parameter specifying whether the virtual camera position should be reset when updating the visualization.
     - plotType is expected to be 'eeg' or 'meg'
     */
-    function visualize3D(plotType, eeg_names, eeg_colors, eeg_selection, eeg_coords, mesh_coords, keepCamera)
+    function visualize3D(plotType, el_names, el_colors, el_selection, el_coords, mesh_coords, keepCamera)
     {
         // get the div to show the 3D plot in
         var graphDiv = document.getElementById(plotType + "Plot")
 
         // get the coordinates of all EEG electrodes
-        var eeg_x = eeg_coords[0]
-        var eeg_y = eeg_coords[1]
-        var eeg_z = eeg_coords[2]
+        var el_x = el_coords[0]
+        var el_y = el_coords[1]
+        var el_z = el_coords[2]
 
         // get the coordinates for the mesh beneath the EEG electrodes (mesh is added for having a clearer view)
         var mesh_x = mesh_coords[0]
@@ -194,48 +194,48 @@ function initializeVisualizations() {
         var mesh_z = mesh_coords[2]
 
         // split up the data in sets for selected electrodes and non-selected electrodes to easily visualize them differently
-        var eeg_selected_x = []
-        var eeg_selected_y = []
-        var eeg_selected_z = []
-        var eeg_selected_names = []
-        var eeg_selected_colors = []
+        var el_selected_x = []
+        var el_selected_y = []
+        var el_selected_z = []
+        var el_selected_names = []
+        var el_selected_colors = []
 
-        var eeg_nonselected_x = []
-        var eeg_nonselected_y = []
-        var eeg_nonselected_z = []
-        var eeg_nonselected_names = []
-        var eeg_nonselected_colors = []
+        var el_nonselected_x = []
+        var el_nonselected_y = []
+        var el_nonselected_z = []
+        var el_nonselected_names = []
+        var el_nonselected_colors = []
 
-        var eeg_selected = []
-        for (var i = 0; i < eeg_selection.length; i++) {
-            if (eeg_selection[i]) {
-                eeg_selected_x.push(eeg_x[i])
-                eeg_selected_y.push(eeg_y[i])
-                eeg_selected_z.push(eeg_z[i])
-                eeg_selected_names.push(eeg_names[i])
-                eeg_selected_colors.push(eeg_colors[i])
+        var el_selected = []
+        for (var i = 0; i < el_selection.length; i++) {
+            if (el_selection[i]) {
+                el_selected_x.push(el_x[i])
+                el_selected_y.push(el_y[i])
+                el_selected_z.push(el_z[i])
+                el_selected_names.push(el_names[i])
+                el_selected_colors.push(el_colors[i])
             }
             else {
-                eeg_nonselected_x.push(eeg_x[i])
-                eeg_nonselected_y.push(eeg_y[i])
-                eeg_nonselected_z.push(eeg_z[i])
-                eeg_nonselected_names.push(eeg_names[i])
-                eeg_nonselected_colors.push(eeg_colors[i])
+                el_nonselected_x.push(el_x[i])
+                el_nonselected_y.push(el_y[i])
+                el_nonselected_z.push(el_z[i])
+                el_nonselected_names.push(el_names[i])
+                el_nonselected_colors.push(el_colors[i])
             }
         }
 
         // trace for the non-selected electrodes
         var traceNon = {
-            x: eeg_nonselected_x,
-            y: eeg_nonselected_y,
-            z: eeg_nonselected_z,
+            x: el_nonselected_x,
+            y: el_nonselected_y,
+            z: el_nonselected_z,
             mode: 'markers',
             hovertemplate: '%{text}<extra></extra>',
-            text: eeg_nonselected_names,
+            text: el_nonselected_names,
             marker: {
                 symbol: 'circle',
                 size: 12,
-                color: eeg_nonselected_colors,
+                color: el_nonselected_colors,
                 opacity: 0.6,
                 line: {
                     color: 'white',
@@ -247,16 +247,16 @@ function initializeVisualizations() {
 
         // trace for the selected electrodes
         var traceSel = {
-            x: eeg_selected_x,
-            y: eeg_selected_y,
-            z: eeg_selected_z,
+            x: el_selected_x,
+            y: el_selected_y,
+            z: el_selected_z,
             mode: 'markers',
             hovertemplate: '%{text}<extra></extra>',
-            text: eeg_selected_names,
+            text: el_selected_names,
             marker: {
                 symbol: 'circle',
                 size: 14,
-                color: eeg_selected_colors,
+                color: el_selected_colors,
                 opacity: 1,
                 line: {
                     color: 'black',
@@ -375,27 +375,49 @@ function initializeVisualizations() {
         // specify the color for each type of cortex
         eeg_colors = []
         for (var i = 0; i < eeg_types.length; i++) {
-            if (eeg_types[i] === "visual") {
+            if (eeg_types[i] === "frontal lobe") {
                 eeg_colors[i] = "red"
             }
-            else if (eeg_types[i] === "motory") {
+            else if (eeg_types[i] === "parietal lobe") {
                 eeg_colors[i] = "blue"
             }
-            else {
+            else if (eeg_types[i] === "occipital lobe") {
                 eeg_colors[i] = "orange"
+            }
+            else if (eeg_types[i] === "temporal lobe (L)") {
+                eeg_colors[i] = "yellow"
+            }
+            else if (eeg_types[i] === "temporal lobe (R)"){
+                eeg_colors[i] = "black"
+            }
+            else
+            {
+                console.log("no bueno")
+                console.log("x" + eeg_types[i] + "x")
             }
         }
 
         meg_colors = []
         for (var i = 0; i < meg_types.length; i++) {
-            if (meg_types[i] === "visual") {
+            if (meg_types[i] === "frontal lobe") {
                 meg_colors[i] = "red"
             }
-            else if (meg_types[i] === "motory") {
+            else if (meg_types[i] === "parietal lobe") {
                 meg_colors[i] = "blue"
             }
-            else {
+            else if (meg_types[i] === "occipital lobe") {
                 meg_colors[i] = "orange"
+            }
+            else if (meg_types[i] === "temporal lobe (L)") {
+                meg_colors[i] = "yellow"
+            }
+            else if (meg_types[i] === "temporal lobe (R)"){
+                meg_colors[i] = "black"
+            }
+            else
+            {
+                console.log("no bueno")
+                console.log("x" + meg_types[i] + "x")
             }
         }
 

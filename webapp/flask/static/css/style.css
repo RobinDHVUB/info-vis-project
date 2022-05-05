@@ -98,7 +98,7 @@ irs--flat .irs-handle>i:first-child {
     height: 400px;
 }
 
-#eeg-selection-container label.eeg-visual {
+#eeg-selection-container label.eeg-frontal {
     color: red;
     border-color: red;
 }
@@ -107,35 +107,59 @@ irs--flat .irs-handle>i:first-child {
     text-align: center;
 }
 
-#eeg-selection-container .eeg-visual.btn-check:checked+.btn-outline-primary,
-#eeg-selection-container .eeg-visual.btn-outline-primary:hover {
+#eeg-selection-container .eeg-frontal.btn-check:checked+.btn-outline-primary,
+#eeg-selection-container .eeg-frontal.btn-outline-primary:hover {
     color: #fff;
     background-color: red;
     border-color: red;
 }
 
-#eeg-selection-container label.eeg-motory {
+#eeg-selection-container label.eeg-parietal {
     color: blue;
     border-color: blue;
 }
 
-#eeg-selection-container .eeg-motory.btn-check:checked+.btn-outline-primary,
-#eeg-selection-container .eeg-motory.btn-outline-primary:hover {
+#eeg-selection-container .eeg-parietal.btn-check:checked+.btn-outline-primary,
+#eeg-selection-container .eeg-parietal.btn-outline-primary:hover {
     color: #fff;
     background-color: blue;
     border-color: blue;
 }
 
-#eeg-selection-container label.eeg-sensory {
+#eeg-selection-container label.eeg-occipital {
     color: orange;
     border-color: orange;
 }
 
-#eeg-selection-container .eeg-sensory.btn-check:checked+.btn-outline-primary,
-#eeg-selection-container .eeg-sensory.btn-outline-primary:hover {
+#eeg-selection-container .eeg-occipital.btn-check:checked+.btn-outline-primary,
+#eeg-selection-container .eeg-occipital.btn-outline-primary:hover {
     color: #fff;
     background-color: orange;
     border-color: orange;
+}
+
+#eeg-selection-container label.eeg-temporal-l {
+    color: yellow;
+    border-color: yellow;
+}
+
+#eeg-selection-container .eeg-temporal-l.btn-check:checked+.btn-outline-primary,
+#eeg-selection-container .eeg-temporal-l.btn-outline-primary:hover {
+    color: #fff;
+    background-color: yellow;
+    border-color: yellow;
+}
+
+#eeg-selection-container label.eeg-temporal-r {
+    color: black;
+    border-color: black;
+}
+
+#eeg-selection-container .eeg-temporal-r.btn-check:checked+.btn-outline-primary,
+#eeg-selection-container .eeg-temporal-r.btn-outline-primary:hover {
+    color: #fff;
+    background-color: black;
+    border-color: black;
 }
 
 /* MEG plot */
@@ -145,44 +169,68 @@ irs--flat .irs-handle>i:first-child {
     height: 400px;
 }
 
-#meg-selection-container label.meg-visual {
-    color: red;
-    border-color: red;
-}
-
 #meg-selection-container .filter-wrapper {
     text-align: center;
 }
 
-#meg-selection-container .meg-visual.btn-check:checked+.btn-outline-primary,
-#meg-selection-container .meg-visual.btn-outline-primary:hover {
+#meg-selection-container label.meg-frontal {
+    color: red;
+    border-color: red;
+}
+
+#meg-selection-container .meg-frontal.btn-check:checked+.btn-outline-primary,
+#meg-selection-container .meg-frontal.btn-outline-primary:hover {
     color: #fff;
     background-color: red;
     border-color: red;
 }
 
-#meg-selection-container label.meg-motory {
+#meg-selection-container label.meg-parietal {
     color: blue;
     border-color: blue;
 }
 
-#meg-selection-container .meg-motory.btn-check:checked+.btn-outline-primary,
-#meg-selection-container .meg-motory.btn-outline-primary:hover {
+#meg-selection-container .meg-parietal.btn-check:checked+.btn-outline-primary,
+#meg-selection-container .meg-parietal.btn-outline-primary:hover {
     color: #fff;
     background-color: blue;
     border-color: blue;
 }
 
-#meg-selection-container label.meg-sensory {
+#meg-selection-container label.meg-occipital {
     color: orange;
     border-color: orange;
 }
 
-#meg-selection-container .meg-sensory.btn-check:checked+.btn-outline-primary,
-#meg-selection-container .meg-sensory.btn-outline-primary:hover {
+#meg-selection-container .meg-occipital.btn-check:checked+.btn-outline-primary,
+#meg-selection-container .meg-occipital.btn-outline-primary:hover {
     color: #fff;
     background-color: orange;
     border-color: orange;
+}
+
+#meg-selection-container label.meg-temporal-l {
+    color: yellow;
+    border-color: yellow;
+}
+
+#meg-selection-container .meg-temporal-l.btn-check:checked+.btn-outline-primary,
+#meg-selection-container .meg-temporal-l.btn-outline-primary:hover {
+    color: #fff;
+    background-color: yellow;
+    border-color: yellow;
+}
+
+#meg-selection-container label.meg-temporal-r {
+    color: black;
+    border-color: black;
+}
+
+#meg-selection-container .meg-temporal-r.btn-check:checked+.btn-outline-primary,
+#meg-selection-container .meg-temporal-r.btn-outline-primary:hover {
+    color: #fff;
+    background-color: black;
+    border-color: black;
 }
 
 /* loading screen */
