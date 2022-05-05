@@ -22,9 +22,9 @@ event_names = {
 # Duration of events in seconds
 event_duration = 0.8
 
-# Windowing limits in seconds 
-minimum_min = 1.5 # (interstimulus interval is 1.7 so 1.5 for safety)
-maximum_max = 1.5 
+# Windowing limits in seconds
+minimum_min = 1.5  # (interstimulus interval is 1.7 so 1.5 for safety)
+maximum_max = 1.5
 
 
 # ----
@@ -48,21 +48,23 @@ def parse_run(subject, run, eeg_channels, meg_channels):
         events (n_events,3) -> first column is event time in samples, third column is event id, ignore the second column
     """
     raw = mne.io.read_raw_fif(
-        "data/processed/subject" + str(subject) + "/run" + str(run) + "/processed.fif"
+        "data/processed/subject" + str(subject) + "/run" + str(run) + "/processed.fif",
+        verbose=None,
     )
 
     return (
         raw.get_data(picks=eeg_channels, units="uV") if len(eeg_channels) > 0 else [],
         raw.get_data(picks=meg_channels, units="fT") if len(meg_channels) > 0 else [],
-        extract_events(raw)
+        extract_events(raw),
     )
 
+
 def extract_events(raw, event_ids=None):
-    
+
     # Get events from raw
-    events = mne.find_events(raw, stim_channel=["STI101"])
-    
-    # Select 
+    events = mne.find_events(raw, stim_channel=["STI101"], min_duration=1)
+
+    # Select
     selected_events = []
     selection = event_names.keys() if event_ids is None else event_ids
     for event in events:
@@ -132,4 +134,11 @@ def parse_windows(subject, run, eeg_channels, meg_channels, event_ids, tmin, tma
     eeg_windows_avg_psd = psd_estimator.transform(eeg_windows_avg)
     meg_windows_avg_psd = psd_estimator.transform(meg_windows_avg)
 
-    return eeg_windows_avg, eeg_windows_std, eeg_windows_avg_psd, meg_windows_avg, meg_windows_std, meg_windows_avg_psd
+    return (
+        eeg_windows_avg,
+        eeg_windows_std,
+        eeg_windows_avg_psd,
+        meg_windows_avg,
+        meg_windows_std,
+        meg_windows_avg_psd,
+    )
