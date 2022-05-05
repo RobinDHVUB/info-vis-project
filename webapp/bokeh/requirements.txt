@@ -1,3 +1,4 @@
 bokeh
 pandas
 mne
+streamlit
