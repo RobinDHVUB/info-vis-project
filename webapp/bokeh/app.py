@@ -12,6 +12,7 @@ import numpy as np
 from bokeh.client import push_session
 from bokeh.io import show
 from bokeh.layouts import column, gridplot, row, layout
+<<<<<<< Updated upstream
 from bokeh.models import (
     Button,
     ColumnDataSource,
@@ -26,6 +27,10 @@ from bokeh.models import (
     Dropdown,
     Select,
 )
+=======
+from bokeh.models import Button, ColumnDataSource, PanTool, Tabs, Panel, Range1d, CheckboxButtonGroup, CustomJS, \
+    Spinner, Span, Dropdown, Select, Rect
+>>>>>>> Stashed changes
 from bokeh.palettes import RdYlBu3
 from bokeh.plotting import figure, curdoc
 import pandas as pd
@@ -68,6 +73,7 @@ checkbox_button_group_average.on_click(print("ok"))
 
 select_runs = Select(options=["run 1", "run 2", "run 3", "run 4", "run 5", "run 6"])
 
+<<<<<<< Updated upstream
 # Creates and renders the EEG and MEG plots as well as the UI
 tabs = []
 EEG_sources = []
@@ -150,6 +156,87 @@ tabs.append(
 
 curdoc().add_root(
     column(
+=======
+
+def start_bokeh():
+    tabs = []
+    EEG_sources = []
+    MEG_sources = []
+
+    """
+    The if should later be used to plot only when channels are selected ==> does not work yet with parse
+    """
+    if 2 > 1:
+        colors = itertools.cycle(palette)
+
+        EEG_temp_source = []
+        MEG_temp_source = []
+
+        EEG_data = runs_data[0]
+        MEG_data = runs_data[1]
+        events = runs_data[2]
+
+        EEG_p = figure(title="EEG", plot_height=200, plot_width=1000,
+                           tools=TOOLS, output_backend="canvas", x_range=(0, 500), toolbar_location="above")
+        MEG_p = figure(title="MEG", plot_height=200, plot_width=1000,
+                           tools=TOOLS, output_backend="canvas", x_range=EEG_p.x_range, toolbar_location=None)
+
+        EEG_p.toolbar.logo = None
+
+        EEG_p.y_range = Range1d(-50, 50)
+        MEG_p.y_range = Range1d(-1500, 1500)
+
+        EEG_p.xaxis.axis_label = 'seconds'
+        EEG_p.yaxis.axis_label = 'µV'
+
+        MEG_p.xaxis.axis_label = 'seconds'
+        MEG_p.yaxis.axis_label = 'fT'
+        for channel, color in zip(range(len(EEG_data)), colors):
+            source = ColumnDataSource(
+                dict(
+                    x=np.arange(0, len(EEG_data[channel]), 1),
+                    y=EEG_data[channel]))
+            EEG_p.line(x='x', y='y', line_width=1, source=source, line_color=color)
+            EEG_temp_source.append(source)
+
+        for channel, color in zip(range(len(MEG_data)), colors):
+            source = ColumnDataSource(
+                dict(
+                    x=np.arange(0, len(MEG_data[channel]), 1),
+                    y=MEG_data[channel]))
+            MEG_p.line(x='x', y='y', line_width=1, source=source, line_color=color)
+            MEG_temp_source.append(source)
+
+
+        """
+        Adding events
+        
+        basic event at one second is added for testing purposes (too low amount of events to test)
+        
+        """
+        logger.info(events)
+        events.append([145, 13])
+        for event in events:
+            # for rectangle, start is around x and around y, so x + half of event duration is correct x-value
+            glyph = Rect(x=event[0] + (event_duration * 145) / 2, y=0, width=event_duration*145, height=100, width_units="data", height_units="data", line_alpha=0.3, fill_alpha=0.3)
+            EEG_p.add_glyph(glyph)
+            MEG_p.add_glyph(glyph)
+
+        x_ticks_loc = [i * 145 for i in range(500)]
+
+        tick_labels = [str(i) for i in range(500)]
+        EEG_p.xaxis.ticker = x_ticks_loc
+        EEG_p.xaxis.major_label_overrides = dict(zip(x_ticks_loc, tick_labels))
+
+        MEG_p.xaxis.ticker = x_ticks_loc
+        MEG_p.xaxis.major_label_overrides = dict(zip(x_ticks_loc, tick_labels))
+        EEG_sources.append(EEG_temp_source)
+        MEG_sources.append(MEG_temp_source)
+
+        tabs.append(Panel(child=column(EEG_p, MEG_p, sizing_mode="stretch_both"), title=f'Run {1}'))
+
+    curdoc().add_root(column(
+>>>>>>> Stashed changes
         column(checkbox_button_group, sizing_mode="fixed"),
         row(
             column(children=[spinner_min, spinner_max]),
