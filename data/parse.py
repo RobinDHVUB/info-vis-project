@@ -19,6 +19,9 @@ event_names = {
     19: "Delayed Repeat Scrambled Face",
 }
 
+# Group names
+group_names = ["Frontal lobe", "Parietal lobe", "Temporal lobe (L)", "Temporal lobe (R)", "Occipital lobe"]
+
 # Duration of events in seconds
 event_duration = 0.8
 
@@ -32,31 +35,54 @@ maximum_max = 1.5
 # ----
 
 
-def parse_run(subject, run, eeg_channels, meg_channels):
+def parse_run(subject, run):
     """
     Parses and returns windows for a given subject's run
     ---
     input:
         subject number [1-19]
         run number [1-6]
-        list of eeg channels (those returned by parse_eeg_names)
-        list of meg channels (those return by parse_meg_names)
     ---
     output:
-        EEG run in microvolt (n_eeg_channels, n_samples)
-        MEG run in femtotesla ( n_meg_channels, n_samples)
-        events (n_events,3) -> first column is event time in samples, third column is event id, ignore the second column
+        raw run
     """
+
+    # Read run
     raw = mne.io.read_raw_fif(
         "data/processed/subject" + str(subject) + "/run" + str(run) + "/processed.fif",
         verbose=None,
     )
 
-    return (
-        raw.get_data(picks=eeg_channels, units="uV") if len(eeg_channels) > 0 else [],
-        raw.get_data(picks=meg_channels, units="fT") if len(meg_channels) > 0 else [],
-        extract_events(raw),
-    )
+    return raw 
+
+def group_average(raw, eeg_groups, meg_groups):
+    """
+    Parses and returns channel group averages for a given run
+    ---
+    input:
+        raw run
+        dict of eeg channels
+        dict of meg channels
+    ---
+    output:
+        dict of EEG run average per group 
+        dict of MEG run average per group
+    """
+
+    # Split per EEG group
+    eeg_groups_data = {}
+    for group_name, group_channels in eeg_groups.items():
+        assert len(group_channels) > 0
+        eeg_groups_data[group_name] = numpy.mean(raw.get_data(picks=group_channels, units="uV"), axis=0)
+
+    # Split per MEG group
+    meg_groups_data = {}
+    for group_name, group_channels in meg_groups.items():
+        assert len(group_channels) > 0
+        meg_groups_data[group_name] = numpy.mean(raw.get_data(picks=group_channels, units="fT"), axis=0)
+
+    # Return groups
+    return eeg_groups_data, meg_groups_data
 
 
 def extract_events(raw, event_ids=None):
