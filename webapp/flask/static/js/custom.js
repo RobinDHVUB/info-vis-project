@@ -392,8 +392,7 @@ function initializeVisualizations() {
             }
             else
             {
-                console.log("no bueno")
-                console.log("x" + eeg_types[i] + "x")
+                console.log("invalid type: " +  eeg_types[i])
             }
         }
 
@@ -416,8 +415,7 @@ function initializeVisualizations() {
             }
             else
             {
-                console.log("no bueno")
-                console.log("x" + meg_types[i] + "x")
+                console.log("invalid type: " + meg_types[i])
             }
         }
 
@@ -600,6 +598,25 @@ function subjectSelectionPage() {
     // TODO: Close Bokeh connection/socket!!!
 }
 
+/* Function to build a dictionary with an array of electrodes (value) for each electrode type (key) */
+function groupPerType(elecTypes, elecs) {
+    var dict = {}
+
+    for (var i = 0; i < elecs.length; i++) {
+        const elecType = elecTypes[i]
+        const elec = elecs[i]
+
+        if (dict.hasOwnProperty(elecType)) {
+            dict[elecType].push(elec)
+        }
+        else {
+            dict[elecType] = [elec]
+        }
+    }
+
+    return dict
+}
+
 /* Function to go to the signals analysis page */
 function startAnalysis()
 {
@@ -613,29 +630,29 @@ function startAnalysis()
 
     // get the selected EEG channels
     var eeg_channels = []
+    var eeg_channel_types = []
     for (var i = 0; i < eeg_selection.length; i++) {
         if (eeg_selection[i]) {
-          eeg_channels.push(eeg_names[i])
+            eeg_channels.push(eeg_names[i])
+            eeg_channel_types.push(eeg_types[i])
         }
     }
 
     // get the selected MEG channels
     var meg_channels = []
+    var meg_channel_types = []
     for (var i = 0; i < meg_selection.length; i++) {
         if (meg_selection[i]) {
           meg_channels.push(meg_names[i])
+          meg_channel_types.push(meg_types[i])
         }
     }
 
-    const s = JSON.stringify({
+    const sel = JSON.stringify({
         "subject": subject_ids[0],
-        "eeg": eeg_channels,
-        "meg": meg_channels
+        "eeg": groupPerType(eeg_channel_types, eeg_channels),
+        "meg": groupPerType(meg_channel_types, meg_channels)
     });
-
-    console.log(eeg_channels)
-    console.log(subject_ids)
-    console.log(meg_channels)
 
     // hide the first page and "start analysis" button
     d3.select(".main-wrapper").classed("d-none", true)
@@ -656,7 +673,7 @@ function startAnalysis()
     $.ajax({
         type: 'POST',
         url: "/data",
-        data: s,
+        data: sel,
         dataType: 'html',
         contentType: 'application/json',
         success: function(data){

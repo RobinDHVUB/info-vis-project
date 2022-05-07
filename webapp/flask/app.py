@@ -5,6 +5,7 @@ from flask import Flask, render_template, request, jsonify
 from bokeh.client import pull_session
 from bokeh.embed import server_document
 import mne
+import json
 import ast
 
 app = Flask(__name__)
@@ -29,15 +30,10 @@ def index():
 @app.route("/data", methods=["POST"])
 def show_data():
     data = request.json
-    ids = data["subject"]
-    eegs = ",".join(data["eeg"])
-    megs = ",".join(data["meg"])
-    print(ids)
-    print(eegs)
-    print(megs)
-
     script = server_document(
-        url="http://localhost:5006/app", arguments={"id": ids, "EEG": eegs, "MEG": megs}
+        url="http://localhost:5006/app", arguments={"id": data["subject"],
+                                                    "EEG": json.dumps(data["eeg"]),
+                                                    "MEG": json.dumps(data["meg"])}
         #arguments={"id": 1, "EEG": "EEG001", "MEG": "MEG0111"}
     )
     return render_template(
