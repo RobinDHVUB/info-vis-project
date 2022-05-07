@@ -5,6 +5,8 @@ from select import select
 import streamlit
 import numpy
 from enum import Enum
+from urllib.parse import unquote
+import json
 
 from bokeh.palettes import Dark2_5 as palette
 from bokeh.layouts import column, row
@@ -38,8 +40,8 @@ logger.setLevel(logging.DEBUG)
 # Get session arguments
 args = doc.session_context.request.arguments
 subject_id = int(args.get("id")[0].decode("UTF-8").split(",")[0])
-EEG_groups = {"Parietal lobe": args.get("EEG")[0].decode("UTF-8").split(",")}
-MEG_groups = {"Parietal lobe": args.get("MEG")[0].decode("UTF-8").split(",")}
+EEG_groups = json.loads(unquote(args.get("EEG")[0]))
+MEG_groups = json.loads(unquote(args.get("MEG")[0]))
 
 # Modes
 class Mode(Enum):
