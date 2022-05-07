@@ -96,7 +96,7 @@ def create_avg_plots(run_idx):
         toolbar_sticky=False,
         sizing_mode="stretch_both",
     )
-    EEG_p.x_range = Range1d(0, view_size, bounds=(0, chunk_size))
+    EEG_p.x_range = Range1d(0, view_size)
     EEG_p.xaxis.ticker = [tick for tick in x_ticks.keys()]
     EEG_p.xaxis.major_label_overrides = x_ticks
     EEG_p.xaxis.axis_label = "Time (s)"
