@@ -495,7 +495,7 @@ function initializeVisualizations() {
           const boxValue = d3.select(this).property("value")
 
           for (var i = 0; i < eeg_types.length; i++) {
-            if (eeg_types[i] === boxValue) {
+            if (eeg_types[i].toLowerCase() === boxValue.toLowerCase()) {
               eeg_selection[i] = isChecked
             }
           }
@@ -510,7 +510,7 @@ function initializeVisualizations() {
           const boxValue = d3.select(this).property("value")
 
           for (var i = 0; i < meg_types.length; i++) {
-            if (meg_types[i] === boxValue) {
+            if (meg_types[i].toLowerCase() === boxValue.toLowerCase()) {
               meg_selection[i] = isChecked
             }
           }
