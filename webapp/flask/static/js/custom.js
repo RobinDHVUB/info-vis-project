@@ -375,19 +375,19 @@ function initializeVisualizations() {
         // specify the color for each type of cortex
         eeg_colors = []
         for (var i = 0; i < eeg_types.length; i++) {
-            if (eeg_types[i] === "frontal lobe") {
+            if (eeg_types[i].toLowerCase() === "frontal lobe") {
                 eeg_colors[i] = "red"
             }
-            else if (eeg_types[i] === "parietal lobe") {
+            else if (eeg_types[i].toLowerCase() === "parietal lobe") {
                 eeg_colors[i] = "blue"
             }
-            else if (eeg_types[i] === "occipital lobe") {
+            else if (eeg_types[i].toLowerCase() === "occipital lobe") {
                 eeg_colors[i] = "orange"
             }
-            else if (eeg_types[i] === "temporal lobe (L)") {
+            else if (eeg_types[i].toLowerCase() === "temporal lobe (l)") {
                 eeg_colors[i] = "yellow"
             }
-            else if (eeg_types[i] === "temporal lobe (R)"){
+            else if (eeg_types[i].toLowerCase() === "temporal lobe (r)"){
                 eeg_colors[i] = "black"
             }
             else
@@ -398,19 +398,19 @@ function initializeVisualizations() {
 
         meg_colors = []
         for (var i = 0; i < meg_types.length; i++) {
-            if (meg_types[i] === "frontal lobe") {
+            if (meg_types[i].toLowerCase() === "frontal lobe") {
                 meg_colors[i] = "red"
             }
-            else if (meg_types[i] === "parietal lobe") {
+            else if (meg_types[i].toLowerCase() === "parietal lobe") {
                 meg_colors[i] = "blue"
             }
-            else if (meg_types[i] === "occipital lobe") {
+            else if (meg_types[i].toLowerCase() === "occipital lobe") {
                 meg_colors[i] = "orange"
             }
-            else if (meg_types[i] === "temporal lobe (L)") {
+            else if (meg_types[i].toLowerCase() === "temporal lobe (l)") {
                 meg_colors[i] = "yellow"
             }
-            else if (meg_types[i] === "temporal lobe (R)"){
+            else if (meg_types[i].toLowerCase() === "temporal lobe (r)"){
                 meg_colors[i] = "black"
             }
             else
