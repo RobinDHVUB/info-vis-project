@@ -69,7 +69,6 @@ EEG_p = figure(
     #output_backend="webgl",
     tools=[PanTool(dimensions="width"), ResetTool(), WheelZoomTool(dimensions="width")],
     toolbar_location="above",
-    sizing_mode="stretch_both",
 )
 EEG_p.x_range = Range1d(0, view_size, bounds=(0,first_run_EEG.shape[1]))
 EEG_p.xaxis.ticker = [tick for tick in x_ticks.keys()]
@@ -95,7 +94,6 @@ MEG_p = figure(
     #output_backend="webgl",
     tools=[PanTool(dimensions="width"), ResetTool(), WheelZoomTool(dimensions="width")],
     toolbar_location=None,
-    sizing_mode="stretch_both",
 )
 MEG_p.x_range = EEG_p.x_range
 MEG_p.xaxis.ticker = [tick for tick in x_ticks.keys()]
@@ -180,9 +178,9 @@ doc.add_root(
             column(children=[spinner_min, spinner_max]),
             column(checkbox_button_group_average),
         ),
-        column(select_runs),
-        column(children=[Tabs(tabs=[Panel(child=column(EEG_p, MEG_p, sizing_mode="stretch_both"), title=f"Run {1}")])], sizing_mode="stretch_both"),
-        sizing_mode="stretch_width",
+        column(select_runs, sizing_mode="fixed"),
+        column(children=[EEG_p, MEG_p], sizing_mode="stretch_both"),
+        sizing_mode="stretch_both"
     )
 )
 
