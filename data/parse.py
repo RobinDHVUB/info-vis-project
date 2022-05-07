@@ -20,7 +20,13 @@ event_names = {
 }
 
 # Group names
-group_names = ["Frontal lobe", "Parietal lobe", "Temporal lobe (L)", "Temporal lobe (R)", "Occipital lobe"]
+group_names = [
+    "Frontal lobe",
+    "Parietal lobe",
+    "Temporal lobe (L)",
+    "Temporal lobe (R)",
+    "Occipital lobe",
+]
 
 # Duration of events in seconds
 event_duration = 0.8
@@ -53,36 +59,49 @@ def parse_run(subject, run):
         verbose=None,
     )
 
-    return raw 
+    return raw
 
-def group_average(raw, eeg_groups, meg_groups):
+
+def group_averages(runs, eeg_groups, meg_groups):
     """
     Parses and returns channel group averages for a given run
     ---
     input:
-        raw run
+        raw runs
         dict of eeg channels
         dict of meg channels
     ---
     output:
-        dict of EEG run average per group 
-        dict of MEG run average per group
+        list of runs each with dict of EEG runs average per group
+        list of runs each with dict of MEG runs average per group
     """
 
-    # Split per EEG group
-    eeg_groups_data = {}
-    for group_name, group_channels in eeg_groups.items():
-        assert len(group_channels) > 0
-        eeg_groups_data[group_name] = numpy.mean(raw.get_data(picks=group_channels, units="uV"), axis=0)
+    # For each run
+    eeg_groups_data_per_run = []
+    meg_groups_data_per_run = []
+    for run in runs:
 
-    # Split per MEG group
-    meg_groups_data = {}
-    for group_name, group_channels in meg_groups.items():
-        assert len(group_channels) > 0
-        meg_groups_data[group_name] = numpy.mean(raw.get_data(picks=group_channels, units="fT"), axis=0)
+        # Split per EEG group
+        eeg_groups_data = {}
+        for group_name, group_channels in eeg_groups.items():
+            assert len(group_channels) > 0
+            eeg_groups_data[group_name] = numpy.mean(
+                run.get_data(picks=group_channels, units="uV"), axis=0
+            )
+
+        eeg_groups_data_per_run.append(eeg_groups_data)
+
+        # Split per MEG group
+        meg_groups_data = {}
+        for group_name, group_channels in meg_groups.items():
+            assert len(group_channels) > 0
+            meg_groups_data[group_name] = numpy.mean(
+                run.get_data(picks=group_channels, units="fT"), axis=0
+            )
+        meg_groups_data_per_run.append(meg_groups_data)
 
     # Return groups
-    return eeg_groups_data, meg_groups_data
+    return eeg_groups_data_per_run, meg_groups_data_per_run
 
 
 def extract_events(raw, event_ids=None):
@@ -107,64 +126,53 @@ def extract_events(raw, event_ids=None):
 # -----
 
 
-def parse_windows(subject, run, eeg_channels, meg_channels, event_ids, tmin, tmax):
+def avg_windows(runs, event_ids, tmin, tmax, EEG_groups, MEG_groups):
     """
     Parses and returns windows for a given subject's run
     ---
     input:
-        subject number [1-19]
-        run number [1-6]
-        list of eeg channels
-        list of meg channels
-        list of event ids to average over
+        raw runs
+        list of event ids to window over
         time to cut before the event (must be >= minimum_min)
         time to cut after the event  (must be <= maximum_max)
+        dict of eeg channels
+        dict of meg channels
     ---
-    output:
-        EEG windows AVG in microvolt    (n_eeg_channels, n_samples)
-        EEG windows STD in microvolt    (n_eeg_channels, n_samples)
-        EEG windows PSD                 (n_eeg_channels, n_frequencies (70))
-        MEG windows AVG in femtotesla   (n_meg_channels, n_samples)
-        MEG windows STD in femtotesla   (n_meg_channels, n_samples)
-        MEG windows PSD                 (n_meg_channels, n_frequencies (70))
+    output
+        dict of EEG runs windowed average per group
+        dict of MEG runs windowed average per group
     """
 
-    # Parse run
-    raw = mne.io.read_raw_fif(
-        "data/processed/subject" + str(subject) + "/run" + str(run) + "/processed.fif"
-    )
-
     # Window
-    windows = mne.Epochs(
-        raw,
-        numpy.insert(extract_events(raw, event_ids), 1, 0, axis=1),
-        picks=eeg_channels + meg_channels,
-        tmin=tmin,
-        tmax=tmax,
-        preload=True,
+    windows = mne.concatenate_epochs(
+        [
+            mne.Epochs(
+                run,
+                numpy.insert(extract_events(run, event_ids), 1, 0, axis=1),
+                picks=[channel for group in EEG_groups.values() for channel in group]
+                + [channel for group in MEG_groups.values() for channel in group],
+                tmin=tmin,
+                tmax=tmax,
+                preload=True,
+            )
+            for run in runs
+        ]
     )
 
-    eeg_windows = windows.get_data(picks=eeg_channels, units="uV")
-    meg_windows = windows.get_data(picks=meg_channels, units="fT")
+    # Split per EEG group
+    eeg_groups_windows = {}
+    for group_name, group_channels in EEG_groups.items():
+        eeg_groups_windows[group_name] = numpy.mean(
+            numpy.mean(windows.get_data(picks=group_channels, units="uV"), axis=0),
+            axis=0,
+        )
 
-    # Average
-    eeg_windows_avg = numpy.mean(eeg_windows, axis=0)
-    meg_windows_avg = numpy.mean(meg_windows, axis=0)
+    # Split per MEG group
+    meg_groups_windows = {}
+    for group_name, group_channels in MEG_groups.items():
+        meg_groups_windows[group_name] = numpy.mean(
+            numpy.mean(windows.get_data(picks=group_channels, units="fT"), axis=0),
+            axis=0,
+        )
 
-    # Standard deviation
-    eeg_windows_std = numpy.std(eeg_windows, axis=0)
-    meg_windows_std = numpy.std(meg_windows, axis=0)
-
-    # PSD
-    psd_estimator = mne.decoding.PSDEstimator(145, fmin=1, fmax=70)
-    eeg_windows_avg_psd = psd_estimator.transform(eeg_windows_avg)
-    meg_windows_avg_psd = psd_estimator.transform(meg_windows_avg)
-
-    return (
-        eeg_windows_avg,
-        eeg_windows_std,
-        eeg_windows_avg_psd,
-        meg_windows_avg,
-        meg_windows_std,
-        meg_windows_avg_psd,
-    )
+    return eeg_groups_windows, meg_groups_windows
