@@ -14,7 +14,7 @@ def build_subjects_file():
     )
 
     """
-        MEG COORDS AND NAMES
+        MEG COORDS, NAMES, TYPES
     """
 
     # Extract and collect
@@ -149,7 +149,7 @@ def build_subjects_file():
     meg_types.extend(["sensory" for _ in range(0, len(meg_names) - 20)])
 
     """
-        EEG NAMES
+        EEG NAMES, TYPES
     """
 
     eeg_names = [ch["ch_name"] for ch in raw.info["chs"] if "EEG" in ch["ch_name"]]
@@ -214,6 +214,7 @@ def build_subjects_file():
         "parietal lobe",  # EEG058
         "parietal lobe",  # EEG059
         "temporal lobe (R)",  # EEG060
+        "parietal lobe (R)",  # EEG060
         "parietal lobe",  # EEG065
         "frontal lobe",  # EEG066
         "frontal lobe",  # EEG067

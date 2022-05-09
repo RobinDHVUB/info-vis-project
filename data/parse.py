@@ -36,6 +36,9 @@ event_duration = 0.8
 minimum_min = 1.5  # (interstimulus interval is 1.7 so 1.5 for safety)
 maximum_max = 1.5
 
+# Sampling frequency
+sfreq = 145
+
 
 # ----
 # RUNS

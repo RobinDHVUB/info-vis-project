@@ -1,11 +1,11 @@
 import itertools
 import logging
 import math
-from select import select
 import streamlit
 import numpy
 from enum import Enum
 from urllib.parse import unquote
+from scipy import signal
 import json
 
 from bokeh.palettes import Dark2_5 as palette
@@ -18,6 +18,7 @@ from bokeh.models import (
     Rect,
     Span,
     Select,
+    MultiSelect,
     PanTool,
     ResetTool,
     WheelZoomTool,
@@ -47,10 +48,16 @@ MEG_groups = json.loads(unquote(args.get("MEG")[0]))
 class ViewMode(Enum):
     TOTAL = 1
     WINDOW = 2
+
+
 current_view_mode = ViewMode.TOTAL
+
+
 class DataMode(Enum):
     TIME = 1
     FREQUENCY = 2
+
+
 current_data_mode = DataMode.TIME
 
 # Parse required data
@@ -62,7 +69,9 @@ for i in range(1, 7):
     runs_events.append(parse.extract_events(run))
 
 # Calculate group averages
-EEG_group_avgs, EEG_group_psds, MEG_group_avgs, MEG_group_psds = parse.group_averages(runs, EEG_groups, MEG_groups)
+EEG_group_avgs, EEG_group_psds, MEG_group_avgs, MEG_group_psds = parse.group_averages(
+    runs, EEG_groups, MEG_groups
+)
 
 # Window averages
 EEG_window_group_avgs = None
@@ -71,7 +80,7 @@ MEG_window_group_avgs = None
 MEG_window_group_psds = None
 
 # Chunks
-chunk_size = 500 * 145
+chunk_size = 1000 * 145
 
 # View
 view_size = 10 * 145
@@ -83,6 +92,8 @@ event_colors = {id: next(colors) for id in parse.event_names.keys()}
 
 # Average plots
 def create_avg_plots(run_idx):
+    downsampling_factor = 3
+    resulting_sampling_freq = math.ceil(parse.sfreq / 3)
 
     # Tools
     tools = [
@@ -91,22 +102,18 @@ def create_avg_plots(run_idx):
         WheelZoomTool(dimensions="width"),
     ]
 
-    # Ticks
-    x_ticks = {i * 145: str(i) for i in range(math.ceil(chunk_size / 145) + 1)}
-
     # EEG
     run_EEG = EEG_group_avgs[run_idx]
     EEG_p = figure(
         title="EEG",
-        # output_backend="webgl",
+        output_backend="webgl",
         tools=tools,
         toolbar_location="above",
         toolbar_sticky=False,
         sizing_mode="stretch_both",
+        lod_threshold=None,
     )
     EEG_p.x_range = Range1d(0, view_size)
-    EEG_p.xaxis.ticker = [tick for tick in x_ticks.keys()]
-    EEG_p.xaxis.major_label_overrides = x_ticks
     EEG_p.xaxis.axis_label = "Time (s)"
     EEG_p.yaxis.axis_label = "µV"
     EEG_p.toolbar.logo = None
@@ -114,10 +121,13 @@ def create_avg_plots(run_idx):
     EEG_lines = []
     legend_items = []
     for group_name, group_data in run_EEG.items():
+        downsampled = signal.resample(
+            group_data, math.ceil(len(group_data) / downsampling_factor)
+        )
         source = ColumnDataSource(
             dict(
-                x=numpy.arange(0, len(group_data[:chunk_size]), 1),
-                y=group_data[:chunk_size],
+                x=numpy.arange(0, len(downsampled), 1),
+                y=downsampled,
             )
         )
         line = EEG_p.line(
@@ -134,29 +144,40 @@ def create_avg_plots(run_idx):
     EEG_p.add_layout(legend, "right")
     EEG_p.y_range.renderers = EEG_lines
 
+    x_ticks = {
+        i * resulting_sampling_freq: str(i)
+        for i in range(math.ceil(len(downsampled) / resulting_sampling_freq) + 1)
+    }
+    EEG_p.xaxis.ticker = [tick for tick in x_ticks.keys()]
+    EEG_p.xaxis.major_label_overrides = x_ticks
+
     # MEG plot
     run_MEG = MEG_group_avgs[run_idx]
     MEG_p = figure(
         title="MEG",
-        # output_backend="webgl",
+        output_backend="webgl",
         tools=tools,
         toolbar_location=None,
         sizing_mode="stretch_both",
+        lod_threshold=None,
     )
     MEG_p.x_range = EEG_p.x_range
     MEG_p.xaxis.ticker = [tick for tick in x_ticks.keys()]
     MEG_p.xaxis.major_label_overrides = x_ticks
     MEG_p.xaxis.axis_label = "Time (s)"
-    MEG_p.yaxis.axis_label = "µV"
+    MEG_p.yaxis.axis_label = "fT"
     MEG_p.toolbar.logo = None
 
     MEG_lines = []
     legend_items = []
     for group_name, group_data in run_MEG.items():
+        downsampled = signal.resample(
+            group_data, math.ceil(len(group_data) / downsampling_factor)
+        )
         source = ColumnDataSource(
             dict(
-                x=numpy.arange(0, len(group_data[:chunk_size]), 1),
-                y=group_data[:chunk_size],
+                x=numpy.arange(0, len(downsampled), 1),
+                y=downsampled,
             )
         )
         line = MEG_p.line(
@@ -184,9 +205,10 @@ def create_avg_plots(run_idx):
 
         # EEG plot
         span = Rect(
-            x=event[0] - (parse.event_duration * 145) / 2,
+            x=math.ceil(event[0] / downsampling_factor)
+            - (parse.event_duration * resulting_sampling_freq) / 2,
             y=0,
-            width=parse.event_duration * 145,
+            width=parse.event_duration * resulting_sampling_freq,
             height=10000,
             width_units="data",
             height_units="data",
@@ -199,9 +221,10 @@ def create_avg_plots(run_idx):
 
         # MEG plot
         span = Rect(
-            x=event[0] - (parse.event_duration * 145) / 2,
+            x=math.ceil(event[0] / downsampling_factor)
+            - (parse.event_duration * resulting_sampling_freq) / 2,
             y=0,
-            width=parse.event_duration * 145,
+            width=parse.event_duration * resulting_sampling_freq,
             height=10000,
             width_units="data",
             height_units="data",
@@ -220,7 +243,7 @@ def create_avg_plots(run_idx):
 
 
 # Window plots
-def create_window_plots(tmin, tplus):
+def create_window_plots(tmin, tplus, events):
     global EEG_window_group_avgs
     global EEG_window_group_psds
     global MEG_window_group_avgs
@@ -228,9 +251,19 @@ def create_window_plots(tmin, tplus):
 
     # Window
     if EEG_window_group_avgs is None:
-        EEG_window_group_avgs, EEG_window_group_psds, MEG_window_group_avgs, MEG_window_group_psds = parse.avg_windows(
-            runs, None, tmin, tplus, EEG_groups, MEG_groups
-        )  # TODO: add selected events
+        (
+            EEG_window_group_avgs,
+            EEG_window_group_psds,
+            MEG_window_group_avgs,
+            MEG_window_group_psds,
+        ) = parse.avg_windows(
+            runs,
+            [int(event_id) for event_id in events],
+            tmin,
+            tplus,
+            EEG_groups,
+            MEG_groups,
+        )
 
     # Tools
     tools = [
@@ -240,7 +273,10 @@ def create_window_plots(tmin, tplus):
     ]
 
     # Ticks
-    x_ticks = {math.floor(i * 145): str(round(i, 2)) for i in numpy.arange(0, math.ceil(-tmin + tplus)+0.1, 0.1)}
+    x_ticks = {
+        math.floor(i * 145): str(round(i, 2))
+        for i in numpy.arange(0, math.ceil(-tmin + tplus) + 0.1, 0.1)
+    }
 
     # EEG
     EEG_p = figure(
@@ -320,13 +356,22 @@ def create_window_plots(tmin, tplus):
 
     # Event line
     EEG_p.add_layout(
-        Span(location=math.floor(-tmin * 145), dimension="height", line_color=list(event_colors.values())[0])
+        Span(
+            location=math.floor(-tmin * 145),
+            dimension="height",
+            line_color=list(event_colors.values())[0],
+        )
     )
     MEG_p.add_layout(
-        Span(location=math.floor(-tmin * 145), dimension="height", line_color=list(event_colors.values())[0])
+        Span(
+            location=math.floor(-tmin * 145),
+            dimension="height",
+            line_color=list(event_colors.values())[0],
+        )
     )
 
     return EEG_p, MEG_p
+
 
 # PSD plots
 def create_psd_plots(run_idx):
@@ -351,7 +396,11 @@ def create_psd_plots(run_idx):
     EEG_p.yaxis.axis_label = "Density"
     EEG_p.toolbar.logo = None
 
-    EEG_psds = EEG_group_psds[run_idx] if current_view_mode == ViewMode.TOTAL else EEG_window_group_psds
+    EEG_psds = (
+        EEG_group_psds[run_idx]
+        if current_view_mode == ViewMode.TOTAL
+        else EEG_window_group_psds
+    )
     EEG_lines = []
     legend_items = []
     for group_name, group_data in EEG_psds.items():
@@ -390,7 +439,11 @@ def create_psd_plots(run_idx):
     MEG_p.yaxis.axis_label = "Density"
     MEG_p.toolbar.logo = None
 
-    MEG_psds = MEG_group_psds[run_idx] if current_view_mode == ViewMode.TOTAL else MEG_window_group_psds
+    MEG_psds = (
+        MEG_group_psds[run_idx]
+        if current_view_mode == ViewMode.TOTAL
+        else MEG_window_group_psds
+    )
     MEG_lines = []
     legend_items = []
     for group_name, group_data in MEG_psds.items():
@@ -422,6 +475,7 @@ def create_psd_plots(run_idx):
 # Switching between runs
 select_runs = Select(value="Run 1", options=["Run " + str(run) for run in range(1, 7)])
 
+
 def change_run(attr, old, new):
     global current_data_mode
     streamlit.legacy_caching.caching.clear_cache()
@@ -434,11 +488,13 @@ def change_run(attr, old, new):
 
     plots_column.children = [new_EEG_p, new_MEG_p]
 
+
 select_runs.on_change("value", change_run)
 
 # Switching between view modes
 select_tmin = Spinner(low=-1.5, high=0, step=0.1, value=-0.5, width=80)
 select_tmax = Spinner(low=0.1, high=1.5, step=0.1, value=0.5, width=80)
+
 
 def reset_windows(attr, old, new):
     global EEG_window_group_avgs
@@ -449,10 +505,22 @@ def reset_windows(attr, old, new):
     EEG_window_group_psds = None
     MEG_window_group_avgs = None
     MEG_window_group_psds = None
+
+
 select_tmin.on_change("value", reset_windows)
 select_tmax.on_change("value", reset_windows)
 
+select_events = MultiSelect(
+    options=[
+        (str(event_id), event_name)
+        for event_id, event_name in zip(
+            list(parse.event_names.keys()), list(parse.event_names.values())
+        )
+    ]
+)
+
 average_button = CheckboxButtonGroup(labels=["Average"], active=[1])
+
 
 def change_view_mode(attr):
     global current_view_mode
@@ -463,8 +531,10 @@ def change_view_mode(attr):
     if current_view_mode == ViewMode.TOTAL:
         current_view_mode = ViewMode.WINDOW
         if current_data_mode == DataMode.TIME:
-            new_EEG_p, new_MEG_p = create_window_plots(select_tmin.value, select_tmax.value)
-        else: 
+            new_EEG_p, new_MEG_p = create_window_plots(
+                select_tmin.value, select_tmax.value, select_events.value
+            )
+        else:
             new_EEG_p, new_MEG_p = create_psd_plots(run_idx)
         select_runs.disabled = True
         select_tmin.disabled = True
@@ -478,13 +548,15 @@ def change_view_mode(attr):
         else:
             new_EEG_p, new_MEG_p = create_psd_plots(run_idx)
         select_runs.disabled = False
-    
+
     plots_column.children = [new_EEG_p, new_MEG_p]
+
 
 average_button.on_click(change_view_mode)
 
 # Switching between data modes
 psd_button = CheckboxButtonGroup(labels=["PSD"], active=[1])
+
 
 def change_data_mode(attr):
     global current_view_mode
@@ -501,14 +573,18 @@ def change_data_mode(attr):
         select_tmax.disabled = True
     else:
         current_data_mode = DataMode.TIME
+        average_button.disabled = False
         if current_view_mode == ViewMode.TOTAL:
             new_EEG_p, new_MEG_p = create_avg_plots(run_idx)
             select_tmin.disabled = False
             select_tmax.disabled = False
         else:
-            new_EEG_p, new_MEG_p = create_window_plots(select_tmin.value, select_tmax.value)
-    
+            new_EEG_p, new_MEG_p = create_window_plots(
+                select_tmin.value, select_tmax.value
+            )
+
     plots_column.children = [new_EEG_p, new_MEG_p]
+
 
 psd_button.on_click(change_data_mode)
 
@@ -517,7 +593,14 @@ EEG_p, MEG_p = create_avg_plots(0)
 plots_column = column(children=[EEG_p, MEG_p], sizing_mode="stretch_both")
 doc.add_root(
     column(
-        row(select_runs, average_button, select_tmin, select_tmax, psd_button),
+        row(
+            select_runs,
+            psd_button,
+            average_button,
+            select_tmin,
+            select_tmax,
+            select_events,
+        ),
         plots_column,
         sizing_mode="stretch_both",
     )
