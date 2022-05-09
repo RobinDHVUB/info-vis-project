@@ -503,11 +503,10 @@ def change_data_mode(attr):
         current_data_mode = DataMode.TIME
         if current_view_mode == ViewMode.TOTAL:
             new_EEG_p, new_MEG_p = create_avg_plots(run_idx)
+            select_tmin.disabled = False
+            select_tmax.disabled = False
         else:
             new_EEG_p, new_MEG_p = create_window_plots(select_tmin.value, select_tmax.value)
-        average_button.disabled = False
-        select_tmin.disabled = False
-        select_tmax.disabled = False
     
     plots_column.children = [new_EEG_p, new_MEG_p]
 
