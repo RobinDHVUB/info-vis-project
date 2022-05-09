@@ -636,7 +636,7 @@ function missingEEGMeshIdx(eegNames) {
         "EEG052", "EEG051", "EEG001", "EEG070", "EEG018",
         "EEG060", "EEG049", "EEG028", "EEG027", "EEG017",
         "EEG026", "EEG016", "EEG009", "EEG010", "EEG059",
-        "EEG071", "EEG072", "EEG073"
+        "EEG071", "EEG072", "EEG073", "EEG015", "EEG011"
     ]
 
     // list of indices of the MEG signals in the original list of MEG names/coordinates
@@ -650,19 +650,19 @@ function missingEEGMeshIdx(eegNames) {
     indices[17], indices[11], indices[7], indices[5], indices[17], indices[10], indices[20], indices[6],
     indices[24], indices[24], indices[4], indices[5], indices[15], indices[18],
     indices[29], indices[30], indices[31], indices[32], indices[9], indices[30], indices[17], indices[8],
-    indices[8]]
+    indices[8], indices[33], indices[2]]
 
     var j = [indices[1], indices[4], indices[6], indices[9], indices[12], indices[14], indices[14],
     indices[18], indices[12], indices[20], indices[7], indices[16], indices[20], indices[7], indices[22],
     indices[23], indices[26], indices[27], indices[6], indices[16], indices[17],
     indices[20], indices[18], indices[18], indices[31], indices[32], indices[8], indices[8], indices[18],
-    indices[31]]
+    indices[31], indices [2], indices[34]]
 
     var k = [indices[2], indices[2], indices[7], indices[10], indices[13], indices[13], indices[16],
     indices[16], indices[19], indices[10], indices[21], indices[15], indices[9], indices[21], indices[23],
     indices[25], indices[1], indices[28], indices[23], indices[18], indices[16],
     indices[9], indices[17], indices[17], indices[17], indices[8], indices[9], indices[18], indices[9],
-    indices[9]]
+    indices[9], indices[1], indices[4]]
 
     return {"i": i, "j": j, "k": k}
 }
