@@ -1,5 +1,6 @@
 import mne
 import numpy
+from scipy import signal
 
 
 # -----
@@ -73,35 +74,49 @@ def group_averages(runs, eeg_groups, meg_groups):
     ---
     output:
         list of runs each with dict of EEG runs average per group
+        list of runs each with dict of EEG psd per group
         list of runs each with dict of MEG runs average per group
+        list of runs each with dict of MEG psd per group
     """
 
     # For each run
     eeg_groups_data_per_run = []
+    eeg_groups_psd_per_run = []
     meg_groups_data_per_run = []
+    meg_groups_psd_per_run = []
     for run in runs:
 
         # Split per EEG group
         eeg_groups_data = {}
+        eeg_groups_psd = {}
         for group_name, group_channels in eeg_groups.items():
             assert len(group_channels) > 0
-            eeg_groups_data[group_name] = numpy.mean(
-                run.get_data(picks=group_channels, units="uV"), axis=0
-            )
+            data = run.get_data(picks=group_channels, units="uV")
+            eeg_groups_data[group_name] = numpy.mean(data, axis=0)
+            eeg_groups_psd[group_name] = signal.welch(data, 145)
 
         eeg_groups_data_per_run.append(eeg_groups_data)
+        eeg_groups_psd_per_run.append(eeg_groups_psd)
 
         # Split per MEG group
         meg_groups_data = {}
+        meg_groups_psd = {}
         for group_name, group_channels in meg_groups.items():
             assert len(group_channels) > 0
-            meg_groups_data[group_name] = numpy.mean(
-                run.get_data(picks=group_channels, units="fT"), axis=0
-            )
+            data = run.get_data(picks=group_channels, units="fT")
+            meg_groups_data[group_name] = numpy.mean(data, axis=0)
+            meg_groups_psd[group_name] = signal.welch(data, 145)
+
         meg_groups_data_per_run.append(meg_groups_data)
+        meg_groups_psd_per_run.append(meg_groups_psd)
 
     # Return groups
-    return eeg_groups_data_per_run, meg_groups_data_per_run
+    return (
+        eeg_groups_data_per_run,
+        eeg_groups_psd_per_run,
+        meg_groups_data_per_run,
+        meg_groups_psd_per_run,
+    )
 
 
 def extract_events(raw, event_ids=None):
@@ -140,7 +155,9 @@ def avg_windows(runs, event_ids, tmin, tmax, EEG_groups, MEG_groups):
     ---
     output
         dict of EEG runs windowed average per group
+        dict of EEG psd windowed average per group
         dict of MEG runs windowed average per group
+        dict of MEG psd windowed average per group
     """
 
     # Window
@@ -161,18 +178,28 @@ def avg_windows(runs, event_ids, tmin, tmax, EEG_groups, MEG_groups):
 
     # Split per EEG group
     eeg_groups_windows = {}
+    eeg_groups_psd = {}
     for group_name, group_channels in EEG_groups.items():
+        avg_window = numpy.mean(
+            windows.get_data(picks=group_channels, units="uV"), axis=0
+        )
         eeg_groups_windows[group_name] = numpy.mean(
-            numpy.mean(windows.get_data(picks=group_channels, units="uV"), axis=0),
+            avg_window,
             axis=0,
         )
+        eeg_groups_psd[group_name] = signal.welch(avg_window, 145)
 
     # Split per MEG group
     meg_groups_windows = {}
+    meg_groups_psd = {}
     for group_name, group_channels in MEG_groups.items():
+        avg_window = numpy.mean(
+            windows.get_data(picks=group_channels, units="fT"), axis=0
+        )
         meg_groups_windows[group_name] = numpy.mean(
-            numpy.mean(windows.get_data(picks=group_channels, units="fT"), axis=0),
+            avg_window,
             axis=0,
         )
+        meg_groups_psd[group_name] = signal.welch(avg_window, 145)
 
-    return eeg_groups_windows, meg_groups_windows
+    return eeg_groups_windows, eeg_groups_psd, meg_groups_windows, meg_groups_psd
