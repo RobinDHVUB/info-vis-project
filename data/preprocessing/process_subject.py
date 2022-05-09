@@ -98,6 +98,23 @@ def process_subject(subject_id):
         # Pick MEG, EEG and stim channels
         raw.pick_types(meg="mag", eeg=True)
 
+        # Create downsampled copy for average view
+        downsampled = raw.copy().resample(45)
+        downsampled.save(
+            "/scratch/brussel/102/vsc10248/info-vis-data/processed/subject"
+            + subject_id
+            + "/run"
+            + str(run_id)
+            + "/processed_downsampled.fif"
+        )
+        downsampled.annotations.save(
+            "/scratch/brussel/102/vsc10248/info-vis-data/processed/subject"
+            + subject_id
+            + "/run"
+            + str(run_id)
+            + "/processed_downsampled_annotations.fif"
+        )
+
         # Save
         raw.save(
             "/scratch/brussel/102/vsc10248/info-vis-data/processed/subject"
@@ -105,13 +122,6 @@ def process_subject(subject_id):
             + "/run"
             + str(run_id)
             + "/processed.fif"
-        )
-        raw.annotations.save(
-            "/scratch/brussel/102/vsc10248/info-vis-data/processed/subject"
-            + subject_id
-            + "/run"
-            + str(run_id)
-            + "/processed_annotations.fif"
         )
 
 if __name__ == "__main__":

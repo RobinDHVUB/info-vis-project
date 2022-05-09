@@ -7,18 +7,8 @@ from scipy import signal
 # Constants
 # -----
 
-# Event id -> event name
-event_names = {
-    5: "Initial Famous Face",
-    6: "Immediate Repeat Famous Face",
-    7: "Delayed Repeat Famous Face",
-    13: "Initial Unfamiliar Face",
-    14: "Immediate Repeat Unfamiliar Face",
-    15: "Delayed Repeat Unfamiliar Face",
-    17: "Initial Scrambled Face",
-    18: "Immediate Repeat Scrambled Face",
-    19: "Delayed Repeat Scrambled Face",
-}
+# Event names
+event_names = {1: "Famous", 2: "Scrambled", 3: "Unfamiliar"}
 
 # Group names
 group_names = [
@@ -39,6 +29,9 @@ maximum_max = 1.5
 # Sampling frequency
 sfreq = 145
 
+# Average downsampled sampling frequency
+avg_sfreq = 45
+
 
 # ----
 # RUNS
@@ -47,31 +40,56 @@ sfreq = 145
 
 def parse_run(subject, run):
     """
-    Parses and returns windows for a given subject's run
+    Parses a subject's run
     ---
     input:
-        subject number [1-19]
+        subject number [1-16]
         run number [1-6]
     ---
     output:
         raw run
+        downsampled run
     """
 
-    # Read run
+    # Read raw run
     raw = mne.io.read_raw_fif(
         "data/processed/subject" + str(subject) + "/run" + str(run) + "/processed.fif",
         verbose=None,
     )
+    annotations = mne.read_annotations(
+        "data/processed/subject"
+        + str(subject)
+        + "/run"
+        + str(run)
+        + "/processed_annotations.fif",
+    )
+    raw.set_annotations(annotations)
 
-    return raw
+    # Read downsampled run
+    downsampled = mne.io.read_raw_fif(
+        "data/processed/subject" + str(subject) + "/run" + str(run) + "/processed_downsampled.fif",
+        verbose=None,
+    )
+    downsampled_annotations = mne.read_annotations(
+        "data/processed/subject"
+        + str(subject)
+        + "/run"
+        + str(run)
+        + "/processed_downsampled_annotations.fif",
+    )
+    downsampled.set_annotations(downsampled_annotations)
 
 
-def group_averages(runs, eeg_groups, meg_groups):
+    return raw, downsampled
+
+
+def group_averages(runs, downsampled_runs, eeg_groups, meg_groups):
     """
-    Parses and returns channel group averages for a given run
+    Parses and returns channel group averages for a given run, downsampled with a given factor
     ---
     input:
         raw runs
+        downsampled runs
         dict of eeg channels
         dict of meg channels
     ---
@@ -80,6 +98,7 @@ def group_averages(runs, eeg_groups, meg_groups):
         list of runs each with dict of EEG psd per group
         list of runs each with dict of MEG runs average per group
         list of runs each with dict of MEG psd per group
+        list of events per run
     """
 
     # For each run
@@ -87,16 +106,27 @@ def group_averages(runs, eeg_groups, meg_groups):
     eeg_groups_psd_per_run = []
     meg_groups_data_per_run = []
     meg_groups_psd_per_run = []
-    for run in runs:
+    events_per_run = []
+    for run, downsampled_run in zip(runs, downsampled_runs):
 
         # Split per EEG group
         eeg_groups_data = {}
         eeg_groups_psd = {}
         for group_name, group_channels in eeg_groups.items():
             assert len(group_channels) > 0
+
+            # Non-downsampled
             data = run.get_data(picks=group_channels, units="uV")
-            eeg_groups_data[group_name] = numpy.mean(data, axis=0)
+
+            # Store psd of non-downsampled
             eeg_groups_psd[group_name] = signal.welch(data, 145)
+
+            # Downsampled
+            downsampled_data = downsampled_run.get_data(picks=group_channels, units="uV")
+
+            # Store data of downsampled
+            eeg_groups_data[group_name] = numpy.mean(downsampled_data, axis=0)
+
 
         eeg_groups_data_per_run.append(eeg_groups_data)
         eeg_groups_psd_per_run.append(eeg_groups_psd)
@@ -106,38 +136,36 @@ def group_averages(runs, eeg_groups, meg_groups):
         meg_groups_psd = {}
         for group_name, group_channels in meg_groups.items():
             assert len(group_channels) > 0
+
+            # Non-downsampled
             data = run.get_data(picks=group_channels, units="fT")
-            meg_groups_data[group_name] = numpy.mean(data, axis=0)
-            meg_groups_psd[group_name] = signal.welch(data, 145)
+
+            # Store psd of non-downsampled
+            eeg_groups_psd[group_name] = signal.welch(data, sfreq)
+
+            # Downsampled
+            downsampled_data = downsampled_run.get_data(picks=group_channels, units="fT")
+
+            # Store data of downsampled
+            eeg_groups_data[group_name] = numpy.mean(downsampled_data, axis=0)
 
         meg_groups_data_per_run.append(meg_groups_data)
         meg_groups_psd_per_run.append(meg_groups_psd)
 
-    # Return groups
+        # Get events from downsampled version
+        events_per_run.append([transform_event(event) for event in mne.events_from_annotations(downsampled_run)[0]])
+
+    # Return collected data
     return (
         eeg_groups_data_per_run,
         eeg_groups_psd_per_run,
         meg_groups_data_per_run,
         meg_groups_psd_per_run,
+        events_per_run,
     )
 
-
-def extract_events(raw, event_ids=None):
-
-    # Get events from raw
-    events = mne.find_events(raw, stim_channel=["STI101"], min_duration=1)
-
-    # Select
-    selected_events = []
-    selection = event_names.keys() if event_ids is None else event_ids
-    for event in events:
-        if event[1] in selection:
-            selected_events.append([event[0], event[1]])
-        elif event[2] in selection:
-            selected_events.append([event[0], event[2]])
-
-    return selected_events
-
+def transform_event(event):
+    return (event[0], event[2])
 
 # -----
 # WINDOWS

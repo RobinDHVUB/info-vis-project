@@ -3,9 +3,6 @@ import logging
 import math
 import streamlit
 import numpy
-from enum import Enum
-from urllib.parse import unquote
-from scipy import signal
 import json
 
 from bokeh.palettes import Dark2_5 as palette
@@ -27,8 +24,10 @@ from bokeh.models import (
     LegendItem,
 )
 from bokeh.plotting import figure, curdoc
+from enum import Enum
+from urllib.parse import unquote
 
-import data.parse as parse
+import data.access as access
 
 # Document
 doc = curdoc()
@@ -62,16 +61,18 @@ current_data_mode = DataMode.TIME
 
 # Parse required data
 runs = []
-runs_events = []
 for i in range(1, 7):
-    run = parse.parse_run(subject_id, i)
+    run = access.parse_run(subject_id, i)
     runs.append(run)
-    runs_events.append(parse.extract_events(run))
 
-# Calculate group averages
-EEG_group_avgs, EEG_group_psds, MEG_group_avgs, MEG_group_psds = parse.group_averages(
-    runs, EEG_groups, MEG_groups
-)
+# Calculate downsampled group averages, group psds, and downsampled events
+(
+    EEG_group_avgs,
+    EEG_group_psds,
+    MEG_group_avgs,
+    MEG_group_psds,
+    downsampled_events,
+) = access.group_averages(runs, EEG_groups, MEG_groups)
 
 # Window averages
 EEG_window_group_avgs = None
@@ -84,13 +85,11 @@ view_size = 10 * 145
 
 # Color palette
 colors = itertools.cycle(palette)
-group_colors = {id: next(colors) for id in parse.group_names}
-event_colors = {id: next(colors) for id in parse.event_names.keys()}
+group_colors = {id: next(colors) for id in access.group_names}
+event_colors = {id: next(colors) for id in access.event_names.keys()}
 
 # Average plots
 def create_avg_plots(run_idx):
-    downsampling_factor = 3
-    resulting_sampling_freq = math.ceil(parse.sfreq / 3)
 
     # Tools
     tools = [
@@ -110,7 +109,7 @@ def create_avg_plots(run_idx):
         sizing_mode="stretch_both",
         lod_threshold=None,
     )
-    EEG_p.x_range = Range1d(0, 10 * resulting_sampling_freq)
+    EEG_p.x_range = Range1d(0, 10 * round(access.sfreq / access.avg_downsampling_factor))
     EEG_p.xaxis.axis_label = "Time (s)"
     EEG_p.yaxis.axis_label = "µV"
     EEG_p.toolbar.logo = None
@@ -118,13 +117,10 @@ def create_avg_plots(run_idx):
     EEG_lines = []
     legend_items = []
     for group_name, group_data in run_EEG.items():
-        downsampled = signal.resample(
-            group_data, math.ceil(len(group_data) / downsampling_factor)
-        )
         source = ColumnDataSource(
             dict(
-                x=numpy.arange(0, len(downsampled), 1),
-                y=downsampled,
+                x=numpy.arange(0, len(group_data), 1),
+                y=group_data,
             )
         )
         line = EEG_p.line(
@@ -142,8 +138,8 @@ def create_avg_plots(run_idx):
     EEG_p.y_range.renderers = EEG_lines
 
     x_ticks = {
-        i * resulting_sampling_freq: str(i)
-        for i in range(math.ceil(len(downsampled) / resulting_sampling_freq) + 1)
+        i * round(access.sfreq / access.avg_downsampling_factor): str(i)
+        for i in range(round(len(group_data) / round(access.sfreq / access.avg_downsampling_factor)) + 1)
     }
     EEG_p.xaxis.ticker = [tick for tick in x_ticks.keys()]
     EEG_p.xaxis.major_label_overrides = x_ticks
@@ -168,13 +164,10 @@ def create_avg_plots(run_idx):
     MEG_lines = []
     legend_items = []
     for group_name, group_data in run_MEG.items():
-        downsampled = signal.resample(
-            group_data, math.ceil(len(group_data) / downsampling_factor)
-        )
         source = ColumnDataSource(
             dict(
-                x=numpy.arange(0, len(downsampled), 1),
-                y=downsampled,
+                x=numpy.arange(0, len(group_data), 1),
+                y=group_data,
             )
         )
         line = MEG_p.line(
@@ -193,19 +186,19 @@ def create_avg_plots(run_idx):
 
     # Events
     renderers = []
-    for event in runs_events[run_idx]:
+    for event in downsampled_events[run_idx]:
         event_data = ColumnDataSource(
             dict(
-                event_type=[parse.event_names[event[1]]], color=[event_colors[event[1]]]
+                event_type=[access.event_names[event[1]]],
+                color=[event_colors[event[1]]],
             )
         )
 
         # EEG plot
         span = Rect(
-            x=math.ceil(event[0] / downsampling_factor)
-            - (parse.event_duration * resulting_sampling_freq) / 2,
+            x=round(event[0] - (access.event_duration * (access.sfreq / access.avg_downsampling_factor)) / 2),
             y=0,
-            width=parse.event_duration * resulting_sampling_freq,
+            width=access.event_duration * (access.sfreq / access.avg_downsampling_factor),
             height=10000,
             width_units="data",
             height_units="data",
@@ -218,11 +211,10 @@ def create_avg_plots(run_idx):
 
         # MEG plot
         span = Rect(
-            x=math.ceil(event[0] / downsampling_factor)
-            - (parse.event_duration * resulting_sampling_freq) / 2,
+            x=round(event[0] - (access.event_duration * (access.sfreq / access.avg_downsampling_factor)) / 2),
             y=0,
-            width=parse.event_duration * resulting_sampling_freq,
-            height=10000,
+            width=access.event_duration * (access.sfreq / access.avg_downsampling_factor),
+            height=100000,
             width_units="data",
             height_units="data",
             line_alpha=0.1,
@@ -253,7 +245,7 @@ def create_window_plots(tmin, tplus, events):
             EEG_window_group_psds,
             MEG_window_group_avgs,
             MEG_window_group_psds,
-        ) = parse.avg_windows(
+        ) = access.avg_windows(
             runs,
             [int(event_id) for event_id in events],
             tmin,
@@ -511,7 +503,7 @@ select_events = MultiSelect(
     options=[
         (str(event_id), event_name)
         for event_id, event_name in zip(
-            list(parse.event_names.keys()), list(parse.event_names.values())
+            list(access.event_names.keys()), list(access.event_names.values())
         )
     ]
 )
