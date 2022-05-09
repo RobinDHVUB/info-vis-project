@@ -215,6 +215,7 @@ def build_subjects_file():
         "Parietal lobe",  # EEG059
         "Temporal lobe (R)",  # EEG060
         "Parietal lobe (R)",  # EEG060
+        "Parietal lobe",  # EEG064
         "Parietal lobe",  # EEG065
         "Frontal lobe",  # EEG066
         "Frontal lobe",  # EEG067

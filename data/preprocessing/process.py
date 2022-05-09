@@ -3,40 +3,45 @@ import sys
 import os
 import json
 import numpy
+import openneuro
+import mne_bids
 
 
-def process_subject(subject_folder):
+def process_subject(subject_id):
     """
     Processes and saves the data for the given subject's run
     """
+    subject_id_string = subject_id if int(subject_id) > 9 else "0" + subject_id
 
-    # Define subject number
-    subject_id = str(int(subject_folder[-2:]))
+    # Download subject data
+    openneuro.download("ds000117", target_dir="/scratch/brussel/102/vsc10248/info-vis-data/raw", include=["sub-"+subject_id_string])
 
     # Make subject folder
     os.mkdir("/scratch/brussel/102/vsc10248/data/processed/subject" + subject_id)
 
     # Loop over runs
-    for run_id, run_file in enumerate(
-        os.listdir("/scratch/brussel/102/vsc10248/data/raw/" + subject_folder)
-    ):
+    for run_id in range(1,7):
+
+        # Define path to files
+        bids_path = mne_bids.BIDSPath(subject=subject_id_string, session="meg", task="facerecognition", datatype="meg", run="run-0" + str(run_id), root="/scratch/brussel/102/vsc10248/info-vis-data/raw")
+
+        # Read raw
+        raw = []
+        try:
+            raw = mne_bids.read_raw_bids(bids_path=bids_path)
+        except:
+            continue
 
         # Make folder for run
         os.mkdir(
             "/scratch/brussel/102/vsc10248/data/processed/subject"
             + subject_id
             + "/run"
-            + str(run_id + 1)
-        )
-
-        # Read raw
-        raw = mne.io.read_raw_fif(
-            "/scratch/brussel/102/vsc10248/data/raw/" + subject_folder + "/" + run_file,
-            preload=True,
+            + str(run_id)
         )
 
         # Do once
-        if run_id == 0:
+        if run_id == 1:
 
             # Get and save subject metadata
             # See: https://mne.tools/dev/generated/mne.Info.html
@@ -54,7 +59,7 @@ def process_subject(subject_folder):
             "/scratch/brussel/102/vsc10248/data/processed/subject"
             + subject_id
             + "/run"
-            + str(run_id + 1)
+            + str(run_id)
             + "/eeg_coords.npy",
             eeg_coords,
         )
@@ -88,22 +93,29 @@ def process_subject(subject_folder):
             "/scratch/brussel/102/vsc10248/data/processed/subject"
             + subject_id
             + "/run"
-            + str(run_id + 1)
+            + str(run_id)
             + "/ICA.pdf"
         )
         ica.exclude = eog_indices + ecg_indices
         ica.apply(raw)  # Apply
 
         # Pick MEG, EEG and stim channels
-        raw.pick_types(meg="mag", eeg=True, stim=True)
+        raw.pick_types(meg="mag", eeg=True)
 
         # Save
         raw.save(
             "/scratch/brussel/102/vsc10248/data/processed/subject"
             + subject_id
             + "/run"
-            + str(run_id + 1)
+            + str(run_id)
             + "/processed.fif"
+        )
+        raw.annotations.save(
+            "/scratch/brussel/102/vsc10248/data/processed/subject"
+            + subject_id
+            + "/run"
+            + str(run_id)
+            + "/processed_annotations.fif"
         )
 
 

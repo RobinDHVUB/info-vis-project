@@ -22,11 +22,11 @@ else
 fi
 
 # Queue the preprocessing tasks
-parallel --delay 0.2 -j $SLURM_NTASKS --joblog runtask.log --resume srun -N1 -n1 -c4 python data/preprocessing/process.py {} ::: $(ls -1 /scratch/brussel/102/vsc10248/data/raw)
+parallel --delay 0.2 -j $SLURM_NTASKS --joblog runtask.log --resume srun -N1 -n1 -c4 python data/preprocessing/process.py {} ::: {1..16}
 wait
 
 # Extract MEG coords and names
-python data/preprocessing/extract_metadata.py
+#python data/preprocessing/extract_metadata.py
 
 # Archive
-tar -Jcvf /scratch/brussel/102/vsc10248/data/processed.tar.xz -C /scratch/brussel/102/vsc10248/data processed 
+#tar -Jcvf /scratch/brussel/102/vsc10248/data/processed.tar.xz -C /scratch/brussel/102/vsc10248/data processed 
