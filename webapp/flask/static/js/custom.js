@@ -275,7 +275,29 @@ function initializeVisualizations() {
                 x: mesh_x,
                 y: mesh_y,
                 z: mesh_z,
-            }
+        }
+
+        // add missing Mesh connections for a prettier mesh
+        var missingMeshIdx = undefined
+        if (plotType == 'meg') {
+            missingMeshIdx = missingMEGMeshIdx(el_names)
+        }
+        else {
+            missingMeshIdx = missingEEGMeshIdx(el_names)
+        }
+
+        missingMesh = {
+            hoverinfo:'skip',
+            opacity:1,
+            color: 'rgb(300,100,200)',
+            type: 'mesh3d',
+            x: mesh_x,
+            y: mesh_y,
+            z: mesh_z,
+            i: missingMeshIdx["i"],
+            j: missingMeshIdx["j"],
+            k: missingMeshIdx["k"]
+        }
 
         // get the camera position to use (either the default one or the last stored one)
         var cameraValue = {
@@ -305,7 +327,7 @@ function initializeVisualizations() {
         }
 
         // we show all traces in the same plot but without any grids, axes, etc. (since we just want the 3D figure)
-        var data = [traceNon, traceSel, traceMesh];
+        var data = [traceNon, traceSel, traceMesh, missingMesh];
         var layout = {
             showlegend: false,
             margin: {
@@ -565,6 +587,82 @@ function initializeVisualizations() {
         console.log(error)
     });
 };
+
+/*
+Helper function to create a prettier mesh for the 3D MEG cap visualization.
+We initially created a more dynamic computation of which additional triangles should be drawn,
+but this seemed to be too variable and would take a lot of time.
+Since it's not the prime focus of this project, we therefore chose to hardcode missing electrode mesh connections.
+*/
+function missingMEGMeshIdx(megNames) {
+
+    // list of MEG signals that should be connected
+    var megsToConnect = ["MEG1211", "MEG1221", "MEG1321", "MEG1331", "MEG2421",
+        "MEG2431", "MEG1411", "MEG1441", "MEG2611", "MEG2641",
+        "MEG2521", "MEG1731", "MEG1931", "MEG2121", "MEG2331",
+        "MEG2511", "MEG1421", "MEG1431", "MEG2621", "MEG2631",
+        "MEG2531", "MEG2541", "MEG2131", "MEG2141", "MEG1741",
+        "MEG1711"]
+
+    // list of indices of the MEG signals in the original list of MEG names/coordinates
+    var indices = []
+    for (var i = 0; i < megsToConnect.length; i++) {
+        indices.push(megNames.indexOf(megsToConnect[i], 0))
+    }
+
+    // original coordinate indices that should be connected
+    var i = [indices[0], indices[6], indices[2], indices[17], indices[18], indices[5],
+        indices[20], indices[21], indices[22], indices[24]]
+    var j = [indices[1], indices[7], indices[16], indices[18], indices[19], indices[19],
+        indices[21], indices[22], indices[13], indices[25]]
+    var k = [indices[6], indices[2], indices[17], indices[3], indices[4], indices[20],
+        indices[15], indices[14], indices[23], indices[11]]
+
+    return {"i": i, "j": j, "k": k}
+}
+
+/*
+Helper function to create a prettier mesh for the 3D EEG cap visualization.
+We initially created a more dynamic computation of which additional triangles should be drawn,
+but this seemed to be too variable and would take a lot of time.
+Since it's not the prime focus of this project, we therefore chose to hardcode missing electrode mesh connections.
+*/
+function missingEEGMeshIdx(eegNames) {
+
+    // list of EEG signals that should be connected
+    var eegsToConnect = ["EEG007", "EEG008", "EEG002", "EEG005", "EEG004",
+        "EEG038", "EEG039", "EEG050", "EEG003", "EEG074",
+        "EEG069", "EEG029", "EEG030", "EEG041", "EEG040",
+        "EEG052", "EEG051", "EEG001", "EEG070", "EEG018",
+        "EEG060", "EEG049", "EEG028", "EEG027", "EEG017",
+        "EEG026", "EEG016", "EEG009", "EEG010", "EEG059",
+        "EEG071", "EEG072", "EEG073"
+    ]
+
+    // list of indices of the MEG signals in the original list of MEG names/coordinates
+    var indices = []
+    for (var i = 0; i < eegsToConnect.length; i++) {
+        indices.push(eegNames.indexOf(eegsToConnect[i], 0))
+    }
+
+    // original coordinate indices that should be connected
+    var i = [indices[0], indices[3], indices[5], indices[8], indices[11], indices[11], indices[15],
+    indices[17], indices[11], indices[7], indices[5], indices[17], indices[10], indices[20], indices[6],
+    indices[24], indices[24], indices[4], indices[5], indices[15], indices[18],
+    indices[29], indices[30], indices[31], indices[32], indices[9], indices[30], indices[17], indices[8],]
+
+    var j = [indices[1], indices[4], indices[6], indices[9], indices[12], indices[14], indices[14],
+    indices[18], indices[12], indices[20], indices[7], indices[16], indices[20], indices[7], indices[22],
+    indices[23], indices[26], indices[27], indices[6], indices[16], indices[17],
+    indices[20], indices[18], indices[18], indices[31], indices[32], indices[8], indices[8], indices[18],]
+
+    var k = [indices[2], indices[2], indices[7], indices[10], indices[13], indices[13], indices[16],
+    indices[16], indices[19], indices[10], indices[21], indices[15], indices[9], indices[21], indices[23],
+    indices[25], indices[1], indices[28], indices[23], indices[18], indices[16],
+    indices[9], indices[17], indices[17], indices[17], indices[8], indices[9], indices[18], indices[9],]
+
+    return {"i": i, "j": j, "k": k}
+}
 
 /*
 Function to create a String summary of the most important subject information
