@@ -79,9 +79,6 @@ EEG_window_group_psds = None
 MEG_window_group_avgs = None
 MEG_window_group_psds = None
 
-# Chunks
-chunk_size = 1000 * 145
-
 # View
 view_size = 10 * 145
 
@@ -113,7 +110,7 @@ def create_avg_plots(run_idx):
         sizing_mode="stretch_both",
         lod_threshold=None,
     )
-    EEG_p.x_range = Range1d(0, view_size)
+    EEG_p.x_range = Range1d(0, 10 * resulting_sampling_freq)
     EEG_p.xaxis.axis_label = "Time (s)"
     EEG_p.yaxis.axis_label = "µV"
     EEG_p.toolbar.logo = None

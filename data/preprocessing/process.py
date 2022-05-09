@@ -63,7 +63,6 @@ def process_subject(subject_folder):
         # See: https://www.nature.com/articles/sdata20151
         raw.rename_channels({"EEG061": "HEOG", "EEG062": "VEOG", "EEG063": "ECG"})
         raw.set_channel_types({"HEOG": "eog", "VEOG": "eog", "ECG": "ecg"})
-        raw.drop_channels(["EEG064"])
 
         # Bandpass filter between lowest and highest of freq bands
         raw.filter(l_freq=1.0, h_freq=70)
