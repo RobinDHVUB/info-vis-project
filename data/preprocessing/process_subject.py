@@ -3,7 +3,6 @@ import sys
 import os
 import json
 import numpy
-import openneuro
 import mne_bids
 
 
@@ -11,30 +10,27 @@ def process_subject(subject_id):
     """
     Processes and saves the data for the given subject's run
     """
-    subject_id_string = subject_id if int(subject_id) > 9 else "0" + subject_id
-
-    # Download subject data
-    openneuro.download("ds000117", target_dir="/scratch/brussel/102/vsc10248/info-vis-data/raw", include=["sub-"+subject_id_string])
 
     # Make subject folder
-    os.mkdir("/scratch/brussel/102/vsc10248/data/processed/subject" + subject_id)
+    os.mkdir("/scratch/brussel/102/vsc10248/info-vis-data/processed/subject" + subject_id)
 
     # Loop over runs
     for run_id in range(1,7):
 
         # Define path to files
-        bids_path = mne_bids.BIDSPath(subject=subject_id_string, session="meg", task="facerecognition", datatype="meg", run="run-0" + str(run_id), root="/scratch/brussel/102/vsc10248/info-vis-data/raw")
+        bids_path = mne_bids.BIDSPath(subject=subject_id.zfill(2), session="meg", task="facerecognition", datatype="meg", run=run_id, root="/scratch/brussel/102/vsc10248/info-vis-data/raw")
 
         # Read raw
         raw = []
         try:
             raw = mne_bids.read_raw_bids(bids_path=bids_path)
+            raw.load_data()
         except:
             continue
 
         # Make folder for run
         os.mkdir(
-            "/scratch/brussel/102/vsc10248/data/processed/subject"
+            "/scratch/brussel/102/vsc10248/info-vis-data/processed/subject"
             + subject_id
             + "/run"
             + str(run_id)
@@ -46,7 +42,7 @@ def process_subject(subject_id):
             # Get and save subject metadata
             # See: https://mne.tools/dev/generated/mne.Info.html
             with open(
-                "/scratch/brussel/102/vsc10248/data/processed/subject"
+                "/scratch/brussel/102/vsc10248/info-vis-data/processed/subject"
                 + subject_id
                 + "/info.json",
                 "w",
@@ -56,7 +52,7 @@ def process_subject(subject_id):
         # Get and save EEG coords (can vary per run)
         eeg_coords = [ch["loc"][:3] for ch in raw.info["chs"] if "EEG" in ch["ch_name"]]
         numpy.save(
-            "/scratch/brussel/102/vsc10248/data/processed/subject"
+            "/scratch/brussel/102/vsc10248/info-vis-data/processed/subject"
             + subject_id
             + "/run"
             + str(run_id)
@@ -90,7 +86,7 @@ def process_subject(subject_id):
             raw, stop=10, show_scrollbars=False
         )  # Plot ICA comps for first 10 seconds
         plot.savefig(
-            "/scratch/brussel/102/vsc10248/data/processed/subject"
+            "/scratch/brussel/102/vsc10248/info-vis-data/processed/subject"
             + subject_id
             + "/run"
             + str(run_id)
@@ -104,20 +100,19 @@ def process_subject(subject_id):
 
         # Save
         raw.save(
-            "/scratch/brussel/102/vsc10248/data/processed/subject"
+            "/scratch/brussel/102/vsc10248/info-vis-data/processed/subject"
             + subject_id
             + "/run"
             + str(run_id)
             + "/processed.fif"
         )
         raw.annotations.save(
-            "/scratch/brussel/102/vsc10248/data/processed/subject"
+            "/scratch/brussel/102/vsc10248/info-vis-data/processed/subject"
             + subject_id
             + "/run"
             + str(run_id)
             + "/processed_annotations.fif"
         )
-
 
 if __name__ == "__main__":
     process_subject(str(sys.argv[1]))

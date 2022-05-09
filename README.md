@@ -1,6 +1,6 @@
-# Information Visualization: Visualising a Multi-Modal Neuroimaging Dataset
+# Information Visualization: Project
 
-Project of Group 8 for the Information Visualization course at [vub](www.vub.be).
+Project of Group 8 for the Information Visualization course at [VUB](www.vub.be).
 
 ## 0. Contact information
 
@@ -12,11 +12,17 @@ Monty Python and the Three WISE Men:
 | Wolf De Wulf             | 0546395        | [wolf.de.wulf@vub.be](mailto:wolf.de.wulf@vub.be)                  |
 | Alexis François Verdoodt | 0545813        | [alexis.francois.verdoodt@vub.be](alexis.francois.verdoodt@vub.be) |
 
-## 1. Installation
+## 1. Data
 
-The visualisation is dockerised and thus to run it you need to install [docker](https://docs.docker.com/engine/install/) and [docker-compose](https://docs.docker.com/compose/install/).
+Download the [preprocessed data](https://vub-my.sharepoint.com/:u:/g/personal/wolf_de_wulf_vub_be/EZ70UnZ1aPFAmXQS98Gt0PEB0kBJ_IjNMszrhueXSs_YnA?e=et2jxn) and extract it into `data/processed`.  
+The code that was used to process the data can be found in [data/preprocessing](data/preprocessing).  
+Note that, because of the size of the dataset (+85GB), all preprocessing was ran on the [VUB Hydra HPC](https://hpc.vub.be/).
 
-## 2. Usage
+## 2. Installation
+
+The visualisation is dockerised and thus the only requirements needed to run it are docker [docker](https://docs.docker.com/engine/install/) and [docker-compose](https://docs.docker.com/compose/install/).
+
+## 3. Usage
 
 To boot the application, navigate to the [webapp](webapp) folder and run the following:
 
@@ -34,7 +40,7 @@ To clean up the docker containers completely, run the following:
 docker-compose rm
 ```
 
-## (3. For developers)
+## (4. For developers)
 
 When changes are made to the docker container's settings or when packages are added to their `requirements.txt` files, the containers need to be rebuilt.  
 To do so, firstly, clean up dangling containers/images/volumes:
@@ -51,3 +57,4 @@ docker-compose up --build --rm
 ```
 
 Lastly, when docker or docker-compose complains about permissions, try running with administrator/root privileges.
+
