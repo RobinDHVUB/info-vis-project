@@ -44,10 +44,14 @@ EEG_groups = json.loads(unquote(args.get("EEG")[0]))
 MEG_groups = json.loads(unquote(args.get("MEG")[0]))
 
 # Modes
-class Mode(Enum):
+class ViewMode(Enum):
     TOTAL = 1
     WINDOW = 2
-current_mode = Mode.TOTAL
+current_view_mode = ViewMode.TOTAL
+class DataMode(Enum):
+    TIME = 1
+    FREQUENCY = 2
+current_data_mode = DataMode.TIME
 
 # Parse required data
 runs = []
@@ -58,11 +62,13 @@ for i in range(1, 7):
     runs_events.append(parse.extract_events(run))
 
 # Calculate group averages
-EEG_group_avgs, MEG_group_avgs = parse.group_averages(runs, EEG_groups, MEG_groups)
+EEG_group_avgs, EEG_group_psds, MEG_group_avgs, MEG_group_psds = parse.group_averages(runs, EEG_groups, MEG_groups)
 
 # Window averages
 EEG_window_group_avgs = None
+EEG_window_group_psds = None
 MEG_window_group_avgs = None
+MEG_window_group_psds = None
 
 # Chunks
 chunk_size = 500 * 145
@@ -215,11 +221,16 @@ def create_avg_plots(run_idx):
 
 # Window plots
 def create_window_plots(tmin, tplus):
+    global EEG_window_group_avgs
+    global EEG_window_group_psds
+    global MEG_window_group_avgs
+    global MEG_window_group_psds
 
     # Window
-    EEG_window_group_avgs, MEG_window_group_avgs = parse.avg_windows(
-        runs, None, tmin, tplus, EEG_groups, MEG_groups
-    )  # TODO: add selected events
+    if EEG_window_group_avgs is None:
+        EEG_window_group_avgs, EEG_window_group_psds, MEG_window_group_avgs, MEG_window_group_psds = parse.avg_windows(
+            runs, None, tmin, tplus, EEG_groups, MEG_groups
+        )  # TODO: add selected events
 
     # Tools
     tools = [
@@ -317,49 +328,190 @@ def create_window_plots(tmin, tplus):
 
     return EEG_p, MEG_p
 
+# PSD plots
+def create_psd_plots(run_idx):
+
+    # Tools
+    tools = [
+        PanTool(dimensions="width"),
+        ResetTool(),
+        WheelZoomTool(dimensions="width"),
+    ]
+
+    # EEG
+    EEG_p = figure(
+        title="EEG",
+        # output_backend="webgl",
+        tools=tools,
+        toolbar_location="above",
+        toolbar_sticky=False,
+        sizing_mode="stretch_both",
+    )
+    EEG_p.xaxis.axis_label = "Frequency (Hz)"
+    EEG_p.yaxis.axis_label = "Density"
+    EEG_p.toolbar.logo = None
+
+    EEG_psds = EEG_group_psds[run_idx] if current_view_mode == ViewMode.TOTAL else EEG_window_group_psds
+    EEG_lines = []
+    legend_items = []
+    for group_name, group_data in EEG_psds.items():
+        freqs, psds = group_data
+        for channel_psd in psds:
+            source = ColumnDataSource(
+                dict(
+                    x=freqs,
+                    y=channel_psd,
+                )
+            )
+            line = EEG_p.line(
+                x="x",
+                y="y",
+                line_width=1,
+                source=source,
+                line_color=group_colors[group_name],
+            )
+            EEG_lines.append(line)
+        legend_items.append(LegendItem(label=group_name, renderers=[line]))
+    legend = Legend(items=legend_items)
+    legend.click_policy = "mute"
+    EEG_p.add_layout(legend, "right")
+    EEG_p.y_range.renderers = EEG_lines
+
+    # MEG plot
+    MEG_p = figure(
+        title="MEG",
+        # output_backend="webgl",
+        tools=tools,
+        toolbar_location=None,
+        sizing_mode="stretch_both",
+    )
+    MEG_p.x_range = EEG_p.x_range
+    MEG_p.xaxis.axis_label = "Frequency (Hz)"
+    MEG_p.yaxis.axis_label = "Density"
+    MEG_p.toolbar.logo = None
+
+    MEG_psds = MEG_group_psds[run_idx] if current_view_mode == ViewMode.TOTAL else MEG_window_group_psds
+    MEG_lines = []
+    legend_items = []
+    for group_name, group_data in MEG_psds.items():
+        freqs, psds = group_data
+        for channel_psd in psds:
+            source = ColumnDataSource(
+                dict(
+                    x=freqs,
+                    y=channel_psd,
+                )
+            )
+            line = MEG_p.line(
+                x="x",
+                y="y",
+                line_width=1,
+                source=source,
+                line_color=group_colors[group_name],
+            )
+            MEG_lines.append(line)
+        legend_items.append(LegendItem(label=group_name, renderers=[line]))
+    legend = Legend(items=legend_items)
+    legend.click_policy = "mute"
+    MEG_p.add_layout(legend, "right")
+    MEG_p.y_range.renderers = MEG_lines
+
+    return EEG_p, MEG_p
+
 
 # Switching between runs
 select_runs = Select(value="Run 1", options=["Run " + str(run) for run in range(1, 7)])
+
 def change_run(attr, old, new):
-    global current_mode
+    global current_data_mode
     streamlit.legacy_caching.caching.clear_cache()
     run_idx = int(new.removeprefix("Run ")) - 1
 
-    new_EEG_p, new_MEG_p = create_avg_plots(run_idx)
+    if current_data_mode == DataMode.TIME:
+        new_EEG_p, new_MEG_p = create_avg_plots(run_idx)
+    else:
+        new_EEG_p, new_MEG_p = create_psd_plots(run_idx)
+
     plots_column.children = [new_EEG_p, new_MEG_p]
 
 select_runs.on_change("value", change_run)
 
-# Switching between modes
+# Switching between view modes
 select_tmin = Spinner(low=-1.5, high=0, step=0.1, value=-0.5, width=80)
 select_tmax = Spinner(low=0.1, high=1.5, step=0.1, value=0.5, width=80)
 
+def reset_windows(attr, old, new):
+    global EEG_window_group_avgs
+    global EEG_window_group_psds
+    global MEG_window_group_avgs
+    global MEG_window_group_psds
+    EEG_window_group_avgs = None
+    EEG_window_group_psds = None
+    MEG_window_group_avgs = None
+    MEG_window_group_psds = None
+select_tmin.on_change("value", reset_windows)
+select_tmax.on_change("value", reset_windows)
+
 average_button = CheckboxButtonGroup(labels=["Average"], active=[1])
 
-def change_mode(attr):
-    global current_mode
+def change_view_mode(attr):
+    global current_view_mode
+    global current_data_mode
     streamlit.legacy_caching.caching.clear_cache()
+    run_idx = int(select_runs.value.removeprefix("Run ")) - 1
 
-    if current_mode == Mode.TOTAL:
-        current_mode = Mode.WINDOW
-        new_EEG_p, new_MEG_p = create_window_plots(select_tmin.value, select_tmax.value)
-        select_runs.disabled=True
+    if current_view_mode == ViewMode.TOTAL:
+        current_view_mode = ViewMode.WINDOW
+        if current_data_mode == DataMode.TIME:
+            new_EEG_p, new_MEG_p = create_window_plots(select_tmin.value, select_tmax.value)
+        else: 
+            new_EEG_p, new_MEG_p = create_psd_plots(run_idx)
+        select_runs.disabled = True
         select_tmin.disabled = True
         select_tmax.disabled = True
     else:
-        run_idx = int(select_runs.value.removeprefix("Run ")) - 1
-        current_mode = Mode.TOTAL
-        new_EEG_p, new_MEG_p = create_avg_plots(run_idx)
-        select_runs.disabled=False
+        current_view_mode = ViewMode.TOTAL
+        if current_data_mode == DataMode.TIME:
+            new_EEG_p, new_MEG_p = create_avg_plots(run_idx)
+            select_tmin.disabled = False
+            select_tmax.disabled = False
+        else:
+            new_EEG_p, new_MEG_p = create_psd_plots(run_idx)
+        select_runs.disabled = False
+    
+    plots_column.children = [new_EEG_p, new_MEG_p]
+
+average_button.on_click(change_view_mode)
+
+# Switching between data modes
+psd_button = CheckboxButtonGroup(labels=["PSD"], active=[1])
+
+def change_data_mode(attr):
+    global current_view_mode
+    global current_data_mode
+    streamlit.legacy_caching.caching.clear_cache()
+    run_idx = int(select_runs.value.removeprefix("Run ")) - 1
+
+    if current_data_mode == DataMode.TIME:
+        current_data_mode = DataMode.FREQUENCY
+        new_EEG_p, new_MEG_p = create_psd_plots(run_idx)
+        if current_view_mode == ViewMode.TOTAL:
+            average_button.disabled = True
+        select_tmin.disabled = True
+        select_tmax.disabled = True
+    else:
+        current_data_mode = DataMode.TIME
+        if current_view_mode == ViewMode.TOTAL:
+            new_EEG_p, new_MEG_p = create_avg_plots(run_idx)
+        else:
+            new_EEG_p, new_MEG_p = create_window_plots(select_tmin.value, select_tmax.value)
+        average_button.disabled = False
         select_tmin.disabled = False
         select_tmax.disabled = False
     
     plots_column.children = [new_EEG_p, new_MEG_p]
 
-average_button.on_click(change_mode)
-
-# PSD
-psd_button = CheckboxButtonGroup(labels=["PSD"], active=[1], disabled=True)
+psd_button.on_click(change_data_mode)
 
 # Layout of whole
 EEG_p, MEG_p = create_avg_plots(0)
