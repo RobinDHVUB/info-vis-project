@@ -377,7 +377,7 @@ function initializeVisualizations() {
     }
 
     // read in the subject data from the JSON file and initialize everything based on this data
-    d3.json("/static/data/subject_data.json").then(function(data)
+    d3.json("/static/subject-data/subject_data.json").then(function(data)
     {
         // names
         eegNames = data["eeg_names"]
