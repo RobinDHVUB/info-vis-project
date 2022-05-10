@@ -513,7 +513,7 @@ function initializeVisualizations() {
             }
           }
 
-          visualizeEEG(eegNames, eegColors, eegSelection, selectedSubject.eegCoords, selectedSubject.meshCoords, true)
+          visualizeEEG(eegNames, eegColors, eegSelection, selectedSubject.eeg_coords, selectedSubject.mesh_coords, true)
           checkAnalysis(selectedSubject)
         })
 
