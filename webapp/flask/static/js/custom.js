@@ -45,14 +45,14 @@ function initializeVisualizations() {
     /* Function to update the subject select box based on the last filter values */
     function updateSelect(newdata) {
         // Get all filter values
-        var slider_bot = $('#ageSlider').data("from")
-        var slider_top = $('#ageSlider').data("to")
-        var chosen_sex = d3.select("#subject-sex input:checked").attr("value")
+        var sliderBot = $('#ageSlider').data("from")
+        var sliderTop = $('#ageSlider').data("to")
+        var chosenSex = d3.select("#subject-sex input:checked").attr("value")
 
         // Filter the given data based on the filter values
         newdata = Array.from(newdata).filter(function(d) {
-            return d.age >= slider_bot && d.age <= slider_top
-                && (d.sex === chosen_sex || chosen_sex === 'all')
+            return d.age >= sliderBot && d.age <= sliderTop
+                && (d.sex === chosenSex || chosenSex === 'all')
         })
 
         // Update the options of the subject select box, based on the filtered data
@@ -161,13 +161,13 @@ function initializeVisualizations() {
     }
 
     /* Function for visualizing EEG electrode cap in 3D, based on the current subject that is selected */
-    function visualizeEEG(eeg_names, eeg_colors, eeg_selection, eeg_coords, mesh_coords, keepCamera) {
-        visualize3D("eeg", eeg_names, eeg_colors, eeg_selection, eeg_coords, mesh_coords, keepCamera)
+    function visualizeEEG(eegNames, eegColors, eegSelection, eegCoords, meshCoords, keepCamera) {
+        visualize3D("eeg", eegNames, eegColors, eegSelection, eegCoords, meshCoords, keepCamera)
     }
 
     /* Function for visualizing MEG electrode cap in 3D, based on the current subject that is selected */
-    function visualizeMEG(meg_names, meg_colors, meg_selection, meg_coords, mesh_coords, keepCamera) {
-        visualize3D("meg", meg_names, meg_colors, meg_selection, meg_coords, mesh_coords, keepCamera)
+    function visualizeMEG(megNames, megColors, megSelection, megCoords, meshCoords, keepCamera) {
+        visualize3D("meg", megNames, megColors, megSelection, megCoords, meshCoords, keepCamera)
     }
 
     /*
@@ -175,64 +175,64 @@ function initializeVisualizations() {
     - keepCamera is a parameter specifying whether the virtual camera position should be reset when updating the visualization.
     - plotType is expected to be 'eeg' or 'meg'
     */
-    function visualize3D(plotType, el_names, el_colors, el_selection, el_coords, mesh_coords, keepCamera)
+    function visualize3D(plotType, elNames, elColors, elSelection, elCoords, meshCoords, keepCamera)
     {
         // get the div to show the 3D plot in
         var graphDiv = document.getElementById(plotType + "Plot")
 
         // get the coordinates of all EEG electrodes
-        var el_x = el_coords[0]
-        var el_y = el_coords[1]
-        var el_z = el_coords[2]
+        var elX = elCoords[0]
+        var elY = elCoords[1]
+        var elZ = elCoords[2]
 
         // get the coordinates for the mesh beneath the EEG electrodes (mesh is added for having a clearer view)
-        var mesh_x = mesh_coords[0]
-        var mesh_y = mesh_coords[1]
-        var mesh_z = mesh_coords[2]
+        var meshX = meshCoords[0]
+        var meshY = meshCoords[1]
+        var meshZ = meshCoords[2]
 
         // split up the data in sets for selected electrodes and non-selected electrodes to easily visualize them differently
-        var el_selected_x = []
-        var el_selected_y = []
-        var el_selected_z = []
-        var el_selected_names = []
-        var el_selected_colors = []
+        var elSelectedX = []
+        var elSelectedY = []
+        var elSelectedZ = []
+        var elSelectedNames = []
+        var elSelectedColors = []
 
-        var el_nonselected_x = []
-        var el_nonselected_y = []
-        var el_nonselected_z = []
-        var el_nonselected_names = []
-        var el_nonselected_colors = []
+        var elNonselectedX = []
+        var elNonselectedY = []
+        var elNonselectedZ = []
+        var elNonselectedNames = []
+        var elNonselectedColors = []
 
-        var el_selected = []
-        for (var i = 0; i < el_selection.length; i++) {
-            if (el_selection[i]) {
-                el_selected_x.push(el_x[i])
-                el_selected_y.push(el_y[i])
-                el_selected_z.push(el_z[i])
-                el_selected_names.push(el_names[i])
-                el_selected_colors.push(el_colors[i])
+        var elSelected = []
+        for (var i = 0; i < elSelection.length; i++) {
+            if (elSelection[i]) {
+                elSelectedX.push(elX[i])
+                elSelectedY.push(elY[i])
+                elSelectedZ.push(elZ[i])
+                elSelectedNames.push(elNames[i])
+                elSelectedColors.push(elColors[i])
             }
             else {
-                el_nonselected_x.push(el_x[i])
-                el_nonselected_y.push(el_y[i])
-                el_nonselected_z.push(el_z[i])
-                el_nonselected_names.push(el_names[i])
-                el_nonselected_colors.push(el_colors[i])
+                elNonselectedX.push(elX[i])
+                elNonselectedY.push(elY[i])
+                elNonselectedZ.push(elZ[i])
+                elNonselectedNames.push(elNames[i])
+                elNonselectedColors.push(elColors[i])
             }
         }
 
         // trace for the non-selected electrodes
         var traceNon = {
-            x: el_nonselected_x,
-            y: el_nonselected_y,
-            z: el_nonselected_z,
+            x: elNonselectedX,
+            y: elNonselectedY,
+            z: elNonselectedZ,
             mode: 'markers',
             hovertemplate: '%{text}<extra></extra>',
-            text: el_nonselected_names,
+            text: elNonselectedNames,
             marker: {
                 symbol: 'circle',
                 size: 12,
-                color: el_nonselected_colors,
+                color: elNonselectedColors,
                 opacity: 0.6,
                 line: {
                     color: 'white',
@@ -244,16 +244,16 @@ function initializeVisualizations() {
 
         // trace for the selected electrodes
         var traceSel = {
-            x: el_selected_x,
-            y: el_selected_y,
-            z: el_selected_z,
+            x: elSelectedX,
+            y: elSelectedY,
+            z: elSelectedZ,
             mode: 'markers',
             hovertemplate: '%{text}<extra></extra>',
-            text: el_selected_names,
+            text: elSelectedNames,
             marker: {
                 symbol: 'circle',
                 size: 14,
-                color: el_selected_colors,
+                color: elSelectedColors,
                 opacity: 1,
                 line: {
                     color: 'black',
@@ -269,18 +269,18 @@ function initializeVisualizations() {
                 opacity:1,
                 color: 'rgb(300,100,200)',
                 type: 'mesh3d',
-                x: mesh_x,
-                y: mesh_y,
-                z: mesh_z,
+                x: meshX,
+                y: meshY,
+                z: meshZ,
         }
 
         // add missing Mesh connections for a prettier mesh
         var missingMeshIdx = undefined
         if (plotType == 'meg') {
-            missingMeshIdx = missingMEGMeshIdx(el_names)
+            missingMeshIdx = missingMEGMeshIdx(elNames)
         }
         else {
-            missingMeshIdx = missingEEGMeshIdx(el_names)
+            missingMeshIdx = missingEEGMeshIdx(elNames)
         }
 
         missingMesh = {
@@ -288,9 +288,9 @@ function initializeVisualizations() {
             opacity:1,
             color: 'rgb(300,100,200)',
             type: 'mesh3d',
-            x: mesh_x,
-            y: mesh_y,
-            z: mesh_z,
+            x: meshX,
+            y: meshY,
+            z: meshZ,
             i: missingMeshIdx["i"],
             j: missingMeshIdx["j"],
             k: missingMeshIdx["k"]
@@ -380,67 +380,67 @@ function initializeVisualizations() {
     d3.json("/static/subject-data/subject_data.json").then(function(data)
     {
         // names
-        eeg_names = data["eeg_names"]
-        meg_names = data["meg_names"]
+        eegNames = data["eeg_names"]
+        megNames = data["meg_names"]
 
         // types
-        eeg_types = data["eeg_types"]
-        meg_types = data["meg_types"]
+        eegTypes = data["eeg_types"]
+        megTypes = data["meg_types"]
 
         // coordinates (MEG coordinates are fixed, EEG coordinates are stored per subject)
-        meg_coords = data["meg_coords"]
-        meg_mesh_coords = data["meg_mesh_coords"]
+        megCoords = data["meg_coords"]
+        megMeshCoords = data["meg_mesh_coords"]
 
         // specify the color for each type of cortex
-        eeg_colors = []
-        for (var i = 0; i < eeg_types.length; i++) {
-            if (eeg_types[i].toLowerCase() === "frontal lobe") {
-                eeg_colors[i] = "red"
+        eegColors = []
+        for (var i = 0; i < eegTypes.length; i++) {
+            if (eegTypes[i].toLowerCase() === "frontal lobe") {
+                eegColors[i] = "red"
             }
-            else if (eeg_types[i].toLowerCase() === "parietal lobe") {
-                eeg_colors[i] = "blue"
+            else if (eegTypes[i].toLowerCase() === "parietal lobe") {
+                eegColors[i] = "blue"
             }
-            else if (eeg_types[i].toLowerCase() === "occipital lobe") {
-                eeg_colors[i] = "orange"
+            else if (eegTypes[i].toLowerCase() === "occipital lobe") {
+                eegColors[i] = "orange"
             }
-            else if (eeg_types[i].toLowerCase() === "temporal lobe (l)") {
-                eeg_colors[i] = "yellow"
+            else if (eegTypes[i].toLowerCase() === "temporal lobe (l)") {
+                eegColors[i] = "yellow"
             }
-            else if (eeg_types[i].toLowerCase() === "temporal lobe (r)"){
-                eeg_colors[i] = "black"
+            else if (eegTypes[i].toLowerCase() === "temporal lobe (r)"){
+                eegColors[i] = "black"
             }
             else
             {
-                console.log("invalid type: " +  eeg_types[i])
+                console.log("invalid type: " +  eegTypes[i])
             }
         }
 
-        meg_colors = []
-        for (var i = 0; i < meg_types.length; i++) {
-            if (meg_types[i].toLowerCase() === "frontal lobe") {
-                meg_colors[i] = "red"
+        megColors = []
+        for (var i = 0; i < megTypes.length; i++) {
+            if (megTypes[i].toLowerCase() === "frontal lobe") {
+                megColors[i] = "red"
             }
-            else if (meg_types[i].toLowerCase() === "parietal lobe") {
-                meg_colors[i] = "blue"
+            else if (megTypes[i].toLowerCase() === "parietal lobe") {
+                megColors[i] = "blue"
             }
-            else if (meg_types[i].toLowerCase() === "occipital lobe") {
-                meg_colors[i] = "orange"
+            else if (megTypes[i].toLowerCase() === "occipital lobe") {
+                megColors[i] = "orange"
             }
-            else if (meg_types[i].toLowerCase() === "temporal lobe (l)") {
-                meg_colors[i] = "yellow"
+            else if (megTypes[i].toLowerCase() === "temporal lobe (l)") {
+                megColors[i] = "yellow"
             }
-            else if (meg_types[i].toLowerCase() === "temporal lobe (r)"){
-                meg_colors[i] = "black"
+            else if (megTypes[i].toLowerCase() === "temporal lobe (r)"){
+                megColors[i] = "black"
             }
             else
             {
-                console.log("invalid type: " + meg_types[i])
+                console.log("invalid type: " + megTypes[i])
             }
         }
 
         // keep track of which electrodes have been selected (initially none are selected)
-        eeg_selection = Array(eeg_types.length).fill().map(_ => false)
-        meg_selection = Array(meg_types.length).fill().map(_ => false)
+        eegSelection = Array(eegTypes.length).fill().map(_ => false)
+        megSelection = Array(megTypes.length).fill().map(_ => false)
 
         // subject data
         subjects=data["subjects"]
@@ -507,13 +507,13 @@ function initializeVisualizations() {
           const isChecked = d3.select(this).property("checked")
           const boxValue = d3.select(this).property("value")
 
-          for (var i = 0; i < eeg_types.length; i++) {
-            if (eeg_types[i].toLowerCase() === boxValue.toLowerCase()) {
-              eeg_selection[i] = isChecked
+          for (var i = 0; i < eegTypes.length; i++) {
+            if (eegTypes[i].toLowerCase() === boxValue.toLowerCase()) {
+              eegSelection[i] = isChecked
             }
           }
 
-          visualizeEEG(eeg_names, eeg_colors, eeg_selection, selectedSubject.eeg_coords, selectedSubject.mesh_coords, true)
+          visualizeEEG(eegNames, eegColors, eegSelection, selectedSubject.eegCoords, selectedSubject.meshCoords, true)
           checkAnalysis(selectedSubject)
         })
 
@@ -522,13 +522,13 @@ function initializeVisualizations() {
           const isChecked = d3.select(this).property("checked")
           const boxValue = d3.select(this).property("value")
 
-          for (var i = 0; i < meg_types.length; i++) {
-            if (meg_types[i].toLowerCase() === boxValue.toLowerCase()) {
-              meg_selection[i] = isChecked
+          for (var i = 0; i < megTypes.length; i++) {
+            if (megTypes[i].toLowerCase() === boxValue.toLowerCase()) {
+              megSelection[i] = isChecked
             }
           }
 
-          visualizeMEG(meg_names, meg_colors, meg_selection, meg_coords, meg_mesh_coords, true)
+          visualizeMEG(megNames, megColors, megSelection, megCoords, megMeshCoords, true)
           checkAnalysis(selectedSubject)
         })
 
@@ -556,9 +556,9 @@ function initializeVisualizations() {
                     d3.selectAll('#eeg-checkbox-container label').classed("disabled", false)
                     d3.selectAll('#meg-checkbox-container label').classed("disabled", false)
 
-                    visualizeEEG(eeg_names, eeg_colors, eeg_selection, selectedSubject.eeg_coords,
-                        selectedSubject.mesh_coords, false)
-                    visualizeMEG(meg_names, meg_colors, meg_selection, meg_coords, meg_mesh_coords, false)
+                    visualizeEEG(eegNames, eegColors, eegSelection, selectedSubject.eegCoords,
+                        selectedSubject.meshCoords, false)
+                    visualizeMEG(megNames, megColors, megSelection, megCoords, megMeshCoords, false)
                 }
             }
 
@@ -713,36 +713,36 @@ function startAnalysis()
 {
     // get the selected subjects (there will only be one subject selected in our visualization)
     var subject = undefined
-    var subject_ids = []
+    var subjectIds = []
     d3.selectAll("#subject-selection option:checked").data().forEach(function(d) {
         subject = d;
-        subject_ids.push(d.id);
+        subjectIds.push(d.id);
     });
 
     // get the selected EEG channels
-    var eeg_channels = []
-    var eeg_channel_types = []
-    for (var i = 0; i < eeg_selection.length; i++) {
-        if (eeg_selection[i]) {
-            eeg_channels.push(eeg_names[i])
-            eeg_channel_types.push(eeg_types[i])
+    var eegChannels = []
+    var eegChannelTypes = []
+    for (var i = 0; i < eegSelection.length; i++) {
+        if (eegSelection[i]) {
+            eegChannels.push(eegNames[i])
+            eegChannelTypes.push(eegTypes[i])
         }
     }
 
     // get the selected MEG channels
-    var meg_channels = []
-    var meg_channel_types = []
-    for (var i = 0; i < meg_selection.length; i++) {
-        if (meg_selection[i]) {
-          meg_channels.push(meg_names[i])
-          meg_channel_types.push(meg_types[i])
+    var megChannels = []
+    var megChannelTypes = []
+    for (var i = 0; i < megSelection.length; i++) {
+        if (megSelection[i]) {
+          megChannels.push(megNames[i])
+          megChannelTypes.push(megTypes[i])
         }
     }
 
     const sel = JSON.stringify({
-        "subject": subject_ids[0],
-        "eeg": groupPerType(eeg_channel_types, eeg_channels),
-        "meg": groupPerType(meg_channel_types, meg_channels)
+        "subject": subjectIds[0],
+        "eeg": groupPerType(eegChannelTypes, eegChannels),
+        "meg": groupPerType(megChannelTypes, megChannels)
     });
 
     // hide the first page and "start analysis" button
@@ -801,11 +801,11 @@ However, it is currently unused since 3D visualization was eventually deemed mor
 */
 function drawEEGElectrodeSelector() {
     // general sizing info of figure
-    const ear_size = 25
-    const nose_height = 40
-    const electrode_size = 15
+    const earSize = 25
+    const noseHeight = 40
+    const electrodeSize = 15
     const width = 450, height = 450;
-    const margin = {top: 25 + nose_height, right: 25 + ear_size, bottom: 25, left: 25 + ear_size};
+    const margin = {top: 25 + noseHeight, right: 25 + earSize, bottom: 25, left: 25 + earSize};
 
 
     const svg = d3.select("#eeg-selection-container")
@@ -831,8 +831,8 @@ function drawEEGElectrodeSelector() {
     svg.append("path")
         .attr("transform", "translate(0," + height / 2 + ")")
         .attr("d", d3.arc()
-            .innerRadius(ear_size)
-            .outerRadius(ear_size)
+            .innerRadius(earSize)
+            .outerRadius(earSize)
             .startAngle(3.14)     // angle is in radian (pi = 3.14 = bottom).
             .endAngle(6.28)       // 2*pi = 6.28 = top
         )
@@ -844,8 +844,8 @@ function drawEEGElectrodeSelector() {
     svg.append("path")
         .attr("transform", "translate(" + width + "," + height / 2 + ")")
         .attr("d", d3.arc()
-            .innerRadius(ear_size)
-            .outerRadius(ear_size)
+            .innerRadius(earSize)
+            .outerRadius(earSize)
             .startAngle(-3.14)
             .endAngle(-6.28)
         )
@@ -863,10 +863,10 @@ function drawEEGElectrodeSelector() {
         })
         .curve(d3.curveBasis);
 
-    var lineData = [{"x": width / 2 - ear_size, "y": 1}, {
+    var lineData = [{"x": width / 2 - earSize, "y": 1}, {
         "x": width / 2,
-        "y": -nose_height
-    }, {"x": width / 2 + ear_size, "y": 1}];
+        "y": -noseHeight
+    }, {"x": width / 2 + earSize, "y": 1}];
 
     svg.append("path")
         .attr("d", bezierLine(lineData))
@@ -946,7 +946,7 @@ function drawEEGElectrodeSelector() {
 
         /* Generate the circles for the nodes */
         elemEnter.append("circle")
-            .attr("r", electrode_size)
+            .attr("r", electrodeSize)
             .attr("stroke", "black")
             .attr("fill", "yellow")
 
@@ -956,20 +956,20 @@ function drawEEGElectrodeSelector() {
                 return d.name
             })
             .attr("text-anchor", "middle")
-            .attr("font-size", electrode_size / ((electrode_size * 10) / 100))
-            .attr("dy", electrode_size / ((electrode_size * 25) / 100))
+            .attr("font-size", electrodeSize / ((electrodeSize * 10) / 100))
+            .attr("dy", electrodeSize / ((electrodeSize * 25) / 100))
     }).catch(function (error) {
         console.log(error)
     });
 
     // CHECKBOXES
     // keep track of the current selection (for hovering behavior)
-    var current_selection = d3.selectAll("#eeg-selection-container .node-group.selected")
+    var currentSelection = d3.selectAll("#eeg-selection-container .node-group.selected")
 
     d3.selectAll("#eeg-selection-checkboxes input").on("change", function (d) {
 
         // available electrode types
-        const available_values = ["visual", "motor", "sensory"]
+        const availableValues = ["visual", "motor", "sensory"]
 
         const isChecked = d3.select(this).property("checked")
         const boxValue = d3.select(this).property("value")
@@ -977,30 +977,30 @@ function drawEEGElectrodeSelector() {
         d3.selectAll("#eeg-selection-container .node-group.eeg-" + boxValue).classed("selected", !isChecked)
 
         // update current selection
-        current_selection = d3.selectAll("#eeg-selection-container .node-group.selected")
+        currentSelection = d3.selectAll("#eeg-selection-container .node-group.selected")
     })
 
     d3.selectAll(".eeg-input-container").on("mouseover", function () {
-        current_selection = d3.selectAll("#eeg-selection-container .node-group.selected")
+        currentSelection = d3.selectAll("#eeg-selection-container .node-group.selected")
         const isChecked = d3.select(this).select("input").property("checked")
         const boxValue = d3.select(this).select("input").property("value")
 
         d3.selectAll("#eeg-selection-container .node-group." + boxValue).classed("selected", !isChecked)
     }).on("mouseout", function () {
         d3.selectAll("#eeg-selection-container .node-group").classed("selected", false)
-        current_selection.classed("selected", true)
+        currentSelection.classed("selected", true)
     })
 
     d3.select(".eeg-all-btn").on("click", function () {
         d3.selectAll("#eeg-selection-container .node-group").classed("selected", true)
         d3.selectAll("#eeg-selection-checkboxes input").property("checked", true)
 
-        current_selection = d3.selectAll("#eeg-selection-container .node-group.selected")
+        currentSelection = d3.selectAll("#eeg-selection-container .node-group.selected")
     })
     d3.select(".eeg-reset-btn").on("click", function () {
         d3.selectAll("#eeg-selection-container .node-group").classed("selected", false)
         d3.selectAll("#eeg-selection-checkboxes input").property("checked", false)
 
-        current_selection = d3.selectAll("#eeg-selection-container .node-group.selected")
+        currentSelection = d3.selectAll("#eeg-selection-container .node-group.selected")
     })
 }
