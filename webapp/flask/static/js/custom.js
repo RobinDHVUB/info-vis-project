@@ -377,7 +377,7 @@ function initializeVisualizations() {
     }
 
     // read in the subject data from the JSON file and initialize everything based on this data
-    d3.json("/static/json/subject_data.json").then(function(data)
+    d3.json("/static/subject-data/subject_data.json").then(function(data)
     {
         // names
         eeg_names = data["eeg_names"]
@@ -763,7 +763,7 @@ function startAnalysis()
 
     $.ajax({
         type: 'POST',
-        url: "/data",
+        url: "/data-analysis",
         data: sel,
         dataType: 'html',
         contentType: 'application/json',
@@ -787,16 +787,10 @@ function startAnalysis()
             $(".bokeh-wrapper").append(data);
         },
         error: function (xhr, ajaxOptions, thrownError) {
-            console.log("nok")
             console.log(xhr.status);
             console.log(thrownError);
         }
     });
-
-    // Go to Bokeh
-
-    /* location.href = `http://localhost:5000/data?id=1&MEG=[1,2,3,4]&EEG=${eeg_values}`; */
-    //location.href = `http://localhost:5006/app?id=` + subject_ids + `&EEG=` + eeg_channels + `&MEG=` + meg_channels;
 }
 
 /* UNUSED FUNCTIONS */
