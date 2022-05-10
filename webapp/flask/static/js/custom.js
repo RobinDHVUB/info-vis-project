@@ -180,12 +180,12 @@ function initializeVisualizations() {
         // get the div to show the 3D plot in
         var graphDiv = document.getElementById(plotType + "Plot")
 
-        // get the coordinates of all EEG electrodes
+        // get the coordinates of all electrodes
         var elX = elCoords[0]
         var elY = elCoords[1]
         var elZ = elCoords[2]
 
-        // get the coordinates for the mesh beneath the EEG electrodes (mesh is added for having a clearer view)
+        // get the coordinates for the mesh beneath the electrodes (mesh is added for having a clearer view)
         var meshX = meshCoords[0]
         var meshY = meshCoords[1]
         var meshZ = meshCoords[2]
@@ -556,8 +556,8 @@ function initializeVisualizations() {
                     d3.selectAll('#eeg-checkbox-container label').classed("disabled", false)
                     d3.selectAll('#meg-checkbox-container label').classed("disabled", false)
 
-                    visualizeEEG(eegNames, eegColors, eegSelection, selectedSubject.eegCoords,
-                        selectedSubject.meshCoords, false)
+                    visualizeEEG(eegNames, eegColors, eegSelection, selectedSubject.eeg_coords,
+                        selectedSubject.mesh_coords, false)
                     visualizeMEG(megNames, megColors, megSelection, megCoords, megMeshCoords, false)
                 }
             }
