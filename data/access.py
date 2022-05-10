@@ -64,6 +64,14 @@ def parse_run(subject, run):
         + "/processed_annotations.fif",
     )
     raw.set_annotations(annotations)
+    annotations = mne.read_annotations(
+        "data/processed/subject"
+        + str(subject)
+        + "/run"
+        + str(run)
+        + "/processed_annotations.fif",
+    )
+    raw.set_annotations(annotations)
 
     # Read downsampled run
     downsampled = mne.io.read_raw_fif(
@@ -83,13 +91,12 @@ def parse_run(subject, run):
     return raw, downsampled
 
 
-def group_averages(runs, downsampled_runs, eeg_groups, meg_groups):
+def group_averages(runs, eeg_groups, meg_groups):
     """
-    Parses and returns channel group averages for a given run, downsampled with a given factor
+    Parses and returns channel group averages for a given run as well as the transformed events
     ---
     input:
         raw runs
-        downsampled runs
         dict of eeg channels
         dict of meg channels
     ---
@@ -107,7 +114,7 @@ def group_averages(runs, downsampled_runs, eeg_groups, meg_groups):
     meg_groups_data_per_run = []
     meg_groups_psd_per_run = []
     events_per_run = []
-    for run, downsampled_run in zip(runs, downsampled_runs):
+    for run in runs:
 
         # Split per EEG group
         eeg_groups_data = {}
@@ -115,17 +122,13 @@ def group_averages(runs, downsampled_runs, eeg_groups, meg_groups):
         for group_name, group_channels in eeg_groups.items():
             assert len(group_channels) > 0
 
-            # Non-downsampled
             data = run.get_data(picks=group_channels, units="uV")
 
-            # Store psd of non-downsampled
+            # Store psd
             eeg_groups_psd[group_name] = signal.welch(data, 145)
 
-            # Downsampled
-            downsampled_data = downsampled_run.get_data(picks=group_channels, units="uV")
-
-            # Store data of downsampled
-            eeg_groups_data[group_name] = numpy.mean(downsampled_data, axis=0)
+            # Store mean
+            eeg_groups_data[group_name] = numpy.mean(data, axis=0)
 
 
         eeg_groups_data_per_run.append(eeg_groups_data)
@@ -137,23 +140,19 @@ def group_averages(runs, downsampled_runs, eeg_groups, meg_groups):
         for group_name, group_channels in meg_groups.items():
             assert len(group_channels) > 0
 
-            # Non-downsampled
             data = run.get_data(picks=group_channels, units="fT")
 
-            # Store psd of non-downsampled
-            eeg_groups_psd[group_name] = signal.welch(data, sfreq)
+            # Store psd
+            meg_groups_psd[group_name] = signal.welch(data, sfreq)
 
-            # Downsampled
-            downsampled_data = downsampled_run.get_data(picks=group_channels, units="fT")
-
-            # Store data of downsampled
-            eeg_groups_data[group_name] = numpy.mean(downsampled_data, axis=0)
+            # Store mean
+            meg_groups_data[group_name] = numpy.mean(data, axis=0)
 
         meg_groups_data_per_run.append(meg_groups_data)
         meg_groups_psd_per_run.append(meg_groups_psd)
 
         # Get events from downsampled version
-        events_per_run.append([transform_event(event) for event in mne.events_from_annotations(downsampled_run)[0]])
+        events_per_run.append(extract_events(run))
 
     # Return collected data
     return (
@@ -164,17 +163,30 @@ def group_averages(runs, downsampled_runs, eeg_groups, meg_groups):
         events_per_run,
     )
 
-def transform_event(event):
-    return (event[0], event[2])
+def extract_events(run, selection=None):
+
+    # Get events
+    events, _ = mne.events_from_annotations(run)
+
+    # Get event ids
+    selected_ids = selection if selection is not None else list(event_names.keys())
+    
+    # Transform
+    transformed_events = []
+    for event in events:
+        if event[2] in selected_ids:
+            transformed_events.append([event[0], event[2]])
+
+    return numpy.array(transformed_events)
 
 # -----
 # WINDOWS
 # -----
 
 
-def avg_windows(runs, event_ids, tmin, tmax, EEG_groups, MEG_groups):
+def avg_windows(runs, event_selection, tmin, tmax, EEG_groups, MEG_groups):
     """
-    Parses and returns windows for a given subject's run
+    Parses and returns average window for a given subject
     ---
     input:
         raw runs
@@ -192,20 +204,22 @@ def avg_windows(runs, event_ids, tmin, tmax, EEG_groups, MEG_groups):
     """
 
     # Window
-    windows = mne.concatenate_epochs(
-        [
+    dev_head_t = runs[0].info["dev_head_t"]
+    epochs = []
+    for run in runs:
+        run.info["dev_head_t"] = dev_head_t
+        epochs.append(
             mne.Epochs(
                 run,
-                numpy.insert(extract_events(run, event_ids), 1, 0, axis=1),
+                numpy.insert(extract_events(run, event_selection), 1, 0, axis=1),
                 picks=[channel for group in EEG_groups.values() for channel in group]
                 + [channel for group in MEG_groups.values() for channel in group],
                 tmin=tmin,
                 tmax=tmax,
                 preload=True,
             )
-            for run in runs
-        ]
-    )
+        )
+    windows = mne.concatenate_epochs(epochs)
 
     # Split per EEG group
     eeg_groups_windows = {}

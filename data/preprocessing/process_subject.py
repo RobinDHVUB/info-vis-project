@@ -123,6 +123,13 @@ def process_subject(subject_id):
             + str(run_id)
             + "/processed.fif"
         )
+        raw.annotations.save(
+            "/scratch/brussel/102/vsc10248/info-vis-data/processed/subject"
+            + subject_id
+            + "/run"
+            + str(run_id)
+            + "/processed_annotations.fif"
+        )
 
 if __name__ == "__main__":
     process_subject(str(sys.argv[1]))
