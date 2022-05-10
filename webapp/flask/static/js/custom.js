@@ -48,13 +48,11 @@ function initializeVisualizations() {
         var slider_bot = $('#ageSlider').data("from")
         var slider_top = $('#ageSlider').data("to")
         var chosen_sex = d3.select("#subject-sex input:checked").attr("value")
-        var chosen_hand = d3.select("#subject-hand input:checked").attr("value")
 
         // Filter the given data based on the filter values
         newdata = Array.from(newdata).filter(function(d) {
             return d.age >= slider_bot && d.age <= slider_top
                 && (d.sex === chosen_sex || chosen_sex === 'all')
-                && (d.hand === chosen_hand || chosen_hand === 'all')
         })
 
         // Update the options of the subject select box, based on the filtered data
@@ -69,8 +67,7 @@ function initializeVisualizations() {
             .append('option')
             .text(function(d) {
                 var sex = d.sex === 'm' ? 'male' : 'female'
-                var hand = d.hand === 'l' ? 'left' : 'right'
-                return "Subject " + d.id + ": " + sex + ", " + d.age + ", " + hand
+                return "Subject " + d.id + ": " + sex + ", " + d.age
             })
 
         options.exit().remove();
@@ -460,12 +457,6 @@ function initializeVisualizations() {
             handleSubjectChange()
         })
 
-        // Update select options when handedness filter changes
-        d3.selectAll("#subject-hand input").on("change", function(d) {
-            updateSelect(selectData)
-            handleSubjectChange()
-        })
-
         // Initialize a slider for subject age filtering and update select options on change
         const minAge = d3.min(subjects, d => d.age)
         const maxAge = d3.max(subjects, d => d.age)
@@ -672,9 +663,8 @@ Function to create a String summary of the most important subject information
 */
 function createSubjectInfo(subjectData) {
     var sex = subjectData.sex === 'm' ? 'male' : 'female'
-    var hand = subjectData.hand === 'l' ? 'left-handed' : 'right-handed'
 
-    return "Subject " + subjectData.id + ": " + sex + ", " + subjectData.age + " years old, " + hand
+    return "Subject " + subjectData.id + ": " + sex + ", " + subjectData.age + " years old"
 }
 
 /*
