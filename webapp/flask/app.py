@@ -1,6 +1,6 @@
 import os
 
-from flask import Flask, BluePrint, render_template, request, jsonify
+from flask import Flask, Blueprint, render_template, request, jsonify
 
 from bokeh.client import pull_session
 from bokeh.embed import server_document
