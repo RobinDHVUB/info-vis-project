@@ -1,6 +1,5 @@
 import logging
 import math
-import streamlit
 import numpy
 import json
 
@@ -21,14 +20,11 @@ from bokeh.models import (
     Legend,
     LegendItem,
 )
-from bokeh.plotting import figure, curdoc
+from bokeh.plotting import figure
 from enum import Enum
 from urllib.parse import unquote
 
 import data.access as access
-
-# Document
-doc = curdoc()
 
 # Logging
 LOG_FORMAT = "%(levelname)s %(asctime)s - %(message)s"
@@ -36,10 +32,13 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
 # Get session arguments
-args = doc.session_context.request.arguments
-subject_id = int(args.get("id")[0].decode("UTF-8").split(",")[0])
-EEG_groups = json.loads(unquote(args.get("EEG")[0]))
-MEG_groups = json.loads(unquote(args.get("MEG")[0]))
+#args = doc.session_context.request.arguments
+#subject_id = int(args.get("id")[0].decode("UTF-8").split(",")[0])
+#EEG_groups = json.loads(unquote(args.get("EEG")[0]))
+#MEG_groups = json.loads(unquote(args.get("MEG")[0]))
+subject_id = 1
+EEG_groups = {"Parietal lobe": ["EEG001"]}
+MEG_groups = {"Parietal lobe": ["MEG0111"]}
 
 # Modes
 class ViewMode(Enum):
@@ -469,7 +468,6 @@ select_runs = Select(value="Run 1", options=["Run " + str(run) for run in range(
 
 def change_run(attr, old, new):
     global current_data_mode
-    streamlit.legacy_caching.caching.clear_cache()
     run_idx = int(new.removeprefix("Run ")) - 1
 
     if current_data_mode == DataMode.TIME:
@@ -527,7 +525,6 @@ average_button = CheckboxButtonGroup(labels=["Average"], active=[1])
 def change_view_mode(attr):
     global current_view_mode
     global current_data_mode
-    streamlit.legacy_caching.caching.clear_cache()
     run_idx = int(select_runs.value.removeprefix("Run ")) - 1
 
     if current_view_mode == ViewMode.TOTAL:
@@ -566,7 +563,6 @@ psd_button = CheckboxButtonGroup(labels=["PSD"], active=[1])
 def change_data_mode(attr):
     global current_view_mode
     global current_data_mode
-    streamlit.legacy_caching.caching.clear_cache()
     run_idx = int(select_runs.value.removeprefix("Run ")) - 1
 
     if current_data_mode == DataMode.TIME:
@@ -598,8 +594,7 @@ psd_button.on_click(change_data_mode)
 EEG_p, MEG_p = create_avg_plots(0)
 EEG_row = row(EEG_p, sizing_mode="scale_both")
 MEG_row = row(EEG_p, sizing_mode="scale_both")
-doc.add_root(
-    column(
+test = column(
         row(
             select_runs,
             psd_button,
@@ -613,4 +608,3 @@ doc.add_root(
         MEG_row,
         sizing_mode="scale_both"
     )
-)

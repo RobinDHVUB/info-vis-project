@@ -1,9 +1,6 @@
 # Pull python image
 FROM python:slim
 
-# Create a volume
-VOLUME /app
-
 # Switch working directory
 WORKDIR /app
 
@@ -16,4 +13,4 @@ COPY bokeh/requirements.txt /app
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Start the bokeh app
-ENTRYPOINT ["bokeh", "serve", "/app", "--allow-websocket-origin=*"]
+ENTRYPOINT ["panel", "serve", "panel.py", "--show", "--autoreload"]
