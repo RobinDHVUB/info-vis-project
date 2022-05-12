@@ -1,12 +1,9 @@
-from cgitb import enable
-import itertools
 import logging
 import math
 import streamlit
 import numpy
 import json
 
-from bokeh.palettes import Dark2_5 as palette
 from bokeh.layouts import column, row
 from bokeh.models import (
     Range1d,
@@ -64,7 +61,7 @@ current_data_mode = DataMode.TIME
 runs = []
 downsampled_runs = []
 for i in range(1, 7):
-    run, downsampled_run = access.parse_run(subject_id, i)
+    run, downsampled_run = access.parse_run(subject_id, i, logger)
     runs.append(run)
     downsampled_runs.append(downsampled_run)
 
@@ -86,11 +83,6 @@ MEG_window_group_psds = None
 # View
 view_size = 10 * 145
 
-# Color palette
-colors = itertools.cycle(palette)
-group_colors = {id: next(colors) for id in access.group_names}
-event_colors = {id: next(colors) for id in access.event_names.keys()}
-
 # Average plots
 def create_avg_plots(run_idx):
 
@@ -102,7 +94,9 @@ def create_avg_plots(run_idx):
     ]
 
     # Ticks
-    run_lengths = [len(group_avg) for group_avg in list(EEG_group_avgs[run_idx].values())]
+    run_lengths = [
+        len(group_avg) for group_avg in list(EEG_group_avgs[run_idx].values())
+    ]
     x_ticks = {
         i * access.avg_sfreq: str(i)
         for i in range(round(max(run_lengths) / access.avg_sfreq) + 1)
@@ -140,7 +134,7 @@ def create_avg_plots(run_idx):
             y="y",
             line_width=1,
             source=source,
-            line_color=group_colors[group_name],
+            line_color=access.group_colors[group_name.capitalize()],
         )
         EEG_lines.append(line)
         legend_items.append(LegendItem(label=group_name, renderers=[line]))
@@ -148,7 +142,6 @@ def create_avg_plots(run_idx):
     legend.click_policy = "mute"
     EEG_p.add_layout(legend, "right")
     EEG_p.y_range.renderers = EEG_lines
-
 
     # MEG plot
     run_MEG = MEG_group_avgs[run_idx]
@@ -181,7 +174,7 @@ def create_avg_plots(run_idx):
             y="y",
             line_width=1,
             source=source,
-            line_color=group_colors[group_name],
+            line_color=access.group_colors[group_name.capitalize()],
         )
         MEG_lines.append(line)
         legend_items.append(LegendItem(label=group_name, renderers=[line]))
@@ -196,8 +189,8 @@ def create_avg_plots(run_idx):
         if event[0] <= max(run_lengths):
             event_data = ColumnDataSource(
                 dict(
-                    event_type=[access.event_names[event[1]]],
-                    color=[event_colors[event[1]]],
+                    event_type=[access.event_names[event[1] - 1]],
+                    color=[access.event_colors[access.event_names[event[1] - 1]]],
                 )
             )
 
@@ -210,9 +203,9 @@ def create_avg_plots(run_idx):
                 width_units="data",
                 height_units="data",
                 line_alpha=0.1,
-                line_color=event_colors[event[1]],
+                line_color=access.event_colors[access.event_names[1]],
                 fill_alpha=0.1,
-                fill_color=event_colors[event[1]],
+                fill_color=access.event_colors[access.event_names[1]],
             )
             renderers.append(EEG_p.add_glyph(source_or_glyph=event_data, glyph=span))
 
@@ -225,9 +218,9 @@ def create_avg_plots(run_idx):
                 width_units="data",
                 height_units="data",
                 line_alpha=0.1,
-                line_color=event_colors[event[1]],
+                line_color=access.event_colors[access.event_names[1]],
                 fill_alpha=0.1,
-                fill_color=event_colors[event[1]],
+                fill_color=access.event_colors[access.event_names[1]],
             )
             renderers.append(MEG_p.add_glyph(source_or_glyph=event_data, glyph=span))
 
@@ -303,7 +296,7 @@ def create_window_plots(tmin, tplus, events):
             y="y",
             line_width=1,
             source=source,
-            line_color=group_colors[group_name],
+            line_color=access.group_colors[group_name.capitalize()],
         )
         EEG_lines.append(line)
         legend_items.append(LegendItem(label=group_name, renderers=[line]))
@@ -341,7 +334,7 @@ def create_window_plots(tmin, tplus, events):
             y="y",
             line_width=1,
             source=source,
-            line_color=group_colors[group_name],
+            line_color=access.group_colors[group_name.capitalize()],
         )
         MEG_lines.append(line)
         legend_items.append(LegendItem(label=group_name, renderers=[line]))
@@ -355,14 +348,14 @@ def create_window_plots(tmin, tplus, events):
         Span(
             location=math.floor(-tmin * 145),
             dimension="height",
-            line_color=list(event_colors.values())[0],
+            line_color="#E70000",
         )
     )
     MEG_p.add_layout(
         Span(
             location=math.floor(-tmin * 145),
             dimension="height",
-            line_color=list(event_colors.values())[0],
+            line_color="#E70000",
         )
     )
 
@@ -413,7 +406,7 @@ def create_psd_plots(run_idx):
                 y="y",
                 line_width=1,
                 source=source,
-                line_color=group_colors[group_name],
+                line_color=access.group_colors[group_name.capitalize()],
             )
             EEG_lines.append(line)
         legend_items.append(LegendItem(label=group_name, renderers=[line]))
@@ -456,7 +449,7 @@ def create_psd_plots(run_idx):
                 y="y",
                 line_width=1,
                 source=source,
-                line_color=group_colors[group_name],
+                line_color=access.group_colors[group_name.capitalize()],
             )
             MEG_lines.append(line)
         legend_items.append(LegendItem(label=group_name, renderers=[line]))
@@ -509,18 +502,18 @@ select_tmax.on_change("value", reset_windows)
 select_events = MultiSelect(
     value=["1"],
     options=[
-        (str(event_id), event_name)
-        for event_id, event_name in zip(
-            list(access.event_names.keys()), list(access.event_names.values())
-        )
-    ]
+        (str(event_id + 1), event_name)
+        for event_id, event_name in enumerate(access.event_names)
+    ],
 )
+
 
 def enable_avg(attr, old, new):
     if len(select_events.value) > 0:
         average_button.disabled = False
     else:
         average_button.disabled = True
+
 
 select_events.on_change("value", enable_avg)
 select_events.on_change("value", reset_windows)
@@ -545,14 +538,14 @@ def change_view_mode(attr):
         select_runs.disabled = True
         select_tmin.disabled = True
         select_tmax.disabled = True
-        select_events.disabled=True
+        select_events.disabled = True
     else:
         current_view_mode = ViewMode.TOTAL
         if current_data_mode == DataMode.TIME:
             new_EEG_p, new_MEG_p = create_avg_plots(run_idx)
             select_tmin.disabled = False
             select_tmax.disabled = False
-            select_events.disabled=False
+            select_events.disabled = False
         else:
             new_EEG_p, new_MEG_p = create_psd_plots(run_idx)
         select_runs.disabled = False

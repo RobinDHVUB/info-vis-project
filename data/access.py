@@ -8,16 +8,26 @@ from scipy import signal
 # -----
 
 # Event names
-event_names = {1: "Famous", 2: "Scrambled", 3: "Unfamiliar"}
+event_names = ["Famous", "Scrambled", "Unfamiliar"]
+event_colors = {
+    event_name: event_color
+    for event_name, event_color in zip(event_names, ["#eefb01", "#930791", "#f09903"])
+}
 
 # Group names
 group_names = [
     "Frontal lobe",
     "Parietal lobe",
-    "Temporal lobe (L)",
-    "Temporal lobe (R)",
+    "Temporal lobe (l)",
+    "Temporal lobe (r)",
     "Occipital lobe",
 ]
+group_colors = {
+    group_name: group_color
+    for group_name, group_color in zip(
+        group_names, ["#ff734e", "#759ffa", "#64ea5f", "#cd34b5", "#000000"]
+    )
+}
 
 # Duration of events in seconds
 event_duration = 0.8
@@ -38,7 +48,7 @@ avg_sfreq = 45
 # ----
 
 
-def parse_run(subject, run):
+def parse_run(subject, run, logger):
     """
     Parses a subject's run
     ---
@@ -75,7 +85,11 @@ def parse_run(subject, run):
 
     # Read downsampled run
     downsampled = mne.io.read_raw_fif(
-        "data/processed/subject" + str(subject) + "/run" + str(run) + "/processed_downsampled.fif",
+        "data/processed/subject"
+        + str(subject)
+        + "/run"
+        + str(run)
+        + "/processed_downsampled.fif",
         verbose=None,
     )
     downsampled_annotations = mne.read_annotations(
@@ -86,7 +100,6 @@ def parse_run(subject, run):
         + "/processed_downsampled_annotations.fif",
     )
     downsampled.set_annotations(downsampled_annotations)
-
 
     return raw, downsampled
 
@@ -130,7 +143,6 @@ def group_averages(runs, eeg_groups, meg_groups):
             # Store mean
             eeg_groups_data[group_name] = numpy.mean(data, axis=0)
 
-
         eeg_groups_data_per_run.append(eeg_groups_data)
         eeg_groups_psd_per_run.append(eeg_groups_psd)
 
@@ -163,14 +175,15 @@ def group_averages(runs, eeg_groups, meg_groups):
         events_per_run,
     )
 
+
 def extract_events(run, selection=None):
 
     # Get events
     events, _ = mne.events_from_annotations(run)
 
     # Get event ids
-    selected_ids = selection if selection is not None else list(event_names.keys())
-    
+    selected_ids = selection if selection is not None else list(range(1, 4))
+
     # Transform
     transformed_events = []
     for event in events:
@@ -178,6 +191,7 @@ def extract_events(run, selection=None):
             transformed_events.append([event[0], event[2]])
 
     return numpy.array(transformed_events)
+
 
 # -----
 # WINDOWS
