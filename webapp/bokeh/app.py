@@ -134,7 +134,7 @@ def create_avg_plots(run_idx):
             y="y",
             line_width=1,
             source=source,
-            line_color=access.group_colors[group_name.capitalize()],
+            line_color=access.group_colors[group_name],
         )
         EEG_lines.append(line)
         legend_items.append(LegendItem(label=group_name, renderers=[line]))
@@ -174,7 +174,7 @@ def create_avg_plots(run_idx):
             y="y",
             line_width=1,
             source=source,
-            line_color=access.group_colors[group_name.capitalize()],
+            line_color=access.group_colors[group_name],
         )
         MEG_lines.append(line)
         legend_items.append(LegendItem(label=group_name, renderers=[line]))
@@ -296,7 +296,7 @@ def create_window_plots(tmin, tplus, events):
             y="y",
             line_width=1,
             source=source,
-            line_color=access.group_colors[group_name.capitalize()],
+            line_color=access.group_colors[group_name],
         )
         EEG_lines.append(line)
         legend_items.append(LegendItem(label=group_name, renderers=[line]))
@@ -334,7 +334,7 @@ def create_window_plots(tmin, tplus, events):
             y="y",
             line_width=1,
             source=source,
-            line_color=access.group_colors[group_name.capitalize()],
+            line_color=access.group_colors[group_name],
         )
         MEG_lines.append(line)
         legend_items.append(LegendItem(label=group_name, renderers=[line]))
@@ -406,7 +406,7 @@ def create_psd_plots(run_idx):
                 y="y",
                 line_width=1,
                 source=source,
-                line_color=access.group_colors[group_name.capitalize()],
+                line_color=access.group_colors[group_name],
             )
             EEG_lines.append(line)
         legend_items.append(LegendItem(label=group_name, renderers=[line]))
@@ -449,7 +449,7 @@ def create_psd_plots(run_idx):
                 y="y",
                 line_width=1,
                 source=source,
-                line_color=access.group_colors[group_name.capitalize()],
+                line_color=access.group_colors[group_name],
             )
             MEG_lines.append(line)
         legend_items.append(LegendItem(label=group_name, renderers=[line]))

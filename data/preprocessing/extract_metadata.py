@@ -8,8 +8,7 @@ import mne_bids
 def build_subjects_file():
 
     # Read first run of first subject
-    bids_path = mne_bids.BIDSPath(subject="01", session="meg", task="facerecognition", datatype="meg", run=1, root="/scratch/brussel/102/vsc10248/info-vis-data/raw")
-    raw = mne_bids.read_raw_bids(bids_path=bids_path)
+    raw = mne.io.read_raw_fif("/scratch/brussel/102/vsc10248/info-vis-data/processed/subject1/run1/processed.fif")
 
     """
         MEG COORDS AND NAMES
@@ -39,108 +38,108 @@ def build_subjects_file():
     meg_mesh_z = meg_mesh[:, 2].tolist()
 
     meg_types = [
-        "temporal lobe (L)",  # MEG0111
-        "temporal lobe (L)",  # MEG0121
-        "temporal lobe (L)",  # MEG0131
-        "temporal lobe (L)",  # MEG0141
-        "temporal lobe (L)",  # MEG0211
-        "frontal lobe",  # MEG0221
-        "parietal lobe",  # MEG0231
-        "temporal lobe (L)",  # MEG0241
-        "frontal lobe",  # MEG0311
-        "frontal lobe",  # MEG0321
-        "frontal lobe",  # MEG0331
-        "frontal lobe",  # MEG0341
-        "frontal lobe",  # MEG0411
-        "frontal lobe",  # MEG0421
-        "parietal lobe",  # MEG0431
-        "parietal lobe",  # MEG0441
-        "frontal lobe",  # MEG0511
-        "frontal lobe",  # MEG0521
-        "frontal lobe",  # MEG0531
-        "frontal lobe",  # MEG0541
-        "frontal lobe",  # MEG0611
-        "frontal lobe",  # MEG0621
-        "frontal lobe",  # MEG0631
-        "frontal lobe",  # MEG0641
-        "parietal lobe",  # MEG0711
-        "parietal lobe",  # MEG0721
-        "parietal lobe",  # MEG0731
-        "parietal lobe",  # MEG0741
-        "frontal lobe",  # MEG0811
-        "frontal lobe",  # MEG0821
-        "frontal lobe",  # MEG0911
-        "frontal lobe",  # MEG0921
-        "frontal lobe",  # MEG0931
-        "frontal lobe",  # MEG0941
-        "frontal lobe",  # MEG1011
-        "frontal lobe",  # MEG1021
-        "frontal lobe",  # MEG1031
-        "frontal lobe",  # MEG1041
-        "frontal lobe",  # MEG1111
-        "frontal lobe",  # MEG1121
-        "parietal lobe",  # MEG1131
-        "parietal lobe",  # MEG1141
-        "frontal lobe",  # MEG1211
-        "frontal lobe",  # MEG1221
-        "frontal lobe",  # MEG1231
-        "frontal lobe",  # MEG1241
-        "frontal lobe",  # MEG1311
-        "temporal lobe (R)",  # MEG1321
-        "temporal lobe (R)",  # MEG1331
-        "parietal lobe",  # MEG1341
-        "temporal lobe (R)",  # MEG1411
-        "temporal lobe (R)",  # MEG1421
-        "temporal lobe (R)",  # MEG1431
-        "temporal lobe (R)",  # MEG1441
-        "temporal lobe (L)",  # MEG1511
-        "temporal lobe (L)",  # MEG1521
-        "temporal lobe (L)",  # MEG1531
-        "temporal lobe (L)",  # MEG1541
-        "temporal lobe (L)",  # MEG1611
-        "parietal lobe",  # MEG1621
-        "parietal lobe",  # MEG1631
-        "temporal lobe (L)",  # MEG1641
-        "occipital lobe",  # MEG1711
-        "temporal lobe (L)",  # MEG1721
-        "occipital lobe",  # MEG1731
-        "occipital lobe",  # MEG1741
-        "parietal lobe",  # MEG1811
-        "parietal lobe",  # MEG1821
-        "parietal lobe",  # MEG1831
-        "parietal lobe",  # MEG1841
-        "parietal lobe",  # MEG1911
-        "occipital lobe",  # MEG1921
-        "occipital lobe",  # MEG1931
-        "occipital lobe",  # MEG1941
-        "parietal lobe",  # MEG2011
-        "parietal lobe",  # MEG2021
-        "parietal lobe",  # MEG2031
-        "parietal lobe",  # MEG2041
-        "occipital lobe",  # MEG2111
-        "occipital lobe",  # MEG2121
-        "occipital lobe",  # MEG2131
-        "occipital lobe",  # MEG2141
-        "parietal lobe",  # MEG2211
-        "parietal lobe",  # MEG2221
-        "parietal lobe",  # MEG2231
-        "parietal lobe",  # MEG2241
-        "parietal lobe",  # MEG2311
-        "occipital lobe",  # MEG2321
-        "occipital lobe",  # MEG2331
-        "occipital lobe",  # MEG2341
-        "parietal lobe",  # MEG2411
-        "temporal lobe (R)",  # MEG2421
-        "temporal lobe (R)",  # MEG2431
-        "parietal lobe",  # MEG2441
-        "occipital lobe",  # MEG2511
-        "temporal lobe (R)",  # MEG2521
-        "occipital lobe",  # MEG2531
-        "occipital lobe",  # MEG2541
-        "temporal lobe (R)",  # MEG2611
-        "temporal lobe (R)",  # MEG2621
-        "temporal lobe (R)",  # MEG2631
-        "temporal lobe (R)",  # MEG2641"
+        "Temporal lobe (L)",  # MEG0111
+        "Temporal lobe (L)",  # MEG0121
+        "Temporal lobe (L)",  # MEG0131
+        "Temporal lobe (L)",  # MEG0141
+        "Temporal lobe (L)",  # MEG0211
+        "Frontal lobe",  # MEG0221
+        "Parietal lobe",  # MEG0231
+        "Temporal lobe (L)",  # MEG0241
+        "Frontal lobe",  # MEG0311
+        "Frontal lobe",  # MEG0321
+        "Frontal lobe",  # MEG0331
+        "Frontal lobe",  # MEG0341
+        "Frontal lobe",  # MEG0411
+        "Frontal lobe",  # MEG0421
+        "Parietal lobe",  # MEG0431
+        "Parietal lobe",  # MEG0441
+        "Frontal lobe",  # MEG0511
+        "Frontal lobe",  # MEG0521
+        "Frontal lobe",  # MEG0531
+        "Frontal lobe",  # MEG0541
+        "Frontal lobe",  # MEG0611
+        "Frontal lobe",  # MEG0621
+        "Frontal lobe",  # MEG0631
+        "Frontal lobe",  # MEG0641
+        "Parietal lobe",  # MEG0711
+        "Parietal lobe",  # MEG0721
+        "Parietal lobe",  # MEG0731
+        "Parietal lobe",  # MEG0741
+        "Frontal lobe",  # MEG0811
+        "Frontal lobe",  # MEG0821
+        "Frontal lobe",  # MEG0911
+        "Frontal lobe",  # MEG0921
+        "Frontal lobe",  # MEG0931
+        "Frontal lobe",  # MEG0941
+        "Frontal lobe",  # MEG1011
+        "Frontal lobe",  # MEG1021
+        "Frontal lobe",  # MEG1031
+        "Frontal lobe",  # MEG1041
+        "Frontal lobe",  # MEG1111
+        "Frontal lobe",  # MEG1121
+        "Parietal lobe",  # MEG1131
+        "Parietal lobe",  # MEG1141
+        "Frontal lobe",  # MEG1211
+        "Frontal lobe",  # MEG1221
+        "Frontal lobe",  # MEG1231
+        "Frontal lobe",  # MEG1241
+        "Frontal lobe",  # MEG1311
+        "Temporal lobe (R)",  # MEG1321
+        "Temporal lobe (R)",  # MEG1331
+        "Parietal lobe",  # MEG1341
+        "Temporal lobe (R)",  # MEG1411
+        "Temporal lobe (R)",  # MEG1421
+        "Temporal lobe (R)",  # MEG1431
+        "Temporal lobe (R)",  # MEG1441
+        "Temporal lobe (L)",  # MEG1511
+        "Temporal lobe (L)",  # MEG1521
+        "Temporal lobe (L)",  # MEG1531
+        "Temporal lobe (L)",  # MEG1541
+        "Temporal lobe (L)",  # MEG1611
+        "Parietal lobe",  # MEG1621
+        "Parietal lobe",  # MEG1631
+        "Temporal lobe (L)",  # MEG1641
+        "Occipital lobe",  # MEG1711
+        "Temporal lobe (L)",  # MEG1721
+        "Occipital lobe",  # MEG1731
+        "Occipital lobe",  # MEG1741
+        "Parietal lobe",  # MEG1811
+        "Parietal lobe",  # MEG1821
+        "Parietal lobe",  # MEG1831
+        "Parietal lobe",  # MEG1841
+        "Parietal lobe",  # MEG1911
+        "Occipital lobe",  # MEG1921
+        "Occipital lobe",  # MEG1931
+        "Occipital lobe",  # MEG1941
+        "Parietal lobe",  # MEG2011
+        "Parietal lobe",  # MEG2021
+        "Parietal lobe",  # MEG2031
+        "Parietal lobe",  # MEG2041
+        "Occipital lobe",  # MEG2111
+        "Occipital lobe",  # MEG2121
+        "Occipital lobe",  # MEG2131
+        "Occipital lobe",  # MEG2141
+        "Parietal lobe",  # MEG2211
+        "Parietal lobe",  # MEG2221
+        "Parietal lobe",  # MEG2231
+        "Parietal lobe",  # MEG2241
+        "Parietal lobe",  # MEG2311
+        "Occipital lobe",  # MEG2321
+        "Occipital lobe",  # MEG2331
+        "Occipital lobe",  # MEG2341
+        "Parietal lobe",  # MEG2411
+        "Temporal lobe (R)",  # MEG2421
+        "Temporal lobe (R)",  # MEG2431
+        "Parietal lobe",  # MEG2441
+        "Occipital lobe",  # MEG2511
+        "Temporal lobe (R)",  # MEG2521
+        "Occipital lobe",  # MEG2531
+        "Occipital lobe",  # MEG2541
+        "Temporal lobe (R)",  # MEG2611
+        "Temporal lobe (R)",  # MEG2621
+        "Temporal lobe (R)",  # MEG2631
+        "Temporal lobe (R)",  # MEG2641"
     ]
 
     """
@@ -149,77 +148,77 @@ def build_subjects_file():
 
     eeg_names = [ch["ch_name"] for ch in raw.info["chs"] if "EEG" in ch["ch_name"]]
     eeg_types = [
-        "occipital lobe",  # EEG001
-        "frontal lobe",  # EEG002
-        "occipital lobe",  # EEG003
-        "frontal lobe",  # EEG004
-        "frontal lobe",  # EEG005
-        "frontal lobe",  # EEG006
-        "frontal lobe",  # EEG007
-        "frontal lobe",  # EEG008
-        "frontal lobe",  # EEG009
-        "frontal lobe",  # EEG010
-        "frontal lobe",  # EEG011
-        "frontal lobe",  # EEG012
-        "frontal lobe",  # EEG013
-        "frontal lobe",  # EEG014
-        "frontal lobe",  # EEG015
-        "frontal lobe",  # EEG016
-        "frontal lobe",  # EEG017
-        "temporal lobe (L)",  # EEG018
-        "temporal lobe (L)",  # EEG019
-        "frontal lobe",  # EEG020
-        "frontal lobe",  # EEG021
-        "frontal lobe",  # EEG022
-        "frontal lobe",  # EEG023
-        "frontal lobe",  # EEG024
-        "frontal lobe",  # EEG025
-        "frontal lobe",  # EEG026
-        "temporal lobe (R)",  # EEG027
-        "temporal lobe (R)",  # EEG028
-        "temporal lobe (L)",  # EEG029
-        "temporal lobe (L)",  # EEG030
-        "frontal lobe",  # EEG031
-        "frontal lobe",  # EEG032
-        "frontal lobe",  # EEG033
-        "frontal lobe",  # EEG034
-        "frontal lobe",  # EEG035
-        "frontal lobe",  # EEG036
-        "frontal lobe",  # EEG037
-        "temporal lobe (R)",  # EEG038
-        "temporal lobe (R)",  # EEG039
-        "temporal lobe (L)",  # EEG040
-        "temporal lobe (L)",  # EEG041
-        "parietal lobe",  # EEG042
-        "parietal lobe",  # EEG043
-        "parietal lobe",  # EEG044
-        "parietal lobe",  # EEG045
-        "parietal lobe",  # EEG046
-        "parietal lobe",  # EEG047
-        "parietal lobe",  # EEG048
-        "temporal lobe (R)",  # EEG049
-        "temporal lobe (R)",  # EEG050
-        "occipital lobe",  # EEG051
-        "temporal lobe (L)",  # EEG052
-        "parietal lobe",  # EEG053
-        "parietal lobe",  # EEG054
-        "parietal lobe",  # EEG055
-        "parietal lobe",  # EEG056
-        "parietal lobe",  # EEG057
-        "parietal lobe",  # EEG058
-        "parietal lobe",  # EEG059
-        "temporal lobe (R)",  # EEG060
-        "parietal lobe",  # EEG064
-        "parietal lobe",  # EEG065
-        "frontal lobe",  # EEG066
-        "frontal lobe",  # EEG067
-        "parietal lobe",  # EEG068
-        "occipital lobe",  # EEG069
-        "occipital lobe",  # EEG070
-        "occipital lobe",  # EEG071
-        "occipital lobe",  # EEG072
-        "occipital lobe",  # EEG073
-        "occipital lobe",  # EEG074
+        "Occipital lobe",  # EEG001
+        "Frontal lobe",  # EEG002
+        "Occipital lobe",  # EEG003
+        "Frontal lobe",  # EEG004
+        "Frontal lobe",  # EEG005
+        "Frontal lobe",  # EEG006
+        "Frontal lobe",  # EEG007
+        "Frontal lobe",  # EEG008
+        "Frontal lobe",  # EEG009
+        "Frontal lobe",  # EEG010
+        "Frontal lobe",  # EEG011
+        "Frontal lobe",  # EEG012
+        "Frontal lobe",  # EEG013
+        "Frontal lobe",  # EEG014
+        "Frontal lobe",  # EEG015
+        "Frontal lobe",  # EEG016
+        "Frontal lobe",  # EEG017
+        "Temporal lobe (L)",  # EEG018
+        "Temporal lobe (L)",  # EEG019
+        "Frontal lobe",  # EEG020
+        "Frontal lobe",  # EEG021
+        "Frontal lobe",  # EEG022
+        "Frontal lobe",  # EEG023
+        "Frontal lobe",  # EEG024
+        "Frontal lobe",  # EEG025
+        "Frontal lobe",  # EEG026
+        "Temporal lobe (R)",  # EEG027
+        "Temporal lobe (R)",  # EEG028
+        "Temporal lobe (L)",  # EEG029
+        "Temporal lobe (L)",  # EEG030
+        "Frontal lobe",  # EEG031
+        "Frontal lobe",  # EEG032
+        "Frontal lobe",  # EEG033
+        "Frontal lobe",  # EEG034
+        "Frontal lobe",  # EEG035
+        "Frontal lobe",  # EEG036
+        "Frontal lobe",  # EEG037
+        "Temporal lobe (R)",  # EEG038
+        "Temporal lobe (R)",  # EEG039
+        "Temporal lobe (L)",  # EEG040
+        "Temporal lobe (L)",  # EEG041
+        "Parietal lobe",  # EEG042
+        "Parietal lobe",  # EEG043
+        "Parietal lobe",  # EEG044
+        "Parietal lobe",  # EEG045
+        "Parietal lobe",  # EEG046
+        "Parietal lobe",  # EEG047
+        "Parietal lobe",  # EEG048
+        "Temporal lobe (R)",  # EEG049
+        "Temporal lobe (R)",  # EEG050
+        "Occipital lobe",  # EEG051
+        "Temporal lobe (L)",  # EEG052
+        "Parietal lobe",  # EEG053
+        "Parietal lobe",  # EEG054
+        "Parietal lobe",  # EEG055
+        "Parietal lobe",  # EEG056
+        "Parietal lobe",  # EEG057
+        "Parietal lobe",  # EEG058
+        "Parietal lobe",  # EEG059
+        "Temporal lobe (R)",  # EEG060
+        "Parietal lobe",  # EEG064
+        "Parietal lobe",  # EEG065
+        "Frontal lobe",  # EEG066
+        "Frontal lobe",  # EEG067
+        "Parietal lobe",  # EEG068
+        "Occipital lobe",  # EEG069
+        "Occipital lobe",  # EEG070
+        "Occipital lobe",  # EEG071
+        "Occipital lobe",  # EEG072
+        "Occipital lobe",  # EEG073
+        "Occipital lobe",  # EEG074
     ]
 
     """
