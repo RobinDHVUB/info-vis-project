@@ -16,6 +16,12 @@ body {
     white-space: normal;
 }
 
+#startAnalysis, #backToSubjectSel {
+    color: #fff;
+    background-color: #198754;
+    border-color: #198754;
+}
+
 /* wrapper */
 .main-wrapper {
     width:95%;
@@ -28,6 +34,19 @@ body {
     margin-top: 10px;
     text-align: center;
     min-width: 300px;
+}
+
+#startAnalysisContainer {
+    margin-top: 1rem;
+    text-align: center;
+}
+
+.analysis-wrapper {
+    width: 100%;
+}
+
+#startAnalysis {
+    width: 100%;
 }
 
 div.filter-wrapper {
