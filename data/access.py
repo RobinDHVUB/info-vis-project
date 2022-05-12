@@ -11,21 +11,21 @@ from scipy import signal
 event_names = ["Famous", "Scrambled", "Unfamiliar"]
 event_colors = {
     event_name: event_color
-    for event_name, event_color in zip(event_names, ["#eefb01", "#930791", "#f09903"])
+    for event_name, event_color in zip(event_names, ["#0900ff", "#930791", "#03f0d3"])
 }
 
 # Group names
 group_names = [
     "Frontal lobe",
     "Parietal lobe",
-    "Temporal lobe (l)",
-    "Temporal lobe (r)",
+    "Temporal lobe (L)",
+    "Temporal lobe (R)",
     "Occipital lobe",
 ]
 group_colors = {
     group_name: group_color
     for group_name, group_color in zip(
-        group_names, ["#ff734e", "#759ffa", "#64ea5f", "#cd34b5", "#000000"]
+        group_names, ["#ff734e", "#ffe900", "#64ea5f", "#a1a1a1", "#000000"]
     )
 }
 

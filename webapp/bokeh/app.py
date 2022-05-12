@@ -203,9 +203,9 @@ def create_avg_plots(run_idx):
                 width_units="data",
                 height_units="data",
                 line_alpha=0.1,
-                line_color=access.event_colors[access.event_names[1]],
+                line_color=access.event_colors[access.event_names[event[1]-1]],
                 fill_alpha=0.1,
-                fill_color=access.event_colors[access.event_names[1]],
+                fill_color=access.event_colors[access.event_names[event[1]-1]],
             )
             renderers.append(EEG_p.add_glyph(source_or_glyph=event_data, glyph=span))
 
@@ -218,9 +218,9 @@ def create_avg_plots(run_idx):
                 width_units="data",
                 height_units="data",
                 line_alpha=0.1,
-                line_color=access.event_colors[access.event_names[1]],
+                line_color=access.event_colors[access.event_names[event[1]-1]],
                 fill_alpha=0.1,
-                fill_color=access.event_colors[access.event_names[1]],
+                fill_color=access.event_colors[access.event_names[event[1]-1]],
             )
             renderers.append(MEG_p.add_glyph(source_or_glyph=event_data, glyph=span))
 
@@ -481,8 +481,8 @@ def change_run(attr, old, new):
 select_runs.on_change("value", change_run)
 
 # Switching between view modes
-select_tmin = Spinner(low=-1.5, high=0, step=0.1, value=-0.5, width=80)
-select_tmax = Spinner(low=0.1, high=1.5, step=0.1, value=0.5, width=80)
+select_tmin = Spinner(title="tmin:", low=-1.5, high=0, step=0.1, value=-0.5, width=80)
+select_tmax = Spinner(title="tplus:", low=0.1, high=1.5, step=0.1, value=0.5, width=80)
 
 
 def reset_windows(attr, old, new):
