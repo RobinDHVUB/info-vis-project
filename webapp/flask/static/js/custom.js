@@ -371,6 +371,7 @@ function initializeVisualizations() {
         Plotly.react(graphDiv, data, layout, {displayModeBar: false, scrollZoom: false, responsive: true});
 
         // keep track of camera changes
+        graphDiv.removeAllListeners('plotly_relayout')
         graphDiv.on('plotly_relayout', function(data) {
             return updateCameraScene(plotType, data)
         });
@@ -536,6 +537,10 @@ function initializeVisualizations() {
         function handleSubjectChange() {
             var selectedOption = d3.selectAll("#subject-selection option:checked");
 
+            // we reset the camera view to its default valueon subject change
+            updateCameraScene("eeg", undefined)
+            updateCameraScene("meg", undefined)
+
             // if no subject is selected we purge the 3D plots and disable selecting cortex checkboxes
             if (selectedOption.empty()){
                 selectedSubject = undefined
@@ -543,10 +548,6 @@ function initializeVisualizations() {
                 Plotly.purge(document.getElementById('megPlot'))
                 d3.selectAll('#eeg-checkbox-container label').classed("disabled", true)
                 d3.selectAll('#meg-checkbox-container label').classed("disabled", true)
-
-                // also reset the camera view to its default value
-                updateCameraScene("eeg", undefined)
-                updateCameraScene("meg", undefined)
             }
             else {
                 // if a subject is selected we update the 3D plots and enable selecting cortex checkboxes
