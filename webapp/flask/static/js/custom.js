@@ -267,7 +267,7 @@ function initializeVisualizations() {
         var traceMesh = {
                 hoverinfo:'skip',
                 opacity:1,
-                color: 'rgb(300,100,200)',
+                color: '#C0C0C0',
                 type: 'mesh3d',
                 x: meshX,
                 y: meshY,
@@ -286,7 +286,7 @@ function initializeVisualizations() {
         missingMesh = {
             hoverinfo:'skip',
             opacity:1,
-            color: 'rgb(300,100,200)',
+            color: '#C0C0C0',
             type: 'mesh3d',
             x: meshX,
             y: meshY,
