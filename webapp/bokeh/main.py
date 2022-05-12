@@ -110,8 +110,9 @@ def create_avg_plots(run_idx):
         tools=tools,
         toolbar_location="above",
         toolbar_sticky=False,
-        sizing_mode="stretch_both",
         lod_threshold=None,
+        width=1000,
+        height=200
     )
     EEG_p.x_range = Range1d(0, 10 * access.avg_sfreq)
     EEG_p.xaxis.axis_label = "Time (s)"
@@ -150,8 +151,9 @@ def create_avg_plots(run_idx):
         output_backend="webgl",
         tools=tools,
         toolbar_location=None,
-        sizing_mode="stretch_both",
         lod_threshold=None,
+        width=1000,
+        height=200
     )
     MEG_p.x_range = EEG_p.x_range
     MEG_p.xaxis.ticker = [tick for tick in x_ticks.keys()]
@@ -203,9 +205,9 @@ def create_avg_plots(run_idx):
                 width_units="data",
                 height_units="data",
                 line_alpha=0.1,
-                line_color=access.event_colors[access.event_names[event[1]-1]],
+                line_color=access.event_colors[access.event_names[event[1] - 1]],
                 fill_alpha=0.1,
-                fill_color=access.event_colors[access.event_names[event[1]-1]],
+                fill_color=access.event_colors[access.event_names[event[1] - 1]],
             )
             renderers.append(EEG_p.add_glyph(source_or_glyph=event_data, glyph=span))
 
@@ -218,9 +220,9 @@ def create_avg_plots(run_idx):
                 width_units="data",
                 height_units="data",
                 line_alpha=0.1,
-                line_color=access.event_colors[access.event_names[event[1]-1]],
+                line_color=access.event_colors[access.event_names[event[1] - 1]],
                 fill_alpha=0.1,
-                fill_color=access.event_colors[access.event_names[event[1]-1]],
+                fill_color=access.event_colors[access.event_names[event[1] - 1]],
             )
             renderers.append(MEG_p.add_glyph(source_or_glyph=event_data, glyph=span))
 
@@ -475,7 +477,8 @@ def change_run(attr, old, new):
     else:
         new_EEG_p, new_MEG_p = create_psd_plots(run_idx)
 
-    plots_column.children = [new_EEG_p, new_MEG_p]
+    EEG_row.children = [new_EEG_p]
+    MEG_row.children = [new_MEG_p]
 
 
 select_runs.on_change("value", change_run)
@@ -550,7 +553,8 @@ def change_view_mode(attr):
             new_EEG_p, new_MEG_p = create_psd_plots(run_idx)
         select_runs.disabled = False
 
-    plots_column.children = [new_EEG_p, new_MEG_p]
+    EEG_row.children = [new_EEG_p]
+    MEG_row.children = [new_MEG_p]
 
 
 average_button.on_click(change_view_mode)
@@ -584,14 +588,16 @@ def change_data_mode(attr):
                 select_tmin.value, select_tmax.value, select_events.value
             )
 
-    plots_column.children = [new_EEG_p, new_MEG_p]
+    EEG_row.children = [new_EEG_p]
+    MEG_row.children = [new_MEG_p]
 
 
 psd_button.on_click(change_data_mode)
 
 # Layout of whole
 EEG_p, MEG_p = create_avg_plots(0)
-plots_column = column(children=[EEG_p, MEG_p], sizing_mode="stretch_both")
+EEG_row = row(EEG_p, sizing_mode="scale_both")
+MEG_row = row(EEG_p, sizing_mode="scale_both")
 doc.add_root(
     column(
         row(
@@ -601,8 +607,10 @@ doc.add_root(
             select_tmin,
             select_tmax,
             select_events,
+            sizing_mode="scale_both",
         ),
-        plots_column,
-        sizing_mode="stretch_both",
+        EEG_row,
+        MEG_row,
+        sizing_mode="scale_both"
     )
 )

@@ -15,5 +15,5 @@ RUN apt update -y && apt upgrade -y
 COPY bokeh/requirements.txt /app
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Start the FLASK app
-ENTRYPOINT ["bokeh", "serve", "/app/app.py", "--allow-websocket-origin=*"]
+# Start the bokeh app
+ENTRYPOINT ["bokeh", "serve", "/app", "--allow-websocket-origin=*"]
