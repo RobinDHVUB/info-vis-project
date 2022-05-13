@@ -1,9 +1,9 @@
 import panel
 import logging
-import time
+import enum
 
-from bokehplots import EEG_p
 from data import access
+from bokehplots import avg_plots
 
 """
 LOGGING
@@ -17,6 +17,18 @@ METADATA
 metadata = access.parse_subject_data()
 min_age = min([int(subject["age"]) for subject in metadata["subjects"]])
 max_age = max([int(subject["age"]) for subject in metadata["subjects"]])
+EEG_groups_assignment = {}
+for EEG_channel, EEG_type in zip(metadata["eeg_names"], metadata["eeg_types"]):
+    current = (
+        EEG_groups_assignment[EEG_type] if EEG_type in EEG_groups_assignment else []
+    )
+    EEG_groups_assignment[EEG_type] = current + [EEG_channel]
+MEG_groups_assignment = {}
+for MEG_channel, MEG_type in zip(metadata["meg_names"], metadata["meg_types"]):
+    current = (
+        MEG_groups_assignment[MEG_type] if MEG_type in MEG_groups_assignment else []
+    )
+    MEG_groups_assignment[MEG_type] = current + [MEG_channel]
 
 
 def sex_to_string(sex):
@@ -61,51 +73,27 @@ css = """
   font-family: monospace;
 }
 .bk-root .bk.famous-button .bk-btn {
-  border: 1px #0900ff solid;
-  color: #0900ff;
+  border: 1px #ff0000 solid;
+  color: #ff0000;
 }
 .bk-root .bk.scrambled-button .bk-btn {
-  border: 1px #930791 solid;
-  color: #930791;
+  border: 1px #00BFFF solid;
+  color: #00BFFF;
 }
 .bk-root .bk.unfamiliar-button .bk-btn {
-  border: 1px #03f0d3 solid;
-  color: #03f0d3;
+  border: 1px #0000FF solid;
+  color: #0000FF;
 }
 """
 
-panel.extension(raw_css=[css])
-
-"""
-BOKEH
-"""
-bokeh_pane = panel.pane.Bokeh(EEG_p)
-
+panel.extension("plotly", raw_css=[css])
 
 """
 PLOTLY
 """
-import numpy as np
-import plotly.graph_objs as go
+import plotly.express as px
 
-xx = np.linspace(-3.5, 3.5, 100)
-yy = np.linspace(-3.5, 3.5, 100)
-x, y = np.meshgrid(xx, yy)
-z = np.exp(-((x - 1) ** 2) - y**2) - (x**3 + y**4 - x / 5) * np.exp(
-    -(x**2 + y**2)
-)
-
-surface = go.Surface(z=z)
-layout = go.Layout(
-    title="Plotly 3D Plot",
-    autosize=False,
-    width=500,
-    height=500,
-    margin=dict(t=50, b=50, r=50, l=50),
-)
-fig = dict(data=[surface], layout=layout)
-
-plotly_pane = panel.pane.Plotly(fig)
+fig = px.scatter(x=[0, 1, 2, 3, 4], y=[0, 1, 4, 9, 16])
 
 """
 TOP BAR
@@ -151,6 +139,7 @@ def first_page(event):
     layout.append(panel.layout.VSpacer())
     layout.append(subject_selection)
     layout.append(panel.layout.VSpacer())
+
 
 change_subject_button.on_click(first_page)
 
@@ -212,7 +201,7 @@ def start_analysis(event):
     # Add selected subject as subtitle
     topbar.append(
         panel.pane.Str(
-            list(subject_select.options.keys())[subject_select.value],
+            list(subject_select.options.keys())[subject_select.value-1],
             style={"color": "white", "font-size": "15pt"},
         )
     )
@@ -246,6 +235,56 @@ subject_selection = panel.Column(
 """
 UI SECOND PAGE
 """
+# Modes
+class ViewMode(enum.Enum):
+    TOTAL = 1
+    WINDOW = 2
+
+
+current_view_mode = ViewMode.TOTAL
+
+
+class DataMode(enum.Enum):
+    TIME = 1
+    FREQUENCY = 2
+
+
+# Data
+runs = []
+downsampled_runs = []
+EEG_group_avgs = None
+EEG_group_psds = None
+MEG_group_avgs = None
+MEG_group_psds = None
+downsampled_events = None
+
+
+def get_subject_data(subject_id):
+    global EEG_group_avgs
+    global EEG_group_psds
+    global MEG_group_avgs
+    global MEG_group_psds
+    global downsampled_events
+
+    # Runs
+    for i in range(1, 7):
+        run, downsampled_run = access.parse_run(subject_id, i)
+        runs.append(run)
+        downsampled_runs.append(downsampled_run)
+
+    # Averages
+    (
+        EEG_group_avgs,
+        EEG_group_psds,
+        MEG_group_avgs,
+        MEG_group_psds,
+        downsampled_events,
+    ) = access.group_averages(
+        downsampled_runs, EEG_groups_assignment, MEG_groups_assignment
+    )
+
+
+current_data_mode = DataMode.TIME
 
 # Run select
 run_select = panel.widgets.Select(
@@ -256,7 +295,9 @@ run_select = panel.widgets.Select(
 psd_button = panel.widgets.Toggle(name="PSD", width_policy="min", align="center")
 
 # AVG toggle
-avg_text = panel.widgets.StaticText(name="", value='Averaging over events:', align="center")
+avg_text = panel.widgets.StaticText(
+    name="", value="Averaging over events:", align="center"
+)
 avg_button = panel.widgets.Toggle(name="AVG", width_policy="max", align="center")
 
 # AVG sliders
@@ -268,14 +309,24 @@ tplus_slider = panel.widgets.FloatSlider(
 )
 
 # Event select toggles
-famous_toggle = panel.widgets.Toggle(name="Famous", css_classes=["famous-button"], width=100, align="center")
-scrambled_toggle = panel.widgets.Toggle(name="Scrambled", css_classes=["scrambled-button"], width=100, align="center", margin=(5, -20, 5, 10))
-unfamiliar_toggle = panel.widgets.Toggle(name="Unfamiliar", css_classes=["unfamiliar-button"], width=100, align="center")
+famous_toggle = panel.widgets.Toggle(
+    name="Famous", css_classes=["famous-button"], width=100, align="center"
+)
+scrambled_toggle = panel.widgets.Toggle(
+    name="Scrambled",
+    css_classes=["scrambled-button"],
+    width=100,
+    align="center",
+    margin=(5, -20, 5, 10),
+)
+unfamiliar_toggle = panel.widgets.Toggle(
+    name="Unfamiliar", css_classes=["unfamiliar-button"], width=100, align="center"
+)
 
 
 # Whole
 def second_page(subject_id):
-    
+
     # Clear first page
     layout.clear()
 
@@ -284,17 +335,43 @@ def second_page(subject_id):
 
     # Start loading animation
     layout.append(panel.layout.VSpacer())
-    layout.loading=True
+    layout.loading = True
 
-    # Create Plotly plots
+    # Load data
+    get_subject_data(subject_select.value)
+
+    # Create Bokeh plots
+    EEG_p, MEG_p = avg_plots(
+        EEG_group_avgs[0], MEG_group_avgs[0], downsampled_events[0], logger
+    )
 
     # Create Bokeh plots
 
     # Set layout
-    time.sleep(2)
-    layout.loading=False
+    layout.append(
+        panel.Column(
+            panel.Row(
+                run_select,
+                psd_button,
+                panel.layout.HSpacer(),
+                avg_text,
+                tmin_slider,
+                tplus_slider,
+                famous_toggle,
+                scrambled_toggle,
+                unfamiliar_toggle,
+                avg_button,
+            ),
+            panel.Row(panel.pane.Bokeh(EEG_p, sizing_mode="stretch_both"), panel.pane.Plotly(fig), sizing_mode="stretch_both"),
+            panel.Row(panel.pane.Bokeh(MEG_p, sizing_mode="stretch_both"), panel.pane.Plotly(fig), sizing_mode="stretch_both"),
+            sizing_mode = "stretch_both"
+        )
+    )
+
+    # Stop loading animation
     layout.pop(1)
-    layout.append(panel.Row(run_select, psd_button, panel.layout.HSpacer(), avg_text, tmin_slider, tplus_slider, famous_toggle, scrambled_toggle, unfamiliar_toggle, avg_button))
+    layout.loading = False
+
 
 """
 LAYOUT

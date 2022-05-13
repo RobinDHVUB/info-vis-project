@@ -22,7 +22,7 @@ def parse_subject_data():
 event_names = ["Famous", "Scrambled", "Unfamiliar"]
 event_colors = {
     event_name: event_color
-    for event_name, event_color in zip(event_names, ["#0900ff", "#930791", "#03f0d3"])
+    for event_name, event_color in zip(event_names, ["#ff0000", "#00BFFF", "#0000FF"])
 }
 
 # Group names
@@ -36,7 +36,7 @@ group_names = [
 group_colors = {
     group_name: group_color
     for group_name, group_color in zip(
-        group_names, ["#ff734e", "#ffe900", "#64ea5f", "#a1a1a1", "#000000"]
+        group_names, ["#ff0000", "#ffe900", "#64ea5f", "#a1a1a1", "#000000"]
     )
 }
 
@@ -59,7 +59,7 @@ avg_sfreq = 45
 # ----
 
 
-def parse_run(subject, run, logger):
+def parse_run(subject, run):
     """
     Parses a subject's run
     ---
@@ -77,14 +77,6 @@ def parse_run(subject, run, logger):
         "data/processed/subject" + str(subject) + "/run" + str(run) + "/processed.fif",
         verbose=None,
     )
-    annotations = mne.read_annotations(
-        "data/processed/subject"
-        + str(subject)
-        + "/run"
-        + str(run)
-        + "/processed_annotations.fif",
-    )
-    raw.set_annotations(annotations)
     annotations = mne.read_annotations(
         "data/processed/subject"
         + str(subject)
@@ -115,14 +107,14 @@ def parse_run(subject, run, logger):
     return raw, downsampled
 
 
-def group_averages(runs, eeg_groups, meg_groups):
+def group_averages(runs, EEG_groups_assignment, MEG_groups_assignment):
     """
     Parses and returns channel group averages for a given run as well as the transformed events
     ---
     input:
         raw runs
-        dict of eeg channels
-        dict of meg channels
+        EEG group assignments
+        MEG group assignments
     ---
     output:
         list of runs each with dict of EEG runs average per group
@@ -143,7 +135,7 @@ def group_averages(runs, eeg_groups, meg_groups):
         # Split per EEG group
         eeg_groups_data = {}
         eeg_groups_psd = {}
-        for group_name, group_channels in eeg_groups.items():
+        for group_name, group_channels in EEG_groups_assignment.items():
             assert len(group_channels) > 0
 
             data = run.get_data(picks=group_channels, units="uV")
@@ -160,7 +152,7 @@ def group_averages(runs, eeg_groups, meg_groups):
         # Split per MEG group
         meg_groups_data = {}
         meg_groups_psd = {}
-        for group_name, group_channels in meg_groups.items():
+        for group_name, group_channels in MEG_groups_assignment.items():
             assert len(group_channels) > 0
 
             data = run.get_data(picks=group_channels, units="fT")

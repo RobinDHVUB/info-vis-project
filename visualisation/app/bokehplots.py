@@ -1,4 +1,3 @@
-import logging
 import math
 import numpy
 
@@ -20,69 +19,14 @@ from bokeh.models import (
     LegendItem,
 )
 from bokeh.plotting import figure
-from enum import Enum
-from urllib.parse import unquote
 
 import data.access as access
 
-# Logging
-LOG_FORMAT = "%(levelname)s %(asctime)s - %(message)s"
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
-
-# Get session arguments
-#args = doc.session_context.request.arguments
-#subject_id = int(args.get("id")[0].decode("UTF-8").split(",")[0])
-#EEG_groups = json.loads(unquote(args.get("EEG")[0]))
-#MEG_groups = json.loads(unquote(args.get("MEG")[0]))
-subject_id = 1
-EEG_groups = {"Parietal lobe": ["EEG001"]}
-MEG_groups = {"Parietal lobe": ["MEG0111"]}
-
-# Modes
-class ViewMode(Enum):
-    TOTAL = 1
-    WINDOW = 2
-
-
-current_view_mode = ViewMode.TOTAL
-
-
-class DataMode(Enum):
-    TIME = 1
-    FREQUENCY = 2
-
-
-current_data_mode = DataMode.TIME
-
-# Parse required data
-runs = []
-downsampled_runs = []
-for i in range(1, 7):
-    run, downsampled_run = access.parse_run(subject_id, i, logger)
-    runs.append(run)
-    downsampled_runs.append(downsampled_run)
-
-# Calculate downsampled group averages, group psds, and downsampled events
-(
-    EEG_group_avgs,
-    EEG_group_psds,
-    MEG_group_avgs,
-    MEG_group_psds,
-    downsampled_events,
-) = access.group_averages(downsampled_runs, EEG_groups, MEG_groups)
-
-# Window averages
-EEG_window_group_avgs = None
-EEG_window_group_psds = None
-MEG_window_group_avgs = None
-MEG_window_group_psds = None
-
 # View
-view_size = 10 * 145
+view_size = 10 * 45
 
 # Average plots
-def create_avg_plots(run_idx):
+def avg_plots(EEG_avgs, MEG_avgs, events, logger):
 
     # Tools
     tools = [
@@ -92,27 +36,23 @@ def create_avg_plots(run_idx):
     ]
 
     # Ticks
-    run_lengths = [
-        len(group_avg) for group_avg in list(EEG_group_avgs[run_idx].values())
-    ]
+    run_lengths = [len(group_avg) for group_avg in list(EEG_avgs.values())]
     x_ticks = {
         i * access.avg_sfreq: str(i)
         for i in range(round(max(run_lengths) / access.avg_sfreq) + 1)
     }
 
     # EEG
-    run_EEG = EEG_group_avgs[run_idx]
     EEG_p = figure(
         title="EEG",
-        output_backend="webgl",
+        # output_backend="webgl",
         tools=tools,
         toolbar_location="above",
         toolbar_sticky=False,
         lod_threshold=None,
-        width=1000,
-        height=200
+        use_scientific=True,
     )
-    EEG_p.x_range = Range1d(0, 10 * access.avg_sfreq)
+    EEG_p.x_range = Range1d(0, view_size)
     EEG_p.xaxis.axis_label = "Time (s)"
     EEG_p.yaxis.axis_label = "µV"
     EEG_p.toolbar.logo = None
@@ -120,8 +60,7 @@ def create_avg_plots(run_idx):
     EEG_p.xaxis.major_label_overrides = x_ticks
 
     EEG_lines = []
-    legend_items = []
-    for group_name, group_data in run_EEG.items():
+    for group_name, group_data in EEG_avgs.items():
         source = ColumnDataSource(
             dict(
                 x=numpy.arange(0, len(group_data), 1),
@@ -136,22 +75,16 @@ def create_avg_plots(run_idx):
             line_color=access.group_colors[group_name],
         )
         EEG_lines.append(line)
-        legend_items.append(LegendItem(label=group_name, renderers=[line]))
-    legend = Legend(items=legend_items)
-    legend.click_policy = "mute"
-    EEG_p.add_layout(legend, "right")
     EEG_p.y_range.renderers = EEG_lines
 
     # MEG plot
-    run_MEG = MEG_group_avgs[run_idx]
     MEG_p = figure(
         title="MEG",
-        output_backend="webgl",
+        # output_backend="webgl",
         tools=tools,
         toolbar_location=None,
         lod_threshold=None,
-        width=1000,
-        height=200
+        use_scientific=True,
     )
     MEG_p.x_range = EEG_p.x_range
     MEG_p.xaxis.ticker = [tick for tick in x_ticks.keys()]
@@ -161,8 +94,7 @@ def create_avg_plots(run_idx):
     MEG_p.toolbar.logo = None
 
     MEG_lines = []
-    legend_items = []
-    for group_name, group_data in run_MEG.items():
+    for group_name, group_data in MEG_avgs.items():
         source = ColumnDataSource(
             dict(
                 x=numpy.arange(0, len(group_data), 1),
@@ -177,15 +109,11 @@ def create_avg_plots(run_idx):
             line_color=access.group_colors[group_name],
         )
         MEG_lines.append(line)
-        legend_items.append(LegendItem(label=group_name, renderers=[line]))
-    legend = Legend(items=legend_items)
-    legend.click_policy = "mute"
-    MEG_p.add_layout(legend, "right")
     MEG_p.y_range.renderers = MEG_lines
 
     # Events
     renderers = []
-    for event in downsampled_events[run_idx]:
+    for event in events:
         if event[0] <= max(run_lengths):
             event_data = ColumnDataSource(
                 dict(
@@ -588,22 +516,3 @@ def change_data_mode(attr):
 
 
 psd_button.on_click(change_data_mode)
-
-# Layout of whole
-EEG_p, MEG_p = create_avg_plots(0)
-EEG_row = row(EEG_p, sizing_mode="scale_both")
-MEG_row = row(EEG_p, sizing_mode="scale_both")
-test = column(
-        row(
-            select_runs,
-            psd_button,
-            average_button,
-            select_tmin,
-            select_tmax,
-            select_events,
-            sizing_mode="scale_both",
-        ),
-        EEG_row,
-        MEG_row,
-        sizing_mode="scale_both"
-    )
