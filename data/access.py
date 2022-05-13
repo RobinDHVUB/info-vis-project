@@ -1,7 +1,18 @@
 import mne
 import numpy
+import json
 from scipy import signal
 
+# ---
+# Subject info
+# ----
+
+def parse_subject_data():
+    as_dict = 0
+    with open("data/processed/subject_data.json") as subject_data:
+        as_dict = json.load(subject_data)
+
+    return as_dict
 
 # -----
 # Constants

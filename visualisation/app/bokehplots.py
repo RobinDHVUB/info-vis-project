@@ -1,7 +1,6 @@
 import logging
 import math
 import numpy
-import json
 
 from bokeh.layouts import column, row
 from bokeh.models import (

@@ -2,9 +2,9 @@ services:
   bokehapp:
     build:
       context: .
-      dockerfile: bokeh/Dockerfile
+      dockerfile: app/Dockerfile
     volumes:
-      - './bokeh:/app'
+      - './app:/app'
       - '../data:/app/data:ro'
     ports:
       - '5006:5006'
