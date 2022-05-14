@@ -312,6 +312,7 @@ def visualize_electrodes_3d(el_names, el_types, el_coords, mesh_coords, plot_typ
 
     # don't include any grids, axes, etc. (since we just want the 3D figure)
     layout = go.Layout(
+        autosize=True,
         showlegend=False,
         margin=dict(l=0, r=0, b=0, t=0),
         scene=dict(
