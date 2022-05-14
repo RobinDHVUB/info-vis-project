@@ -949,6 +949,8 @@ def second_page():
     UI_bar.visible = True
     EEG_pane.visible = True
     MEG_pane.visible = True
+    EEG_group_toggles_row.visible = True
+    MEG_group_toggles_row.visible = True
     MEG_3D_pane.visible = True
 
     # Stop loading animation
