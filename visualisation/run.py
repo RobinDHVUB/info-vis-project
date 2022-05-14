@@ -2,7 +2,7 @@ import panel
 import logging
 import enum
 
-from data import access
+import data_access
 from bokehplots import avg_plots, window_plots, psd_plots
 
 """
@@ -14,7 +14,7 @@ logger.setLevel(logging.DEBUG)
 """
 METADATA
 """
-metadata = access.parse_subject_data()
+metadata = data_access.parse_subject_data()
 min_age = min([int(subject["age"]) for subject in metadata["subjects"]])
 max_age = max([int(subject["age"]) for subject in metadata["subjects"]])
 EEG_groups_assignment = {}
@@ -48,6 +48,7 @@ def filter_subjects(sex, age):
         and int(subject["age"]) <= age[1]
         and subject["sex"] in sex
     }
+
 
 
 """
@@ -189,8 +190,10 @@ age_select.param.watch(change_age_select, ["value"], onlychanged=True)
 
 # Subject select
 subject_select_title = panel.pane.Str("Subject:", align="center", margin=25)
+initial_subject_select_options = filter_subjects(sex_select.value, age_select.value)
+initial_subject_select_values = {id:description for description, id in initial_subject_select_options.items()}
 subject_select = panel.widgets.Select(
-    options=filter_subjects(sex_select.value, age_select.value),
+    options=initial_subject_select_options,
 )
 
 # Start analysis button
@@ -204,7 +207,7 @@ def start_analysis(event):
     # Add selected subject as subtitle
     topbar.append(
         panel.pane.Str(
-            list(subject_select.options.keys())[subject_select.value - 1],
+            initial_subject_select_values[subject_select.value],
             align="center",
             sizing_mode="scale_height",
             style={"color": "white"},
@@ -215,7 +218,7 @@ def start_analysis(event):
     topbar.append(change_subject_button)
 
     # Change page
-    second_page(subject_select.value)
+    second_page()
 
 
 start_analysis_button.on_click(start_analysis)
@@ -266,7 +269,7 @@ MEG_window_group_avgs = None
 MEG_window_group_psds = None
 
 
-def get_subject_data(subject_id):
+def get_subject_data():
     global EEG_group_avgs
     global EEG_group_psds
     global MEG_group_avgs
@@ -274,8 +277,9 @@ def get_subject_data(subject_id):
     global downsampled_events
 
     # Runs
+    logger.info(subject_select.value)
     for i in range(1, 7):
-        run, downsampled_run = access.parse_run(subject_id, i)
+        run, downsampled_run = data_access.parse_run(subject_select.value, i)
         runs.append(run)
         downsampled_runs.append(downsampled_run)
 
@@ -286,7 +290,7 @@ def get_subject_data(subject_id):
         MEG_group_avgs,
         MEG_group_psds,
         downsampled_events,
-    ) = access.group_averages(
+    ) = data_access.group_averages(
         downsampled_runs, EEG_groups_assignment, MEG_groups_assignment
     )
 
@@ -374,7 +378,7 @@ def change_data(event):
             )
     else:
         current_data_mode = DataMode.TIME
-        avg_button.disabled = False
+        enable_avg(0)
         if current_view_mode == ViewMode.TOTAL:
             new_EEG_p, EEG_lines, new_MEG_p, MEG_lines = avg_plots(
                 EEG_group_avgs[run_idx],
@@ -451,7 +455,7 @@ def change_view(event):
             EEG_window_group_psds,
             MEG_window_group_avgs,
             MEG_window_group_psds,
-        ) = access.avg_windows(
+        ) = data_access.avg_windows(
             runs,
             selected_events,
             tmin_slider.value,
@@ -584,7 +588,7 @@ MEG_pane = None
 MEG_lines = None
 
 
-def second_page(subject_id):
+def second_page():
     global EEG_pane
     global MEG_pane
 
@@ -616,7 +620,7 @@ def second_page(subject_id):
     grid.loading = True
 
     # Load data
-    get_subject_data(subject_select.value)
+    get_subject_data()
 
     # Create Bokeh plots
     EEG_p, EEG_lines, MEG_p, MEG_lines = avg_plots(

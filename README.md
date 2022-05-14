@@ -20,41 +20,36 @@ Note that, because of the size of the dataset (+85GB), all preprocessing was ran
 
 ## 2. Installation
 
-The visualisation is dockerised and thus the only requirements needed to run it are docker [docker](https://docs.docker.com/engine/install/) and [docker-compose](https://docs.docker.com/compose/install/).
+### Create a Python virtual environment
+```console
+python -m venv env
+```
+
+### Activate the environment
+```console
+source env/bin/activate
+```
+
+To deactivate, use:
+```console
+deactivate
+```
+
+### Install the requirements
+```console
+pip install -r requirements.txt
+```
 
 ## 3. Usage
 
-To boot the application, navigate to the [webapp](webapp) folder and run the following:
+To boot the [Panel](https://panel.holoviz.org/) visualisation, use:
 
 ```console
-docker-compose up
+panel serve visualisation/run.py
 ```
-
-Make sure that the docker daemon is running.
 
 To stop the application, press `Ctrl-c`.  
-Note that this does not completely remove the docker containers.  
-To clean up the docker containers completely, run the following:
-
-```console
-docker-compose rm
-```
 
 ## (4. For developers)
 
-When changes are made to the docker container's settings or when packages are added to their `requirements.txt` files, the containers need to be rebuilt.  
-To do so, firstly, clean up dangling containers/images/volumes:
-
-```console
-docker system prune -a
-docker volume prune
-```
-
-Afterwards, rebuild:
-
-```console
-docker-compose up --build --rm
-```
-
-Lastly, when docker or docker-compose complains about permissions, try running with administrator/root privileges.
-
+Use the above command with the ``--autoreload`` option to allow for live code updates.

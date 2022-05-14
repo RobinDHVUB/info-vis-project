@@ -4,22 +4,18 @@ import numpy
 from bokeh.models import (
     Range1d,
     ColumnDataSource,
-    CheckboxButtonGroup,
     Spinner,
     Rect,
     Span,
-    Select,
     MultiSelect,
     PanTool,
     ResetTool,
     WheelZoomTool,
     HoverTool,
-    Legend,
-    LegendItem,
 )
 from bokeh.plotting import figure
 
-import data.access as access
+import data_access
 
 # View
 view_size = 10 * 45
@@ -37,8 +33,8 @@ def avg_plots(EEG_avgs, MEG_avgs, events, logger):
     # Ticks
     run_lengths = [len(group_avg) for group_avg in list(EEG_avgs.values())]
     x_ticks = {
-        i * access.avg_sfreq: str(i)
-        for i in range(round(max(run_lengths) / access.avg_sfreq) + 1)
+        i * data_access.avg_sfreq: str(i)
+        for i in range(round(max(run_lengths) / data_access.avg_sfreq) + 1)
     }
 
     # EEG
@@ -70,7 +66,7 @@ def avg_plots(EEG_avgs, MEG_avgs, events, logger):
             y="y",
             line_width=1,
             source=source,
-            line_color=access.group_colors[group_name],
+            line_color=data_access.group_colors[group_name],
         )
         EEG_lines[group_name].append(line)
     EEG_p.y_range.renderers = [line for group in EEG_lines.values() for line in group]
@@ -103,7 +99,7 @@ def avg_plots(EEG_avgs, MEG_avgs, events, logger):
             y="y",
             line_width=1,
             source=source,
-            line_color=access.group_colors[group_name],
+            line_color=data_access.group_colors[group_name],
         )
         MEG_lines[group_name].append(line)
     MEG_p.y_range.renderers = [line for group in MEG_lines.values() for line in group]
@@ -114,38 +110,38 @@ def avg_plots(EEG_avgs, MEG_avgs, events, logger):
         if event[0] <= max(run_lengths):
             event_data = ColumnDataSource(
                 dict(
-                    event_type=[access.event_names[event[1] - 1]],
-                    color=[access.event_colors[access.event_names[event[1] - 1]]],
+                    event_type=[data_access.event_names[event[1] - 1]],
+                    color=[data_access.event_colors[data_access.event_names[event[1] - 1]]],
                 )
             )
 
             # EEG plot
             span = Rect(
-                x=round(event[0] - (access.event_duration * access.avg_sfreq) / 2),
+                x=round(event[0] - (data_access.event_duration * data_access.avg_sfreq) / 2),
                 y=0,
-                width=access.event_duration * access.avg_sfreq,
+                width=data_access.event_duration * data_access.avg_sfreq,
                 height=10000,
                 width_units="data",
                 height_units="data",
                 line_alpha=0.1,
-                line_color=access.event_colors[access.event_names[event[1] - 1]],
+                line_color=data_access.event_colors[data_access.event_names[event[1] - 1]],
                 fill_alpha=0.1,
-                fill_color=access.event_colors[access.event_names[event[1] - 1]],
+                fill_color=data_access.event_colors[data_access.event_names[event[1] - 1]],
             )
             renderers.append(EEG_p.add_glyph(source_or_glyph=event_data, glyph=span))
 
             # MEG plot
             span = Rect(
-                x=round(event[0] - (access.event_duration * access.avg_sfreq) / 2),
+                x=round(event[0] - (data_access.event_duration * data_access.avg_sfreq) / 2),
                 y=0,
-                width=access.event_duration * access.avg_sfreq,
+                width=data_access.event_duration * data_access.avg_sfreq,
                 height=100000,
                 width_units="data",
                 height_units="data",
                 line_alpha=0.1,
-                line_color=access.event_colors[access.event_names[event[1] - 1]],
+                line_color=data_access.event_colors[data_access.event_names[event[1] - 1]],
                 fill_alpha=0.1,
-                fill_color=access.event_colors[access.event_names[event[1] - 1]],
+                fill_color=data_access.event_colors[data_access.event_names[event[1] - 1]],
             )
             renderers.append(MEG_p.add_glyph(source_or_glyph=event_data, glyph=span))
 
@@ -199,7 +195,7 @@ def window_plots(EEG_window_group_avgs, MEG_window_group_avgs, tmin, tplus, logg
             y="y",
             line_width=1,
             source=source,
-            line_color=access.group_colors[group_name],
+            line_color=data_access.group_colors[group_name],
         )
         EEG_lines[group_name].append(line)
     EEG_p.y_range.renderers = [line for group in EEG_lines.values() for line in group]
@@ -231,7 +227,7 @@ def window_plots(EEG_window_group_avgs, MEG_window_group_avgs, tmin, tplus, logg
             y="y",
             line_width=1,
             source=source,
-            line_color=access.group_colors[group_name],
+            line_color=data_access.group_colors[group_name],
         )
         MEG_lines[group_name].append(line)
     MEG_p.y_range.renderers = [line for group in MEG_lines.values() for line in group]
@@ -292,7 +288,7 @@ def psd_plots(EEG_psds, MEG_psds, logger):
                 y="y",
                 line_width=1,
                 source=source,
-                line_color=access.group_colors[group_name],
+                line_color=data_access.group_colors[group_name],
             )
             EEG_lines[group_name].append(line)
     EEG_p.y_range.renderers = [line for group in EEG_lines.values() for line in group]
@@ -324,7 +320,7 @@ def psd_plots(EEG_psds, MEG_psds, logger):
                 y="y",
                 line_width=1,
                 source=source,
-                line_color=access.group_colors[group_name],
+                line_color=data_access.group_colors[group_name],
             )
             MEG_lines[group_name].append(line)
     MEG_p.y_range.renderers = [line for group in MEG_lines.values() for line in group]
@@ -342,6 +338,6 @@ select_events = MultiSelect(
     value=["1"],
     options=[
         (str(event_id + 1), event_name)
-        for event_id, event_name in enumerate(access.event_names)
+        for event_id, event_name in enumerate(data_access.event_names)
     ],
 )
