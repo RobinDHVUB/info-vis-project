@@ -1,14 +1,13 @@
 import mne
 import numpy
 import json
+
 from scipy import signal
 
-# ---
+# ----
 # Subject info
 # ----
-
-
-def parse_subject_data():
+def parse_metadata():
     as_dict = 0
     with open("data/processed/subject_data.json") as subject_data:
         as_dict = json.load(subject_data)
@@ -57,10 +56,8 @@ avg_sfreq = 45
 
 
 # ----
-# RUNS
+# Runs
 # ----
-
-
 def parse_run(subject, run):
     """
     Parses a subject's run
@@ -109,6 +106,9 @@ def parse_run(subject, run):
     return raw, downsampled
 
 
+# ----
+# Group averages
+# ----
 def group_averages(runs, EEG_groups_assignment, MEG_groups_assignment):
     """
     Parses and returns channel group averages for a given run as well as the transformed events
@@ -199,10 +199,8 @@ def extract_events(run, selection=None):
 
 
 # -----
-# WINDOWS
+# Windows
 # -----
-
-
 def avg_windows(
     runs, event_selection, tmin, tmax, EEG_groups_assignment, MEG_groups_assignment
 ):

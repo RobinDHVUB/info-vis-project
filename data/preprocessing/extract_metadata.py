@@ -2,17 +2,18 @@ import mne
 import numpy
 import os
 import json
-import mne_bids
 
 
-def build_subjects_file():
+def build_metadata_file():
 
     # Read first run of first subject
-    raw = mne.io.read_raw_fif("/scratch/brussel/102/vsc10248/info-vis-data/processed/subject1/run1/processed.fif")
+    raw = mne.io.read_raw_fif(
+        "/scratch/brussel/102/vsc10248/info-vis-data/processed/subject1/run1/processed.fif"
+    )
 
-    """
-        MEG COORDS AND NAMES
-    """
+    # ----
+    # MEG coords, names, and types
+    # ----
 
     # Extract and collect
     meg_coords = []
@@ -142,10 +143,9 @@ def build_subjects_file():
         "Temporal lobe (R)",  # MEG2641"
     ]
 
-    """
-        EEG NAMES
-    """
-
+    # ----
+    # EEG names and types
+    # ----
     eeg_names = [ch["ch_name"] for ch in raw.info["chs"] if "EEG" in ch["ch_name"]]
     eeg_types = [
         "Occipital lobe",  # EEG001
@@ -221,11 +221,11 @@ def build_subjects_file():
         "Occipital lobe",  # EEG074
     ]
 
-    """
-        SUBJECT DATA
-    """
+    # ----
+    # Subject data
+    # ----
 
-    # meg data and eeg are fixed, so include it only once in the JSON
+    # MEG data and EEG are fixed, so include it only once in the JSON
     subject_data = {
         "meg_names": meg_names,
         "meg_types": meg_types,
@@ -235,10 +235,10 @@ def build_subjects_file():
         "meg_mesh_coords": [meg_mesh_x, meg_mesh_y, meg_mesh_z],
     }
 
-    # initialize the dict of subjects
+    # Initialize list of subjects
     subjects = []
 
-    # Go over each subject folder and build an easily usable representation (for JS)
+    # Go over each subject folder
     for subject_id in sorted(
         [
             int(subject_folder.removeprefix("subject"))
@@ -248,7 +248,7 @@ def build_subjects_file():
         ]
     ):
 
-        # gather all subject specific info
+        # Gather all subject specific info
         with open(
             "/scratch/brussel/102/vsc10248/info-vis-data/processed/subject"
             + str(subject_id)
@@ -284,17 +284,16 @@ def build_subjects_file():
                 }
             )
 
-    # store the subject info
+    # Store the subject info
     subject_data["subjects"] = subjects
 
-    # generate and save the JSON object with all subject info
+    # Generate and save the JSON object with all metadata
     json_object = json.dumps(subject_data, indent=4)
     with open(
-        "/scratch/brussel/102/vsc10248/info-vis-data/processed/subject_data.json", "w"
+        "/scratch/brussel/102/vsc10248/info-vis-data/processed/metadata.json", "w"
     ) as outfile:
         outfile.write(json_object)
 
 
 if __name__ == "__main__":
-    build_subjects_file()
-
+    build_metadata_file()

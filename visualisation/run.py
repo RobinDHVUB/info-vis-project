@@ -2,19 +2,20 @@ import panel
 import logging
 import enum
 
-import data_access
 from bokehplots import avg_plots, window_plots, psd_plots
+import data_access
 
-"""
-LOGGING
-"""
+# ----
+# Logging
+# ----
 logger = logging.getLogger()
 logger.setLevel(logging.DEBUG)
 
-"""
-METADATA
-"""
-metadata = data_access.parse_subject_data()
+
+# ----
+# Metadata
+# ----
+metadata = data_access.parse_metadata()
 min_age = min([int(subject["age"]) for subject in metadata["subjects"]])
 max_age = max([int(subject["age"]) for subject in metadata["subjects"]])
 EEG_groups_assignment = {}
@@ -50,10 +51,9 @@ def filter_subjects(sex, age):
     }
 
 
-
-"""
-CSS
-"""
+# ----
+# CSS
+# ----
 css = """
 .bk.panel-widget-box {
   background: #f0f0f0;
@@ -89,16 +89,18 @@ css = """
 
 panel.extension("plotly", raw_css=[css])
 
-"""
-PLOTLY
-"""
+
+# ----
+# Plotly
+# ----
 import plotly.express as px
 
 fig = px.scatter(x=[0, 1, 2, 3, 4], y=[0, 1, 4, 9, 16])
 
-"""
-TOP BAR
-"""
+
+# ----
+# Top bar
+# ----
 change_subject_button = panel.widgets.Button(
     name="Change subject",
     button_type="success",
@@ -136,7 +138,7 @@ def first_page(event):
 
     # Add subject selection pane
     grid[1:2, 0:5] = panel.Spacer()
-    subject_selection.sizing_mode="stretch_both"
+    subject_selection.sizing_mode = "stretch_both"
     grid[3:12, 5:10] = subject_selection
     grid[9:12, 11:15] = panel.Spacer()
 
@@ -144,12 +146,12 @@ def first_page(event):
     topbar.visible = True
 
 
-
 change_subject_button.on_click(first_page)
 
-"""
-UI FIRST PAGE
-"""
+
+# ----
+# First stage
+# ----
 title = panel.pane.Str(
     "Subject selection",
     align="center",
@@ -191,7 +193,9 @@ age_select.param.watch(change_age_select, ["value"], onlychanged=True)
 # Subject select
 subject_select_title = panel.pane.Str("Subject:", align="center", margin=25)
 initial_subject_select_options = filter_subjects(sex_select.value, age_select.value)
-initial_subject_select_values = {id:description for description, id in initial_subject_select_options.items()}
+initial_subject_select_values = {
+    id: description for description, id in initial_subject_select_options.items()
+}
 subject_select = panel.widgets.Select(
     options=initial_subject_select_options,
 )
@@ -235,12 +239,14 @@ subject_selection = panel.Column(
     subject_select,
     start_analysis_button,
     css_classes=["panel-widget-box"],
-    sizing_mode="stretch_height"
+    sizing_mode="stretch_height",
 )
 
-"""
-UI SECOND PAGE
-"""
+
+# ----
+# Second stage
+# ----
+
 # Modes
 class ViewMode(enum.Enum):
     TOTAL = 1
@@ -645,9 +651,9 @@ def second_page():
     grid.loading = False
 
 
-"""
-WHOLE
-"""
+# ----
+# WHOLE
+# ----
 grid = panel.GridSpec(sizing_mode="stretch_both")
 first_page(0)
 grid.servable()

@@ -4,10 +4,8 @@ import numpy
 from bokeh.models import (
     Range1d,
     ColumnDataSource,
-    Spinner,
     Rect,
     Span,
-    MultiSelect,
     PanTool,
     ResetTool,
     WheelZoomTool,
@@ -20,7 +18,10 @@ import data_access
 # View
 view_size = 10 * 45
 
+
+# ----
 # Average plots
+# ----
 def avg_plots(EEG_avgs, MEG_avgs, events, logger):
 
     # Tools
@@ -152,7 +153,9 @@ def avg_plots(EEG_avgs, MEG_avgs, events, logger):
     return EEG_p, EEG_lines, MEG_p, MEG_lines
 
 
+# ----
 # Window plots
+# ----
 def window_plots(EEG_window_group_avgs, MEG_window_group_avgs, tmin, tplus, logger):
 
     # Tools
@@ -251,7 +254,9 @@ def window_plots(EEG_window_group_avgs, MEG_window_group_avgs, tmin, tplus, logg
     return EEG_p, EEG_lines, MEG_p, MEG_lines
 
 
+# ----
 # PSD plots
+# ----
 def psd_plots(EEG_psds, MEG_psds, logger):
 
     # Tools
@@ -326,18 +331,3 @@ def psd_plots(EEG_psds, MEG_psds, logger):
     MEG_p.y_range.renderers = [line for group in MEG_lines.values() for line in group]
 
     return EEG_p, EEG_lines, MEG_p, MEG_lines
-
-
-# Switching between view modes
-select_tmin = Spinner(title="tmin:", low=-1.5, high=0, step=0.1, value=-0.5, width=80)
-select_tmax = Spinner(title="tplus:", low=0.1, high=1.5, step=0.1, value=0.5, width=80)
-
-
-
-select_events = MultiSelect(
-    value=["1"],
-    options=[
-        (str(event_id + 1), event_name)
-        for event_id, event_name in enumerate(data_access.event_names)
-    ],
-)
