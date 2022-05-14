@@ -116,7 +116,7 @@ topbar = panel.Row(
 )
 
 link_code = """
-window.location.href="https://www.nature.com/articles/sdata20151"
+window.open("https://www.nature.com/articles/sdata20151", "_blank")
 """
 title.js_on_click(code=link_code)
 
