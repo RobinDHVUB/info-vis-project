@@ -949,12 +949,7 @@ def second_page():
     UI_bar.visible = True
     EEG_pane.visible = True
     MEG_pane.visible = True
-<<<<<<< HEAD
-    EEG_group_toggles_row.visible = True
-    MEG_group_toggles_row.visible = True
-=======
     MEG_3D_pane.visible = True
->>>>>>> ab1b82a4ae3ed5d37a3102269fa647050bbb7365
 
     # Stop loading animation
     grid.loading = False
