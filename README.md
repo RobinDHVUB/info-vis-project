@@ -1,4 +1,4 @@
-# Information Visualization: Project
+# Information Visualisation: Project
 
 Project of Group 8 for the Information Visualization course at [VUB](www.vub.be).
 
