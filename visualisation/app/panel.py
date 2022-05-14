@@ -3,7 +3,7 @@ import logging
 import enum
 
 from data import access
-from bokehplots import avg_plots
+from bokehplots import avg_plots, window_plots, psd_plots
 
 """
 LOGGING
@@ -101,44 +101,47 @@ TOP BAR
 change_subject_button = panel.widgets.Button(
     name="Change subject",
     button_type="success",
-    sizing_mode="stretch_height",
+    sizing_mode="scale_height",
     css_classes=["main-button"],
 )
-title = panel.widgets.Button(
+main_title = panel.widgets.Button(
     name="A multi-subject multi-modal human neuroimaging dataset",
-    sizing_mode="stretch_both",
+    sizing_mode="scale_width",
     css_classes=["title-button"],
 )
 topbar = panel.Row(
-    title,
-    width_policy="max",
+    main_title,
+    sizing_mode="scale_width",
     background="#000000",
 )
 
 link_code = """
 window.location.href="https://www.nature.com/articles/sdata20151"
 """
-title.js_on_click(code=link_code)
+main_title.js_on_click(code=link_code)
 
 
 # Whole
 def first_page(event):
+    grid.objects = {}
+    topbar.visible = False
+    subject_selection.visible = False
 
-    # Clear previous page
-    layout.clear()
-
-    # Remove select subject button
+    # Add topbar
     if len(topbar) > 1:
         topbar.pop(1)
         topbar.pop(1)
+    grid[0, :] = topbar
 
-    # Add topbar
-    layout.append(topbar)
+    # Add subject selection pane
+    grid[1:2, 0:5] = panel.Spacer()
+    subject_selection.sizing_mode="stretch_both"
+    grid[3:12, 5:10] = subject_selection
+    grid[9:12, 11:15] = panel.Spacer()
 
-    # Add subject select with spacing
-    layout.append(panel.layout.VSpacer())
-    layout.append(subject_selection)
-    layout.append(panel.layout.VSpacer())
+    subject_selection.visible = True
+    topbar.visible = True
+
 
 
 change_subject_button.on_click(first_page)
@@ -201,8 +204,10 @@ def start_analysis(event):
     # Add selected subject as subtitle
     topbar.append(
         panel.pane.Str(
-            list(subject_select.options.keys())[subject_select.value-1],
-            style={"color": "white", "font-size": "15pt"},
+            list(subject_select.options.keys())[subject_select.value - 1],
+            align="center",
+            sizing_mode="scale_height",
+            style={"color": "white"},
         )
     )
 
@@ -226,10 +231,8 @@ subject_selection = panel.Column(
     subject_select_title,
     subject_select,
     start_analysis_button,
-    align="center",
-    width=500,
-    height=500,
     css_classes=["panel-widget-box"],
+    sizing_mode="stretch_height"
 )
 
 """
@@ -257,6 +260,10 @@ EEG_group_psds = None
 MEG_group_avgs = None
 MEG_group_psds = None
 downsampled_events = None
+EEG_window_group_avgs = None
+EEG_window_group_psds = None
+MEG_window_group_avgs = None
+MEG_window_group_psds = None
 
 
 def get_subject_data(subject_id):
@@ -291,26 +298,255 @@ run_select = panel.widgets.Select(
     options={"Run " + str(i): i - 1 for i in range(1, 7)}, value=0, align="center"
 )
 
+
+def change_run(event):
+    global current_data_mode
+    global EEG_pane
+    global EEG_lines
+    global MEG_pane
+    global MEG_lines
+    run_idx = run_select.value
+
+    # Loading
+    EEG_pane.loading = True
+    MEG_pane.loading = True
+
+    if current_data_mode == DataMode.TIME:
+        new_EEG_p, EEG_lines, new_MEG_p, MEG_lines = avg_plots(
+            EEG_group_avgs[run_idx],
+            MEG_group_avgs[run_idx],
+            downsampled_events[run_idx],
+            logger,
+        )
+    else:
+        new_EEG_p, EEG_lines, new_MEG_p, MEG_lines = psd_plots(
+            EEG_group_psds[run_idx], MEG_group_psds[run_idx], logger
+        )
+
+    EEG_pane.object = new_EEG_p
+    MEG_pane.object = new_MEG_p
+
+    # Stop loading
+    EEG_pane.loading = False
+    MEG_pane.loading = False
+
+
+run_select.param.watch(change_run, ["value"], onlychanged=True)
+
+
 # PSD toggle
-psd_button = panel.widgets.Toggle(name="PSD", width_policy="min", align="center")
+psd_button = panel.widgets.Toggle(
+    name="PSD", align="center", sizing_mode="stretch_width"
+)
+
+
+def change_data(event):
+    global current_data_mode
+    global current_view_mode
+    global EEG_lines
+    global MEG_lines
+    global EEG_window_group_avgs
+    global EEG_window_group_psds
+    global MEG_window_group_avgs
+    global MEG_window_group_psds
+    run_idx = run_select.value
+
+    # Loading
+    EEG_pane.loading = True
+    MEG_pane.loading = True
+
+    if current_data_mode == DataMode.TIME:
+        current_data_mode = DataMode.FREQUENCY
+
+        if current_view_mode == ViewMode.TOTAL:
+            new_EEG_p, EEG_lines, new_MEG_p, MEG_lines = psd_plots(
+                EEG_group_psds[run_idx], MEG_group_psds[run_idx], logger
+            )
+            avg_button.disabled = True
+            tmin_slider.disabled = True
+            tplus_slider.disabled = True
+            famous_toggle.disabled = True
+            scrambled_toggle.disabled = True
+            unfamiliar_toggle.disabled = True
+        else:
+            new_EEG_p, EEG_lines, new_MEG_p, MEG_lines = psd_plots(
+                EEG_window_group_psds, MEG_window_group_psds, logger
+            )
+    else:
+        current_data_mode = DataMode.TIME
+        avg_button.disabled = False
+        if current_view_mode == ViewMode.TOTAL:
+            new_EEG_p, EEG_lines, new_MEG_p, MEG_lines = avg_plots(
+                EEG_group_avgs[run_idx],
+                MEG_group_avgs[run_idx],
+                downsampled_events[run_idx],
+                logger,
+            )
+            tmin_slider.disabled = False
+            tplus_slider.disabled = False
+            famous_toggle.disabled = False
+            scrambled_toggle.disabled = False
+            unfamiliar_toggle.disabled = False
+        else:
+            new_EEG_p, EEG_lines, new_MEG_p, MEG_lines = window_plots(
+                EEG_window_group_avgs,
+                MEG_window_group_avgs,
+                tmin_slider.value,
+                tplus_slider.value,
+                logger,
+            )
+
+    EEG_pane.object = new_EEG_p
+    MEG_pane.object = new_MEG_p
+
+    # Stop loading
+    EEG_pane.loading = False
+    MEG_pane.loading = False
+
+
+psd_button.param.watch(change_data, ["value"], onlychanged=True)
+
 
 # AVG toggle
 avg_text = panel.widgets.StaticText(
-    name="", value="Averaging over events:", align="center"
+    name="", value="Averaging over events:", align="center", sizing_mode="stretch_width"
 )
-avg_button = panel.widgets.Toggle(name="AVG", width_policy="max", align="center")
+avg_button = panel.widgets.Toggle(
+    name="AVG", align="center", sizing_mode="stretch_width", disabled=True
+)
+
+
+def change_view(event):
+    global current_view_mode
+    global current_data_mode
+    global EEG_lines
+    global MEG_lines
+    global EEG_window_group_avgs
+    global EEG_window_group_psds
+    global MEG_window_group_avgs
+    global MEG_window_group_psds
+    run_idx = run_select.value
+
+    # Loading
+    EEG_pane.loading = True
+    MEG_pane.loading = True
+
+    # Event selection
+    selected_events = [
+        idx + 1
+        for idx, value in enumerate(
+            [
+                famous_toggle.value,
+                scrambled_toggle.value,
+                unfamiliar_toggle.value,
+            ]
+        )
+        if value
+    ]
+
+    # Re-calculate windows if needed
+    if EEG_window_group_avgs is None:
+        (
+            EEG_window_group_avgs,
+            EEG_window_group_psds,
+            MEG_window_group_avgs,
+            MEG_window_group_psds,
+        ) = access.avg_windows(
+            runs,
+            selected_events,
+            tmin_slider.value,
+            tplus_slider.value,
+            EEG_groups_assignment,
+            MEG_groups_assignment,
+        )
+
+    if current_view_mode == ViewMode.TOTAL:
+        current_view_mode = ViewMode.WINDOW
+        new_EEG_p, EEG_lines, new_MEG_p, MEG_lines = window_plots(
+            EEG_window_group_avgs,
+            MEG_window_group_avgs,
+            tmin_slider.value,
+            tplus_slider.value,
+            logger,
+        )
+        run_select.disabled = True
+        tmin_slider.disabled = True
+        tplus_slider.disabled = True
+        famous_toggle.disabled = True
+        scrambled_toggle.disabled = True
+        unfamiliar_toggle.disabled = True
+    else:
+        current_view_mode = ViewMode.TOTAL
+        if current_data_mode == DataMode.TIME:
+            new_EEG_p, EEG_lines, new_MEG_p, MEG_lines = avg_plots(
+                EEG_group_avgs[run_idx],
+                MEG_group_avgs[run_idx],
+                downsampled_events[run_idx],
+                logger,
+            )
+            tmin_slider.disabled = False
+            tplus_slider.disabled = False
+            famous_toggle.disabled = False
+            scrambled_toggle.disabled = False
+            unfamiliar_toggle.disabled = False
+        else:
+            new_EEG_p, EEG_lines, new_MEG_p, MEG_lines = psd_plots(
+                EEG_group_psds[run_idx], MEG_group_psds[run_idx], logger
+            )
+        run_select.disabled = False
+
+    EEG_pane.object = new_EEG_p
+    MEG_pane.object = new_MEG_p
+
+    # Stop loading
+    EEG_pane.loading = False
+    MEG_pane.loading = False
+
+
+avg_button.param.watch(change_view, ["value"], onlychanged=True)
+
 
 # AVG sliders
 tmin_slider = panel.widgets.FloatSlider(
-    name="tmin", start=-1.5, end=0, step=0.01, value=-0.5, align="center"
+    name="tmin",
+    start=-1.5,
+    end=0,
+    step=0.01,
+    value=-0.5,
+    align="center",
+    sizing_mode="stretch_width",
 )
 tplus_slider = panel.widgets.FloatSlider(
-    name="tplus", start=0, end=1.5, step=0.01, value=0.5, align="center"
+    name="tplus",
+    start=0,
+    end=1.5,
+    step=0.01,
+    value=0.5,
+    align="center",
+    sizing_mode="stretch_width",
 )
+
+
+def reset_windows(event):
+    global EEG_window_group_avgs
+    global EEG_window_group_psds
+    global MEG_window_group_avgs
+    global MEG_window_group_psds
+    EEG_window_group_avgs = None
+    EEG_window_group_psds = None
+    MEG_window_group_avgs = None
+    MEG_window_group_psds = None
+
+
+tmin_slider.param.watch(reset_windows, ["value"], onlychanged=True)
+tplus_slider.param.watch(reset_windows, ["value"], onlychanged=True)
 
 # Event select toggles
 famous_toggle = panel.widgets.Toggle(
-    name="Famous", css_classes=["famous-button"], width=100, align="center"
+    name="Famous",
+    css_classes=["famous-button"],
+    width=100,
+    align="center",
 )
 scrambled_toggle = panel.widgets.Toggle(
     name="Scrambled",
@@ -320,64 +556,94 @@ scrambled_toggle = panel.widgets.Toggle(
     margin=(5, -20, 5, 10),
 )
 unfamiliar_toggle = panel.widgets.Toggle(
-    name="Unfamiliar", css_classes=["unfamiliar-button"], width=100, align="center"
+    name="Unfamiliar",
+    css_classes=["unfamiliar-button"],
+    width=100,
+    align="center",
 )
 
 
+def enable_avg(event):
+    if any([famous_toggle.value, scrambled_toggle.value, unfamiliar_toggle.value]):
+        avg_button.disabled = False
+    else:
+        avg_button.disabled = True
+
+
+famous_toggle.param.watch(enable_avg, ["value"], onlychanged=True)
+famous_toggle.param.watch(reset_windows, ["value"], onlychanged=True)
+scrambled_toggle.param.watch(enable_avg, ["value"], onlychanged=True)
+scrambled_toggle.param.watch(reset_windows, ["value"], onlychanged=True)
+unfamiliar_toggle.param.watch(enable_avg, ["value"], onlychanged=True)
+unfamiliar_toggle.param.watch(reset_windows, ["value"], onlychanged=True)
+
 # Whole
+EEG_pane = None
+EEG_lines = None
+MEG_pane = None
+MEG_lines = None
+
+
 def second_page(subject_id):
+    global EEG_pane
+    global MEG_pane
 
     # Clear first page
-    layout.clear()
+    grid.objects = {}
+    grid[8:14, :] = panel.Spacer()
 
     # Re-add topbar
-    layout.append(topbar)
+    topbar.visible = False
+    grid[0, :] = topbar
+
+    # Add second page UI
+    UI_bar = panel.Row(
+        run_select,
+        psd_button,
+        panel.layout.HSpacer(),
+        avg_text,
+        tmin_slider,
+        tplus_slider,
+        famous_toggle,
+        scrambled_toggle,
+        unfamiliar_toggle,
+        avg_button,
+        visible=False,
+    )
+    grid[1, :] = UI_bar
 
     # Start loading animation
-    layout.append(panel.layout.VSpacer())
-    layout.loading = True
+    grid.loading = True
 
     # Load data
     get_subject_data(subject_select.value)
 
     # Create Bokeh plots
-    EEG_p, MEG_p = avg_plots(
+    EEG_p, EEG_lines, MEG_p, MEG_lines = avg_plots(
         EEG_group_avgs[0], MEG_group_avgs[0], downsampled_events[0], logger
     )
 
-    # Create Bokeh plots
-
     # Set layout
-    layout.append(
-        panel.Column(
-            panel.Row(
-                run_select,
-                psd_button,
-                panel.layout.HSpacer(),
-                avg_text,
-                tmin_slider,
-                tplus_slider,
-                famous_toggle,
-                scrambled_toggle,
-                unfamiliar_toggle,
-                avg_button,
-            ),
-            panel.Row(panel.pane.Bokeh(EEG_p, sizing_mode="stretch_both"), panel.pane.Plotly(fig), sizing_mode="stretch_both"),
-            panel.Row(panel.pane.Bokeh(MEG_p, sizing_mode="stretch_both"), panel.pane.Plotly(fig), sizing_mode="stretch_both"),
-            sizing_mode = "stretch_both"
-        )
-    )
+    EEG_pane = panel.pane.Bokeh(EEG_p, visible=False)
+    MEG_pane = panel.pane.Bokeh(MEG_p, visible=False)
+    grid[2:8, 0:7] = EEG_pane
+    grid[2:8, 7:10] = panel.Spacer(color="green")
+    grid[8:14, 0:7] = MEG_pane
+    grid[8:14, 7:10] = panel.Spacer(color="red")
+
+    # Make everything visible
+    topbar.visible = True
+    UI_bar.visible = True
+    EEG_pane.visible = True
+    MEG_pane.visible = True
 
     # Stop loading animation
-    layout.pop(1)
-    layout.loading = False
+    grid.loading = False
 
 
 """
-LAYOUT
+WHOLE
 """
-layout = panel.Column(
-    sizing_mode="stretch_both",
-)
+grid = panel.GridSpec(sizing_mode="stretch_both")
 first_page(0)
-layout.servable()
+grid.servable()

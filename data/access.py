@@ -7,12 +7,14 @@ from scipy import signal
 # Subject info
 # ----
 
+
 def parse_subject_data():
     as_dict = 0
     with open("data/processed/subject_data.json") as subject_data:
         as_dict = json.load(subject_data)
 
     return as_dict
+
 
 # -----
 # Constants
@@ -22,7 +24,7 @@ def parse_subject_data():
 event_names = ["Famous", "Scrambled", "Unfamiliar"]
 event_colors = {
     event_name: event_color
-    for event_name, event_color in zip(event_names, ["#ff0000", "#00BFFF", "#0000FF"])
+    for event_name, event_color in zip(event_names, ["#ff0000", "#ffea00", "#35FF0D"])
 }
 
 # Group names
@@ -36,7 +38,7 @@ group_names = [
 group_colors = {
     group_name: group_color
     for group_name, group_color in zip(
-        group_names, ["#ff0000", "#ffe900", "#64ea5f", "#a1a1a1", "#000000"]
+        group_names, ["#00fff7", "#18156e", "#f700ff", "#7d7d7d", "#000000"]
     )
 }
 
@@ -201,7 +203,9 @@ def extract_events(run, selection=None):
 # -----
 
 
-def avg_windows(runs, event_selection, tmin, tmax, EEG_groups, MEG_groups):
+def avg_windows(
+    runs, event_selection, tmin, tmax, EEG_groups_assignment, MEG_groups_assignment
+):
     """
     Parses and returns average window for a given subject
     ---
@@ -210,8 +214,8 @@ def avg_windows(runs, event_selection, tmin, tmax, EEG_groups, MEG_groups):
         list of event ids to window over
         time to cut before the event (must be >= minimum_min)
         time to cut after the event  (must be <= maximum_max)
-        dict of eeg channels
-        dict of meg channels
+        EEG group assignments
+        MEG group assignments
     ---
     output
         dict of EEG runs windowed average per group
@@ -229,8 +233,6 @@ def avg_windows(runs, event_selection, tmin, tmax, EEG_groups, MEG_groups):
             mne.Epochs(
                 run,
                 numpy.insert(extract_events(run, event_selection), 1, 0, axis=1),
-                picks=[channel for group in EEG_groups.values() for channel in group]
-                + [channel for group in MEG_groups.values() for channel in group],
                 tmin=tmin,
                 tmax=tmax,
                 preload=True,
@@ -241,7 +243,7 @@ def avg_windows(runs, event_selection, tmin, tmax, EEG_groups, MEG_groups):
     # Split per EEG group
     eeg_groups_windows = {}
     eeg_groups_psd = {}
-    for group_name, group_channels in EEG_groups.items():
+    for group_name, group_channels in EEG_groups_assignment.items():
         avg_window = numpy.mean(
             windows.get_data(picks=group_channels, units="uV"), axis=0
         )
@@ -254,7 +256,7 @@ def avg_windows(runs, event_selection, tmin, tmax, EEG_groups, MEG_groups):
     # Split per MEG group
     meg_groups_windows = {}
     meg_groups_psd = {}
-    for group_name, group_channels in MEG_groups.items():
+    for group_name, group_channels in MEG_groups_assignment.items():
         avg_window = numpy.mean(
             windows.get_data(picks=group_channels, units="fT"), axis=0
         )
