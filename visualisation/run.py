@@ -2,6 +2,8 @@ import panel
 import logging
 import enum
 
+from functools import partial
+
 from bokehplots import avg_plots, window_plots, psd_plots
 import data_access
 
@@ -54,40 +56,63 @@ def filter_subjects(sex, age):
 # ----
 # CSS
 # ----
-css = """
-.bk.panel-widget-box {
-  background: #f0f0f0;
-  border-radius: 5px;
-  border: 1px black solid;
-}
-.bk-root .bk.title-button .bk-btn {
-  background: #000000;
-  text-align: left;
-  border: 0px black solid;
-  color: white;
-  font-size: 16pt;
-  font-family: monospace;
-}
-.bk-root .bk.main-button .bk-btn {
-  color: white;
-  font-size: 12pt;
-  font-family: monospace;
-}
-.bk-root .bk.famous-button .bk-btn {
-  border: 1px #ff0000 solid;
-  color: #ff0000;
-}
-.bk-root .bk.scrambled-button .bk-btn {
-  border: 1px #00BFFF solid;
-  color: #00BFFF;
-}
-.bk-root .bk.unfamiliar-button .bk-btn {
-  border: 1px #0000FF solid;
-  color: #0000FF;
-}
-"""
-
-panel.extension("plotly", raw_css=[css])
+panel.extension(
+    "plotly",
+    raw_css=[
+        f"""
+        .bk.panel-widget-box {{
+          background: #f0f0f0;
+          border-radius: 5px;
+          border: 1px black solid;
+        }}
+        .bk-root .bk.title-button .bk-btn {{
+          background: #000000;
+          text-align: left;
+          border: 0px black solid;
+          color: white;
+          font-size: 16pt;
+          font-family: monospace;
+        }}
+        .bk-root .bk.main-button .bk-btn {{
+          color: white;
+          font-size: 12pt;
+          font-family: monospace;
+        }}
+        .bk-root .bk.famous-button .bk-btn {{
+          border: 1px {data_access.event_colors["Famous"]} solid;
+          color: {data_access.event_colors["Famous"]};
+        }}
+        .bk-root .bk.scrambled-button .bk-btn {{
+          border: 1px {data_access.event_colors["Scrambled"]} solid;
+          color: {data_access.event_colors["Scrambled"]};
+        }}
+        .bk-root .bk.unfamiliar-button .bk-btn {{
+          border: 1px {data_access.event_colors["Unfamiliar"]} solid;
+          color: {data_access.event_colors["Unfamiliar"]};
+        }}
+        .bk-root .bk.temporalL-button .bk-btn {{
+          border: 1px {data_access.group_colors["Temporal lobe (L)"]} solid;
+          color: {data_access.group_colors["Temporal lobe (L)"]};
+        }}
+        .bk-root .bk.temporalR-button .bk-btn {{
+          border: 1px {data_access.group_colors["Temporal lobe (R)"]} solid;
+          color: {data_access.group_colors["Temporal lobe (R)"]};
+        }}
+        .bk-root .bk.parietal-button .bk-btn {{
+          border: 1px {data_access.group_colors["Parietal lobe"]} solid;
+          color: {data_access.group_colors["Parietal lobe"]};
+        }}
+        .bk-root .bk.occipital-button .bk-btn {{
+          border: 1px {data_access.group_colors["Occipital lobe"]} solid;
+          color: {data_access.group_colors["Occipital lobe"]};
+        }}
+        .bk-root .bk.frontal-button .bk-btn {{
+          border: 1px {data_access.group_colors["Frontal lobe"]} solid;
+          color: {data_access.group_colors["Frontal lobe"]};
+        }}
+        """
+    ],
+)
 
 
 # ----
@@ -370,7 +395,11 @@ def change_data(event):
 
         if current_view_mode == ViewMode.TOTAL:
             new_EEG_p, EEG_lines, new_MEG_p, MEG_lines = psd_plots(
-                EEG_group_psds[run_idx], MEG_group_psds[run_idx], logger
+                EEG_group_psds[run_idx],
+                EEG_group_line_visible(),
+                MEG_group_psds[run_idx],
+                MEG_group_line_visible(),
+                logger,
             )
             avg_button.disabled = True
             tmin_slider.disabled = True
@@ -380,7 +409,11 @@ def change_data(event):
             unfamiliar_toggle.disabled = True
         else:
             new_EEG_p, EEG_lines, new_MEG_p, MEG_lines = psd_plots(
-                EEG_window_group_psds, MEG_window_group_psds, logger
+                EEG_window_group_psds,
+                EEG_group_line_visible(),
+                MEG_window_group_psds,
+                MEG_group_line_visible(),
+                logger,
             )
     else:
         current_data_mode = DataMode.TIME
@@ -388,7 +421,9 @@ def change_data(event):
         if current_view_mode == ViewMode.TOTAL:
             new_EEG_p, EEG_lines, new_MEG_p, MEG_lines = avg_plots(
                 EEG_group_avgs[run_idx],
+                EEG_group_line_visible(),
                 MEG_group_avgs[run_idx],
+                MEG_group_line_visible(),
                 downsampled_events[run_idx],
                 logger,
             )
@@ -400,7 +435,9 @@ def change_data(event):
         else:
             new_EEG_p, EEG_lines, new_MEG_p, MEG_lines = window_plots(
                 EEG_window_group_avgs,
+                EEG_group_line_visible(),
                 MEG_window_group_avgs,
+                MEG_group_line_visible(),
                 tmin_slider.value,
                 tplus_slider.value,
                 logger,
@@ -474,7 +511,9 @@ def change_view(event):
         current_view_mode = ViewMode.WINDOW
         new_EEG_p, EEG_lines, new_MEG_p, MEG_lines = window_plots(
             EEG_window_group_avgs,
+            EEG_group_line_visible(),
             MEG_window_group_avgs,
+            MEG_group_line_visible(),
             tmin_slider.value,
             tplus_slider.value,
             logger,
@@ -490,7 +529,9 @@ def change_view(event):
         if current_data_mode == DataMode.TIME:
             new_EEG_p, EEG_lines, new_MEG_p, MEG_lines = avg_plots(
                 EEG_group_avgs[run_idx],
+                EEG_group_line_visible(),
                 MEG_group_avgs[run_idx],
+                MEG_group_line_visible(),
                 downsampled_events[run_idx],
                 logger,
             )
@@ -501,7 +542,11 @@ def change_view(event):
             unfamiliar_toggle.disabled = False
         else:
             new_EEG_p, EEG_lines, new_MEG_p, MEG_lines = psd_plots(
-                EEG_group_psds[run_idx], MEG_group_psds[run_idx], logger
+                EEG_group_psds[run_idx],
+                EEG_group_line_visible(),
+                MEG_group_psds[run_idx],
+                MEG_group_line_visible(),
+                logger,
             )
         run_select.disabled = False
 
@@ -587,16 +632,101 @@ scrambled_toggle.param.watch(reset_windows, ["value"], onlychanged=True)
 unfamiliar_toggle.param.watch(enable_avg, ["value"], onlychanged=True)
 unfamiliar_toggle.param.watch(reset_windows, ["value"], onlychanged=True)
 
+# Group select toggles
+def show_EEG_lines(group_name, event):
+    global EEG_lines
+    for line in EEG_lines[group_name]:
+        line.visible = event.new
+
+
+def EEG_group_line_visible():
+    return {
+        group_name: group_toggle.value for group_name, group_toggle in EEG_group_toggles
+    }
+
+
+def show_MEG_lines(group_name, event):
+    global MEG_lines
+    for line in MEG_lines[group_name]:
+        line.visible = event.new
+
+
+def MEG_group_line_visible():
+    return {
+        group_name: group_toggle.value for group_name, group_toggle in MEG_group_toggles
+    }
+
+
+EEG_group_toggles = [
+    (
+        group_name,
+        panel.widgets.Toggle(
+            name=group_name.replace("lobe", ""),
+            align="center",
+            width_policy="min",
+            margin=(0, 1, 0, 0),
+            value=True,
+            css_classes=[
+                group_name.split(" ")[0].lower() + "-button"
+                if len(group_name.split(" ")) == 2
+                else group_name.split(" ")[0].lower()
+                + group_name.split(" ")[2].strip(")").strip("(")
+                + "-button"
+            ],
+        ),
+    )
+    for group_name in data_access.group_names
+]
+EEG_group_toggles_row = panel.Row(
+    *[toggle for group_name, toggle in EEG_group_toggles], aling="center", visible=False
+)
+
+MEG_group_toggles = [
+    (
+        group_name,
+        panel.widgets.Toggle(
+            name=group_name.replace("lobe", ""),
+            align="center",
+            width_policy="min",
+            margin=(0, 1, 0, 0),
+            value=True,
+            css_classes=[
+                group_name.split(" ")[0].lower() + "-button"
+                if len(group_name.split(" ")) == 2
+                else group_name.split(" ")[0].lower()
+                + group_name.split(" ")[2].strip(")").strip("(")
+                + "-button"
+            ],
+        ),
+    )
+    for group_name in data_access.group_names
+]
+MEG_group_toggles_row = panel.Row(
+    *[toggle for group_name, toggle in MEG_group_toggles], aling="center", visible=False
+)
+
+
 # Whole
 EEG_pane = None
 EEG_lines = None
 MEG_pane = None
 MEG_lines = None
 
+for group_name, group_toggle in EEG_group_toggles:
+    group_toggle.param.watch(
+        partial(show_EEG_lines, group_name), ["value"], onlychanged=True
+    )
+for group_name, group_toggle in MEG_group_toggles:
+    group_toggle.param.watch(
+        partial(show_MEG_lines, group_name), ["value"], onlychanged=True
+    )
+
 
 def second_page():
     global EEG_pane
+    global EEG_lines
     global MEG_pane
+    global MEG_lines
 
     # Clear first page
     grid.objects = {}
@@ -630,22 +760,31 @@ def second_page():
 
     # Create Bokeh plots
     EEG_p, EEG_lines, MEG_p, MEG_lines = avg_plots(
-        EEG_group_avgs[0], MEG_group_avgs[0], downsampled_events[0], logger
+        EEG_group_avgs[0],
+        EEG_group_line_visible(),
+        MEG_group_avgs[0],
+        MEG_group_line_visible(),
+        downsampled_events[0],
+        logger,
     )
 
     # Set layout
     EEG_pane = panel.pane.Bokeh(EEG_p, visible=False)
     MEG_pane = panel.pane.Bokeh(MEG_p, visible=False)
     grid[2:8, 0:7] = EEG_pane
-    grid[2:8, 7:10] = panel.Spacer(color="green")
+    grid[2:7, 7:10] = panel.Spacer(color="green")
+    grid[7:8, 7:10] = EEG_group_toggles_row
     grid[8:14, 0:7] = MEG_pane
-    grid[8:14, 7:10] = panel.Spacer(color="red")
+    grid[8:13, 7:10] = panel.Spacer(color="red")
+    grid[13:14, 7:10] = MEG_group_toggles_row
 
     # Make everything visible
     topbar.visible = True
     UI_bar.visible = True
     EEG_pane.visible = True
     MEG_pane.visible = True
+    EEG_group_toggles_row.visible = True
+    MEG_group_toggles_row.visible = True
 
     # Stop loading animation
     grid.loading = False

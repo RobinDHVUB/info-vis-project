@@ -22,7 +22,7 @@ view_size = 10 * 45
 # ----
 # Average plots
 # ----
-def avg_plots(EEG_avgs, MEG_avgs, events, logger):
+def avg_plots(EEG_avgs, EEG_line_visible, MEG_avgs, MEG_line_visible, events, logger):
 
     # Tools
     tools = [
@@ -68,6 +68,7 @@ def avg_plots(EEG_avgs, MEG_avgs, events, logger):
             line_width=1,
             source=source,
             line_color=data_access.group_colors[group_name],
+            visible=EEG_line_visible[group_name],
         )
         EEG_lines[group_name].append(line)
     EEG_p.y_range.renderers = [line for group in EEG_lines.values() for line in group]
@@ -101,6 +102,7 @@ def avg_plots(EEG_avgs, MEG_avgs, events, logger):
             line_width=1,
             source=source,
             line_color=data_access.group_colors[group_name],
+            visible=MEG_line_visible[group_name],
         )
         MEG_lines[group_name].append(line)
     MEG_p.y_range.renderers = [line for group in MEG_lines.values() for line in group]
@@ -112,37 +114,51 @@ def avg_plots(EEG_avgs, MEG_avgs, events, logger):
             event_data = ColumnDataSource(
                 dict(
                     event_type=[data_access.event_names[event[1] - 1]],
-                    color=[data_access.event_colors[data_access.event_names[event[1] - 1]]],
+                    color=[
+                        data_access.event_colors[data_access.event_names[event[1] - 1]]
+                    ],
                 )
             )
 
             # EEG plot
             span = Rect(
-                x=round(event[0] - (data_access.event_duration * data_access.avg_sfreq) / 2),
+                x=round(
+                    event[0] - (data_access.event_duration * data_access.avg_sfreq) / 2
+                ),
                 y=0,
                 width=data_access.event_duration * data_access.avg_sfreq,
                 height=10000,
                 width_units="data",
                 height_units="data",
                 line_alpha=0.1,
-                line_color=data_access.event_colors[data_access.event_names[event[1] - 1]],
+                line_color=data_access.event_colors[
+                    data_access.event_names[event[1] - 1]
+                ],
                 fill_alpha=0.1,
-                fill_color=data_access.event_colors[data_access.event_names[event[1] - 1]],
+                fill_color=data_access.event_colors[
+                    data_access.event_names[event[1] - 1]
+                ],
             )
             renderers.append(EEG_p.add_glyph(source_or_glyph=event_data, glyph=span))
 
             # MEG plot
             span = Rect(
-                x=round(event[0] - (data_access.event_duration * data_access.avg_sfreq) / 2),
+                x=round(
+                    event[0] - (data_access.event_duration * data_access.avg_sfreq) / 2
+                ),
                 y=0,
                 width=data_access.event_duration * data_access.avg_sfreq,
                 height=100000,
                 width_units="data",
                 height_units="data",
                 line_alpha=0.1,
-                line_color=data_access.event_colors[data_access.event_names[event[1] - 1]],
+                line_color=data_access.event_colors[
+                    data_access.event_names[event[1] - 1]
+                ],
                 fill_alpha=0.1,
-                fill_color=data_access.event_colors[data_access.event_names[event[1] - 1]],
+                fill_color=data_access.event_colors[
+                    data_access.event_names[event[1] - 1]
+                ],
             )
             renderers.append(MEG_p.add_glyph(source_or_glyph=event_data, glyph=span))
 
@@ -156,7 +172,15 @@ def avg_plots(EEG_avgs, MEG_avgs, events, logger):
 # ----
 # Window plots
 # ----
-def window_plots(EEG_window_group_avgs, MEG_window_group_avgs, tmin, tplus, logger):
+def window_plots(
+    EEG_window_group_avgs,
+    EEG_line_visible,
+    MEG_window_group_avgs,
+    MEG_line_visible,
+    tmin,
+    tplus,
+    logger,
+):
 
     # Tools
     tools = [
@@ -199,6 +223,7 @@ def window_plots(EEG_window_group_avgs, MEG_window_group_avgs, tmin, tplus, logg
             line_width=1,
             source=source,
             line_color=data_access.group_colors[group_name],
+            visible=EEG_line_visible[group_name],
         )
         EEG_lines[group_name].append(line)
     EEG_p.y_range.renderers = [line for group in EEG_lines.values() for line in group]
@@ -231,6 +256,7 @@ def window_plots(EEG_window_group_avgs, MEG_window_group_avgs, tmin, tplus, logg
             line_width=1,
             source=source,
             line_color=data_access.group_colors[group_name],
+            visible=MEG_line_visible[group_name],
         )
         MEG_lines[group_name].append(line)
     MEG_p.y_range.renderers = [line for group in MEG_lines.values() for line in group]
@@ -257,7 +283,7 @@ def window_plots(EEG_window_group_avgs, MEG_window_group_avgs, tmin, tplus, logg
 # ----
 # PSD plots
 # ----
-def psd_plots(EEG_psds, MEG_psds, logger):
+def psd_plots(EEG_psds, EEG_line_visible, MEG_psds, MEG_line_visible, logger):
 
     # Tools
     tools = [
@@ -294,6 +320,7 @@ def psd_plots(EEG_psds, MEG_psds, logger):
                 line_width=1,
                 source=source,
                 line_color=data_access.group_colors[group_name],
+                visible=EEG_line_visible[group_name],
             )
             EEG_lines[group_name].append(line)
     EEG_p.y_range.renderers = [line for group in EEG_lines.values() for line in group]
@@ -326,6 +353,7 @@ def psd_plots(EEG_psds, MEG_psds, logger):
                 line_width=1,
                 source=source,
                 line_color=data_access.group_colors[group_name],
+                visible=MEG_line_visible[group_name],
             )
             MEG_lines[group_name].append(line)
     MEG_p.y_range.renderers = [line for group in MEG_lines.values() for line in group]
