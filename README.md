@@ -26,8 +26,20 @@ python -m venv env
 ```
 
 ### Activate the environment
+
+*Linux*
 ```console
 source env/bin/activate
+```
+
+To deactivate, use:
+```console
+deactivate
+```
+
+*Windows*
+```console
+.\\env\Scripts\activate
 ```
 
 To deactivate, use:
