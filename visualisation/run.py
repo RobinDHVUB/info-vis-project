@@ -1027,11 +1027,15 @@ def second_page():
         config={"displayModeBar": False, "scrollZoom": False, "responsive": True},
         visible=False,
     )
+
+    # Plotly panes need to be nested in a Panel pane in order to get correct scaling,
+    # since Plotly panes default to 100% height and width instead of explicitly computing
+    # a height and width that fits the grid
     grid[2:8, 0:7] = EEG_pane
-    grid[2:7, 7:10] = EEG_head_pane
+    grid[2:7, 7:10] = panel.Row(EEG_head_pane)
     grid[7:8, 7:10] = EEG_group_toggles_row
     grid[8:14, 0:7] = MEG_pane
-    grid[8:13, 7:10] = MEG_head_pane
+    grid[8:13, 7:10] = panel.Row(MEG_head_pane)
     grid[13:14, 7:10] = MEG_group_toggles_row
 
     # Make everything visible
