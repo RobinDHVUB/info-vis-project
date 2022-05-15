@@ -1,4 +1,4 @@
-# Information Visualization: Project
+# Visualising a multi-modal neuroimaging dataset
 
 Project of Group 8 for the Information Visualization course at [VUB](www.vub.be).
 
