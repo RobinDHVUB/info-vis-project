@@ -9,7 +9,7 @@ Monty Python and the Three WISE Men:
 | Name                     | Student number | Email address                                                      |
 | :----------------------- | :------------- | :----------------------------------------------------------------- |
 | Robin De Haes            | 0565683        | [robin.de.haes@vub.be](mailto:robin.de.haes@vub.be)                |
-| Wolf De Wulf             | 0546395        | [wolf.de.wulf@vub.be](mailto:wolf.de.wulf@vub.be)                  |
+| Wolf De Wulf             | 0546395        | [wolf.de.wulf@vub.be](mailto:wolf.de.wulf@vub.be)/[wolf.de.wulf@ed.ac.uk](mailto:wolf.de.wulf@ed.ac.uk)|
 | Alexis François Verdoodt | 0545813        | [alexis.francois.verdoodt@vub.be](alexis.francois.verdoodt@vub.be) |
 
 ## 1. Data
