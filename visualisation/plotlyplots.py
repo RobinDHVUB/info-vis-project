@@ -373,7 +373,7 @@ def electrode_plot(el_names, el_types, el_coords, mesh_coords, plot_type):
     fig.update_layout(paper_bgcolor="#EAEAEA")
     fig.update_layout(plot_bgcolor="#EAEAEA")
 
-    return fig, electrode_traces
+    return fig
 
 # update fig, which is the 3D visualization of an EEG or MEG "electrode cap"
 # group_toggles is a dictionary containing group names as key and as value True if that group should be selected
