@@ -46,6 +46,8 @@ def avg_plots(EEG_avgs, EEG_line_visible, MEG_avgs, MEG_line_visible, events, lo
         toolbar_sticky=False,
         lod_threshold=None,
         sizing_mode="stretch_both",
+        background_fill_color = "#EAEAEA",
+        border_fill_color = "#EAEAEA",
     )
     EEG_p.x_range = Range1d(0, view_size)
     EEG_p.xaxis.axis_label = "Time (s)"
@@ -53,6 +55,8 @@ def avg_plots(EEG_avgs, EEG_line_visible, MEG_avgs, MEG_line_visible, events, lo
     EEG_p.toolbar.logo = None
     EEG_p.xaxis.ticker = [tick for tick in x_ticks.keys()]
     EEG_p.xaxis.major_label_overrides = x_ticks
+    EEG_p.xgrid.grid_line_color = "#D4D4D4"
+    EEG_p.ygrid.grid_line_color = "#D4D4D4"
 
     EEG_lines = {group_name: [] for group_name in EEG_avgs.keys()}
     for group_name, group_data in EEG_avgs.items():
@@ -80,6 +84,8 @@ def avg_plots(EEG_avgs, EEG_line_visible, MEG_avgs, MEG_line_visible, events, lo
         toolbar_location=None,
         lod_threshold=None,
         sizing_mode="stretch_both",
+        background_fill_color = "#EAEAEA",
+        border_fill_color = "#EAEAEA"
     )
     MEG_p.x_range = EEG_p.x_range
     MEG_p.xaxis.ticker = [tick for tick in x_ticks.keys()]
@@ -87,6 +93,8 @@ def avg_plots(EEG_avgs, EEG_line_visible, MEG_avgs, MEG_line_visible, events, lo
     MEG_p.xaxis.axis_label = "Time (s)"
     MEG_p.yaxis.axis_label = "fT"
     MEG_p.toolbar.logo = None
+    MEG_p.xgrid.grid_line_color = "#D4D4D4"
+    MEG_p.ygrid.grid_line_color = "#D4D4D4"
 
     MEG_lines = {group_name: [] for group_name in MEG_avgs.keys()}
     for group_name, group_data in MEG_avgs.items():
@@ -202,12 +210,16 @@ def window_plots(
         toolbar_location="above",
         toolbar_sticky=False,
         sizing_mode="stretch_both",
+        background_fill_color = "#EAEAEA",
+        border_fill_color = "#EAEAEA"
     )
     EEG_p.xaxis.ticker = [tick for tick in x_ticks.keys()]
     EEG_p.xaxis.major_label_overrides = x_ticks
     EEG_p.xaxis.axis_label = "Time (s)"
     EEG_p.yaxis.axis_label = "µV"
     EEG_p.toolbar.logo = None
+    EEG_p.xgrid.grid_line_color = "#D4D4D4"
+    EEG_p.ygrid.grid_line_color = "#D4D4D4"
 
     EEG_lines = {group_name: [] for group_name in EEG_window_group_avgs.keys()}
     for group_name, group_data in EEG_window_group_avgs.items():
@@ -234,6 +246,8 @@ def window_plots(
         tools=tools,
         toolbar_location=None,
         sizing_mode="stretch_both",
+        background_fill_color = "#EAEAEA",
+        border_fill_color = "#EAEAEA"
     )
     MEG_p.x_range = EEG_p.x_range
     MEG_p.xaxis.ticker = [tick for tick in x_ticks.keys()]
@@ -241,6 +255,8 @@ def window_plots(
     MEG_p.xaxis.axis_label = "Time (s)"
     MEG_p.yaxis.axis_label = "fT"
     MEG_p.toolbar.logo = None
+    MEG_p.xgrid.grid_line_color = "#D4D4D4"
+    MEG_p.ygrid.grid_line_color = "#D4D4D4"
 
     MEG_lines = {group_name: [] for group_name in MEG_window_group_avgs.keys()}
     for group_name, group_data in MEG_window_group_avgs.items():
@@ -299,10 +315,14 @@ def psd_plots(EEG_psds, EEG_line_visible, MEG_psds, MEG_line_visible, logger):
         toolbar_location="above",
         toolbar_sticky=False,
         sizing_mode="stretch_both",
+        background_fill_color = "#EAEAEA",
+        border_fill_color = "#EAEAEA"
     )
     EEG_p.xaxis.axis_label = "Frequency (Hz)"
     EEG_p.yaxis.axis_label = "Density"
     EEG_p.toolbar.logo = None
+    EEG_p.xgrid.grid_line_color = "#D4D4D4"
+    EEG_p.ygrid.grid_line_color = "#D4D4D4"
 
     EEG_lines = {group_name: [] for group_name in EEG_psds.keys()}
     for group_name, group_data in EEG_psds.items():
@@ -331,11 +351,15 @@ def psd_plots(EEG_psds, EEG_line_visible, MEG_psds, MEG_line_visible, logger):
         tools=tools,
         toolbar_location=None,
         sizing_mode="stretch_both",
+        background_fill_color = "#EAEAEA",
+        border_fill_color = "#EAEAEA"
     )
     MEG_p.x_range = EEG_p.x_range
     MEG_p.xaxis.axis_label = "Frequency (Hz)"
     MEG_p.yaxis.axis_label = "Density"
     MEG_p.toolbar.logo = None
+    MEG_p.xgrid.grid_line_color = "#D4D4D4"
+    MEG_p.ygrid.grid_line_color = "#D4D4D4"
 
     MEG_lines = {group_name: [] for group_name in MEG_psds.keys()}
     for group_name, group_data in MEG_psds.items():

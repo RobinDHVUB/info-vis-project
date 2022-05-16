@@ -3,6 +3,7 @@ import numpy
 import json
 
 from scipy import signal
+from bokeh.palettes import Colorblind
 
 # ----
 # Subject info
@@ -23,7 +24,7 @@ def parse_metadata():
 event_names = ["Famous", "Scrambled", "Unfamiliar"]
 event_colors = {
     event_name: event_color
-    for event_name, event_color in zip(event_names, ["#ff0000", "#ffea00", "#35FF0D"])
+    for event_name, event_color in zip(event_names, Colorblind[3])
 }
 
 # Group names
@@ -37,7 +38,7 @@ group_names = [
 group_colors = {
     group_name: group_color
     for group_name, group_color in zip(
-        group_names, ["#00fff7", "#18156e", "#f700ff", "#7d7d7d", "#000000"]
+        group_names, Colorblind[8][3:]
     )
 }
 
