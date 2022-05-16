@@ -198,7 +198,7 @@ def electrode_plot(el_names, el_types, el_coords, mesh_coords, plot_type):
         margin=dict(l=0, r=0, b=0, t=0),
         scene=dict(
             # camera?
-            bgcolor="#fff",
+            bgcolor="#EAEAEA",
             xaxis=dict(
                 title="",
                 showgrid=False,
