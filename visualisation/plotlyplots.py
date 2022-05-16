@@ -250,11 +250,6 @@ def missing_meg_mesh_idx(el_names):
     return i, j, k
 
 
-# convert a list of electrode types to a list of colors
-def types_to_colors(el_types):
-    return [data_access.group_colors[el_type] for el_type in el_types]
-
-
 # generate a 3D visualization of an EEG or MEG "electrode cap"
 # plot_type is expected be either "eeg" or "meg" and is used to fill up "gaps" in the mesh
 def electrode_plot(el_names, el_types, el_coords, mesh_coords, plot_type):
