@@ -5,7 +5,7 @@ import enum
 from functools import partial
 
 from bokehplots import avg_plots, window_plots, psd_plots
-from plotlyplots import electrode_plot
+from plotlyplots import electrode_plot, update_electrode_plot
 import data_access
 
 # ----
