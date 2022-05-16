@@ -122,20 +122,20 @@ panel.extension(
 change_subject_button = panel.widgets.Button(
     name="Change subject",
     button_type="success",
-    sizing_mode="scale_height",
+    sizing_mode="stretch_height",
     align="center",
     css_classes=["main-button"],
 )
 main_title = panel.widgets.Button(
     name="A multi-subject multi-modal human neuroimaging dataset",
-    sizing_mode="scale_width",
+    sizing_mode="stretch_width",
     align="center",
     css_classes=["title-button"],
 )
 topbar = panel.Row(
     main_title,
     align="center",
-    sizing_mode="scale_width",
+    sizing_mode="stretch_width",
     background="#000000",
 )
 
@@ -175,13 +175,11 @@ title = panel.pane.Str(
     "Subject selection",
     align="center",
     style={"font-size": "12pt"},
+    margin=(-15, 0, 0, 0),
 )
 
 # Sex select
-sex_select_title = panel.pane.Str(
-    "Sex:",
-    align="center",
-)
+sex_select_title = panel.pane.Str("Sex:", align="center", margin=0)
 sex_select = panel.widgets.CheckButtonGroup(
     value=["f", "m"],
     options={"Female": "f", "Male": "m"},
@@ -199,7 +197,7 @@ def change_sex_select(event):
 sex_select.param.watch(change_sex_select, ["value"], onlychanged=True)
 
 # Age select
-age_select_title = panel.pane.Str("Age:", align="center", margin=25)
+age_select_title = panel.pane.Str("Age:", align="center", margin=0)
 age_select_value = panel.pane.Str(f"{min_age}...{max_age}", align="center", margin=-20)
 age_select = panel.widgets.IntRangeSlider(
     start=min_age, end=max_age, value=(min_age, max_age), step=1, show_value=False
@@ -218,7 +216,7 @@ def change_age_select(event):
 age_select.param.watch(change_age_select, ["value"], onlychanged=True)
 
 # Subject select
-subject_select_title = panel.pane.Str("Subject:", align="center", margin=25)
+subject_select_title = panel.pane.Str("Subject:", align="center", margin=0)
 initial_subject_select_options = filter_subjects(sex_select.value, age_select.value)
 initial_subject_select_values = {
     id: description for description, id in initial_subject_select_options.items()
@@ -229,7 +227,10 @@ subject_select = panel.widgets.Select(
 
 # Start analysis button
 start_analysis_button = panel.widgets.Button(
-    name="Start analysis", button_type="success", margin=25, css_classes=["main-button"]
+    name="Start analysis",
+    button_type="success",
+    margin=(10, 10),
+    css_classes=["main-button"],
 )
 
 
@@ -278,9 +279,11 @@ class ViewMode(enum.Enum):
     TOTAL = 1
     WINDOW = 2
 
+
 class DataMode(enum.Enum):
     TIME = 1
     FREQUENCY = 2
+
 
 current_view_mode = ViewMode.TOTAL
 current_data_mode = DataMode.TIME
@@ -346,7 +349,7 @@ def change_run(event):
     run_idx = run_select.value
 
     if current_data_mode is not None:
-        
+
         # Loading
         EEG_pane.loading = True
         MEG_pane.loading = True
@@ -467,10 +470,10 @@ psd_button.param.watch(change_data, ["value"], onlychanged=True)
 
 # AVG toggle
 avg_text = panel.widgets.StaticText(
-    name="", value="Averaging over events:", align="center", sizing_mode="stretch_width"
+    name="", value="Windowing:", align="center", sizing_mode="stretch_width"
 )
 avg_button = panel.widgets.Toggle(
-    name="AVG", align="center", sizing_mode="stretch_width", disabled=True
+    name="AVG", align="center", sizing_mode="stretch_width", disabled=True, margin=(0,0,0,20)
 )
 
 
@@ -484,7 +487,6 @@ def change_view(event):
     global MEG_window_group_avgs
     global MEG_window_group_psds
     run_idx = run_select.value
-
 
     if current_data_mode is not None:
 
@@ -618,7 +620,7 @@ event_toggles = [
         name=event_name,
         align="center",
         width=100,
-        margin=(0, 4, 0, 5),
+        margin=(0, 2),
         css_classes=[event_name.lower() + "-button"],
     )
     for event_name in data_access.event_names
@@ -680,9 +682,8 @@ EEG_group_toggles = [
         group_name,
         panel.widgets.Toggle(
             name=group_name.replace("lobe", ""),
-            align="center",
-            width_policy="min",
-            margin=(0, 2, 0, 0),
+            width_policy="max",
+            margin=(2, 5, 0,0),
             css_classes=[
                 group_name.split(" ")[0].lower() + "-button"
                 if len(group_name.split(" ")) == 2
@@ -694,8 +695,8 @@ EEG_group_toggles = [
     )
     for group_name in data_access.group_names
 ]
-EEG_group_toggles_row = panel.Row(
-    *[toggle for group_name, toggle in EEG_group_toggles], align="center"
+EEG_group_toggles_col = panel.Column(
+    *[toggle for group_name, toggle in EEG_group_toggles], margin=0, align="center"
 )
 
 MEG_group_toggles = [
@@ -703,9 +704,8 @@ MEG_group_toggles = [
         group_name,
         panel.widgets.Toggle(
             name=group_name.replace("lobe", ""),
-            align="center",
-            width_policy="min",
-            margin=(0, 2, 0, 0),
+            width_policy="max",
+            margin=(2, 5, 0,0),
             css_classes=[
                 group_name.split(" ")[0].lower() + "-button"
                 if len(group_name.split(" ")) == 2
@@ -717,8 +717,10 @@ MEG_group_toggles = [
     )
     for group_name in data_access.group_names
 ]
-MEG_group_toggles_row = panel.Row(
-    *[toggle for group_name, toggle in MEG_group_toggles], align="center"
+MEG_group_toggles_col = panel.Column(
+    *[toggle for group_name, toggle in MEG_group_toggles],
+    align="center",
+    margin=0,
 )
 
 
@@ -768,7 +770,7 @@ def second_page():
     tmin_slider.disabled = False
     tplus_slider.value = 0.5
     tplus_slider.disabled = False
-    run_select.value=0
+    run_select.value = 0
     current_data_mode = DataMode.TIME
     current_view_mode = ViewMode.TOTAL
 
@@ -792,7 +794,7 @@ def second_page():
     )
 
     # Set layout
-    EEG_pane = panel.pane.Bokeh(EEG_p)
+    EEG_pane = panel.pane.Bokeh(EEG_p, margin=(0,0,10,0))
     EEG_head = electrode_plot(
         metadata["eeg_names"],
         metadata["eeg_types"],
@@ -804,10 +806,12 @@ def second_page():
         panel.pane.Plotly(
             EEG_head,
             config={"displayModeBar": False, "scrollZoom": False, "responsive": True},
+            margin=0,
         ),
         align="center",
+        margin=0,
     )
-    MEG_pane = panel.pane.Bokeh(MEG_p)
+    MEG_pane = panel.pane.Bokeh(MEG_p, margin=(0,0,10,0))
     MEG_head = electrode_plot(
         metadata["meg_names"],
         metadata["meg_types"],
@@ -819,19 +823,21 @@ def second_page():
         panel.pane.Plotly(
             MEG_head,
             config={"displayModeBar": False, "scrollZoom": False, "responsive": True},
+            margin=0,
         ),
         align="center",
+        margin=0,
     )
 
     # Plotly panes need to be nested in a Panel pane in order to get correct scaling,
     # since Plotly panes default to 100% height and width instead of explicitly computing
     # a height and width that fits the grid
-    new_grid[2:8, 0:7] = EEG_pane
-    new_grid[2:7, 7:10] = EEG_head_pane
-    new_grid[7:8, 7:10] = EEG_group_toggles_row
-    new_grid[8:14, 0:7] = MEG_pane
-    new_grid[8:13, 7:10] = MEG_head_pane
-    new_grid[13:14, 7:10] = MEG_group_toggles_row
+    new_grid[2:8, :7] = EEG_pane
+    new_grid[2:8, 7:10] = EEG_head_pane
+    new_grid[2:8, 10] = EEG_group_toggles_col
+    new_grid[8:15, :7] = MEG_pane
+    new_grid[8:14, 7:10] = MEG_head_pane
+    new_grid[8:14, 10] = MEG_group_toggles_col
 
     # Stop loading animation and swap grid contents
     grid.objects = new_grid.objects
@@ -841,6 +847,6 @@ def second_page():
 # ----
 # WHOLE
 # ----
-grid = panel.GridSpec(sizing_mode="stretch_both", background='#EAEAEA')
+grid = panel.GridSpec(sizing_mode="stretch_both", background="#EAEAEA", margin=0)
 first_page(0)
 grid.servable()

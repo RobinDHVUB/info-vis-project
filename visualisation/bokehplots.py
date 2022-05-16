@@ -42,15 +42,18 @@ def avg_plots(EEG_avgs, EEG_line_visible, MEG_avgs, MEG_line_visible, events, lo
     EEG_p = figure(
         title="EEG",
         tools=tools,
-        toolbar_location="above",
+        toolbar_location="right",
         toolbar_sticky=False,
         lod_threshold=None,
         sizing_mode="stretch_both",
         background_fill_color = "#EAEAEA",
         border_fill_color = "#EAEAEA",
+        outline_line_color="#D4D4D4",
+        outline_line_width = 1,
+        outline_line_alpha = 0.8
     )
     EEG_p.x_range = Range1d(0, view_size)
-    EEG_p.xaxis.axis_label = "Time (s)"
+    EEG_p.xaxis.visible = False
     EEG_p.yaxis.axis_label = "µV"
     EEG_p.toolbar.logo = None
     EEG_p.xaxis.ticker = [tick for tick in x_ticks.keys()]
@@ -85,7 +88,10 @@ def avg_plots(EEG_avgs, EEG_line_visible, MEG_avgs, MEG_line_visible, events, lo
         lod_threshold=None,
         sizing_mode="stretch_both",
         background_fill_color = "#EAEAEA",
-        border_fill_color = "#EAEAEA"
+        border_fill_color = "#EAEAEA",
+        outline_line_color="#D4D4D4",
+        outline_line_width = 1,
+        outline_line_alpha = 0.8
     )
     MEG_p.x_range = EEG_p.x_range
     MEG_p.xaxis.ticker = [tick for tick in x_ticks.keys()]
@@ -211,11 +217,14 @@ def window_plots(
         toolbar_sticky=False,
         sizing_mode="stretch_both",
         background_fill_color = "#EAEAEA",
-        border_fill_color = "#EAEAEA"
+        border_fill_color = "#EAEAEA",
+        outline_line_color="#D4D4D4",
+        outline_line_width = 1,
+        outline_line_alpha = 0.8
     )
     EEG_p.xaxis.ticker = [tick for tick in x_ticks.keys()]
     EEG_p.xaxis.major_label_overrides = x_ticks
-    EEG_p.xaxis.axis_label = "Time (s)"
+    EEG_p.xaxis.visible = False
     EEG_p.yaxis.axis_label = "µV"
     EEG_p.toolbar.logo = None
     EEG_p.xgrid.grid_line_color = "#D4D4D4"
@@ -247,7 +256,10 @@ def window_plots(
         toolbar_location=None,
         sizing_mode="stretch_both",
         background_fill_color = "#EAEAEA",
-        border_fill_color = "#EAEAEA"
+        border_fill_color = "#EAEAEA",
+        outline_line_color="#D4D4D4",
+        outline_line_width = 1,
+        outline_line_alpha = 0.8
     )
     MEG_p.x_range = EEG_p.x_range
     MEG_p.xaxis.ticker = [tick for tick in x_ticks.keys()]
@@ -316,9 +328,12 @@ def psd_plots(EEG_psds, EEG_line_visible, MEG_psds, MEG_line_visible, logger):
         toolbar_sticky=False,
         sizing_mode="stretch_both",
         background_fill_color = "#EAEAEA",
-        border_fill_color = "#EAEAEA"
+        border_fill_color = "#EAEAEA",
+        outline_line_color="#D4D4D4",
+        outline_line_width = 1,
+        outline_line_alpha = 0.8
     )
-    EEG_p.xaxis.axis_label = "Frequency (Hz)"
+    EEG_p.xaxis.visible = False
     EEG_p.yaxis.axis_label = "Density"
     EEG_p.toolbar.logo = None
     EEG_p.xgrid.grid_line_color = "#D4D4D4"
@@ -352,7 +367,10 @@ def psd_plots(EEG_psds, EEG_line_visible, MEG_psds, MEG_line_visible, logger):
         toolbar_location=None,
         sizing_mode="stretch_both",
         background_fill_color = "#EAEAEA",
-        border_fill_color = "#EAEAEA"
+        border_fill_color = "#EAEAEA",
+        outline_line_color="#D4D4D4",
+        outline_line_width = 1,
+        outline_line_alpha = 0.8
     )
     MEG_p.x_range = EEG_p.x_range
     MEG_p.xaxis.axis_label = "Frequency (Hz)"
