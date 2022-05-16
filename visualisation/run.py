@@ -61,6 +61,9 @@ panel.extension(
     "plotly",
     raw_css=[
         f"""
+        body {{
+            background: #EAEAEA;
+        }}
         .bk.panel-widget-box {{
           background: #f0f0f0;
           border-radius: 5px;
