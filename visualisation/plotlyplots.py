@@ -259,6 +259,17 @@ def types_to_colors(el_types):
 # plot_type is expected be either "eeg" or "meg" and is used to fill up "gaps" in the mesh
 def electrode_plot(el_names, el_types, el_coords, mesh_coords, plot_type):
 
+    # get the unique group names
+    group_names = list(set(el_types))
+
+    # collect the indices per group
+    electrode_indices = {group_name: [] for group_name in group_names}
+    for el_index, el_type in enumerate(el_types):
+        electrode_indices[el_type].append(el_index)
+
+    # generate and store the trace per group
+    electrode_traces = {}
+
     # get the coordinates of all electrodes
     el_x = el_coords[0]
     el_y = el_coords[1]
@@ -269,25 +280,29 @@ def electrode_plot(el_names, el_types, el_coords, mesh_coords, plot_type):
     mesh_y = mesh_coords[1]
     mesh_z = mesh_coords[2]
 
-    # get the non-selected elements
-    el_colors = types_to_colors(el_types)
+    for group_name in group_names:
+        trace_x = [el_x[i] for i in electrode_indices[group_name]]
+        trace_y = [el_y[i] for i in electrode_indices[group_name]]
+        trace_z = [el_z[i] for i in electrode_indices[group_name]]
+        trace_names = [el_names[i] for i in electrode_indices[group_name]]
+        trace_colors = [data_access.group_colors[el_types[i]] for i in electrode_indices[group_name]]
 
-    # trace for the non-selected electrodes
-    trace_non = go.Scatter3d(
-        x=el_x,
-        y=el_y,
-        z=el_z,
-        mode="markers",
-        hovertemplate="%{text}<extra></extra>",
-        text=el_names,
-        marker=dict(
-            symbol="circle",
-            size=12,
-            color=el_colors,
-            opacity=0.6,
-            line=dict(color="white", width=1),
-        ),
-    )
+        electrode_traces[group_name] = go.Scatter3d(
+            name=group_name, # set the group name, so we can easily select on this name for modifying specific traces
+            x=trace_x,
+            y=trace_y,
+            z=trace_z,
+            mode="markers",
+            hovertemplate="%{text}<extra></extra>",
+            text=trace_names,
+            marker=dict(
+                symbol="circle",
+                size=12,
+                color=trace_colors,
+                opacity=0.6,
+                line=dict(color="white", width=1),
+            ),
+        )
 
     # trace for the mesh
     trace_mesh = go.Mesh3d(
@@ -315,7 +330,8 @@ def electrode_plot(el_names, el_types, el_coords, mesh_coords, plot_type):
     )
 
     # include all traces
-    data = [trace_non, trace_mesh, trace_missing_mesh]
+    data = [trace_mesh, trace_missing_mesh]
+    data.extend(electrode_traces.values())
 
     # don't include any grids, axes, etc. (since we just want the 3D figure)
     layout = go.Layout(
@@ -361,5 +377,39 @@ def electrode_plot(el_names, el_types, el_coords, mesh_coords, plot_type):
     fig = go.Figure(data=data, layout=layout)
     fig.update_layout(paper_bgcolor="#EAEAEA")
     fig.update_layout(plot_bgcolor="#EAEAEA")
-    return fig
 
+    return fig, electrode_traces
+
+# update fig, which is the 3D visualization of an EEG or MEG "electrode cap"
+# group_toggles is a dictionary containing group names as key and as value True if that group should be selected
+# and False if not
+def update_electrode_plot(fig, group_toggles):
+
+    # update all traces with the same name as the group name in group_toggles
+    for group_name, group_toggle in group_toggles.items():
+        # if the group_toggle has value True, we should update the trace, so it looks selected
+        if group_toggle:
+            fig.update_traces(
+                marker=dict(
+                    size=14,
+                    opacity=1,
+                    line=dict(
+                        color="black"
+                    )
+                ),
+                selector=dict(name=group_name)
+            )
+        else:
+            # if the group_toggle has value False, we should update the trace, so it looks unselected
+            fig.update_traces(
+                marker=dict(
+                    size=12,
+                    opacity=0.6,
+                    line=dict(
+                        color="white"
+                    )
+                ),
+                selector=dict(name=group_name)
+            )
+
+    return fig
