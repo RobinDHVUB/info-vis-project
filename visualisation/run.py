@@ -62,8 +62,16 @@ panel.extension(
     "plotly",
     raw_css=[
         f"""
+        html {{
+            width: 100%;
+        }}
         body {{
+            margin:0;
+            width:100%;
             background: #E8FCFF;
+        }}
+        .bk-root > .bk {{
+            margin: 0 !important;
         }}
         .bk.panel-widget-box {{
           background: #f0f0f0;
@@ -71,6 +79,7 @@ panel.extension(
           border: 1px black solid;
         }}
         .bk-root .bk.title-button .bk-btn {{
+          width: 100%;
           background: #000000;
           text-align: left;
           border: 0px black solid;
@@ -856,6 +865,7 @@ def second_page():
         ),
         align="center",
         margin=0,
+        sizing_mode="stretch_both"
     )
 
     # Plotly panes need to be nested in a Panel pane in order to get correct scaling,
@@ -876,6 +886,6 @@ def second_page():
 # ----
 # WHOLE
 # ----
-grid = panel.GridSpec(sizing_mode="stretch_both", background="#E8FCFF", margin=(-9,-8,0,-8))
+grid = panel.GridSpec(sizing_mode="stretch_both", background="#E8FCFF")
 first_page(0)
 grid.servable()
