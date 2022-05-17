@@ -1,3 +1,4 @@
+from turtle import update
 import panel
 import logging
 import enum
@@ -62,7 +63,7 @@ panel.extension(
     raw_css=[
         f"""
         body {{
-            background: #EAEAEA;
+            background: #E8FCFF;
         }}
         .bk.panel-widget-box {{
           background: #f0f0f0;
@@ -360,18 +361,18 @@ def change_run(event):
         if current_data_mode == DataMode.TIME:
             new_EEG_p, EEG_lines, new_MEG_p, MEG_lines = avg_plots(
                 EEG_group_avgs[run_idx],
-                EEG_group_line_visible(),
+                EEG_group_visible(),
                 MEG_group_avgs[run_idx],
-                MEG_group_line_visible(),
+                MEG_group_visible(),
                 downsampled_events[run_idx],
                 logger,
             )
         else:
             new_EEG_p, EEG_lines, new_MEG_p, MEG_lines = psd_plots(
                 EEG_group_psds[run_idx],
-                EEG_group_line_visible(),
+                EEG_group_visible(),
                 MEG_group_psds[run_idx],
-                MEG_group_line_visible(),
+                MEG_group_visible(),
                 logger,
             )
 
@@ -415,9 +416,9 @@ def change_data(event):
             if current_view_mode == ViewMode.TOTAL:
                 new_EEG_p, EEG_lines, new_MEG_p, MEG_lines = psd_plots(
                     EEG_group_psds[run_idx],
-                    EEG_group_line_visible(),
+                    EEG_group_visible(),
                     MEG_group_psds[run_idx],
-                    MEG_group_line_visible(),
+                    MEG_group_visible(),
                     logger,
                 )
                 avg_button.disabled = True
@@ -428,9 +429,9 @@ def change_data(event):
             else:
                 new_EEG_p, EEG_lines, new_MEG_p, MEG_lines = psd_plots(
                     EEG_window_group_psds,
-                    EEG_group_line_visible(),
+                    EEG_group_visible(),
                     MEG_window_group_psds,
-                    MEG_group_line_visible(),
+                    MEG_group_visible(),
                     logger,
                 )
         else:
@@ -439,9 +440,9 @@ def change_data(event):
             if current_view_mode == ViewMode.TOTAL:
                 new_EEG_p, EEG_lines, new_MEG_p, MEG_lines = avg_plots(
                     EEG_group_avgs[run_idx],
-                    EEG_group_line_visible(),
+                    EEG_group_visible(),
                     MEG_group_avgs[run_idx],
-                    MEG_group_line_visible(),
+                    MEG_group_visible(),
                     downsampled_events[run_idx],
                     logger,
                 )
@@ -452,9 +453,9 @@ def change_data(event):
             else:
                 new_EEG_p, EEG_lines, new_MEG_p, MEG_lines = window_plots(
                     EEG_window_group_avgs,
-                    EEG_group_line_visible(),
+                    EEG_group_visible(),
                     MEG_window_group_avgs,
-                    MEG_group_line_visible(),
+                    MEG_group_visible(),
                     tmin_slider.value,
                     tplus_slider.value,
                     logger,
@@ -525,9 +526,9 @@ def change_view(event):
             if current_data_mode == DataMode.TIME:
                 new_EEG_p, EEG_lines, new_MEG_p, MEG_lines = window_plots(
                     EEG_window_group_avgs,
-                    EEG_group_line_visible(),
+                    EEG_group_visible(),
                     MEG_window_group_avgs,
-                    MEG_group_line_visible(),
+                    MEG_group_visible(),
                     tmin_slider.value,
                     tplus_slider.value,
                     logger,
@@ -535,9 +536,9 @@ def change_view(event):
             else:
                 new_EEG_p, EEG_lines, new_MEG_p, MEG_lines = psd_plots(
                     EEG_window_group_psds,
-                    EEG_group_line_visible(),
+                    EEG_group_visible(),
                     MEG_window_group_psds,
-                    MEG_group_line_visible(),
+                    MEG_group_visible(),
                     logger,
                 )
 
@@ -551,9 +552,9 @@ def change_view(event):
             if current_data_mode == DataMode.TIME:
                 new_EEG_p, EEG_lines, new_MEG_p, MEG_lines = avg_plots(
                     EEG_group_avgs[run_idx],
-                    EEG_group_line_visible(),
+                    EEG_group_visible(),
                     MEG_group_avgs[run_idx],
-                    MEG_group_line_visible(),
+                    MEG_group_visible(),
                     downsampled_events[run_idx],
                     logger,
                 )
@@ -564,9 +565,9 @@ def change_view(event):
             else:
                 new_EEG_p, EEG_lines, new_MEG_p, MEG_lines = psd_plots(
                     EEG_group_psds[run_idx],
-                    EEG_group_line_visible(),
+                    EEG_group_visible(),
                     MEG_group_psds[run_idx],
-                    MEG_group_line_visible(),
+                    MEG_group_visible(),
                     logger,
                 )
             run_select.disabled = False
@@ -654,27 +655,42 @@ UI_bar = panel.Row(
 )
 
 # Group select toggles
-def show_EEG_lines(group_name, event):
+def show_EEG_group(group_name, event):
     global EEG_lines
+    global EEG_head
+
+    # Lines
     if EEG_lines is not None:
         for line in EEG_lines[group_name]:
             line.visible = event.new
 
+    # Balls
+    if EEG_head is not None:
+        update_electrode_plot(EEG_head, {group_name:event.new})
 
-def EEG_group_line_visible():
+
+def EEG_group_visible():
     return {
         group_name: group_toggle.value for group_name, group_toggle in EEG_group_toggles
     }
 
 
-def show_MEG_lines(group_name, event):
+def show_MEG_group(group_name, event):
     global MEG_lines
+    global MEG_head
+
+    # Lines
     if MEG_lines is not None:
         for line in MEG_lines[group_name]:
             line.visible = event.new
 
+    # Balls
+    if MEG_head is not None:
+        logger.info(MEG_head)
+        update_electrode_plot(MEG_head, {group_name:event.new})
 
-def MEG_group_line_visible():
+
+def MEG_group_visible():
     return {
         group_name: group_toggle.value for group_name, group_toggle in MEG_group_toggles
     }
@@ -730,24 +746,28 @@ MEG_group_toggles_col = panel.Column(
 # Whole
 EEG_pane = None
 EEG_lines = None
+EEG_head = None
 MEG_pane = None
 MEG_lines = None
+MEG_head = None
 
 for group_name, group_toggle in EEG_group_toggles:
     group_toggle.param.watch(
-        partial(show_EEG_lines, group_name), ["value"], onlychanged=True
+        partial(show_EEG_group, group_name), ["value"], onlychanged=True
     )
 for group_name, group_toggle in MEG_group_toggles:
     group_toggle.param.watch(
-        partial(show_MEG_lines, group_name), ["value"], onlychanged=True
+        partial(show_MEG_group, group_name), ["value"], onlychanged=True
     )
 
 
 def second_page():
     global EEG_pane
     global EEG_lines
+    global EEG_head
     global MEG_pane
     global MEG_lines
+    global MEG_head
     global current_data_mode
     global current_view_mode
 
@@ -781,7 +801,7 @@ def second_page():
     new_grid[0, :] = topbar
 
     # Add second page UI bar
-    new_grid[1, :] = UI_bar
+    new_grid[1, 1:] = UI_bar
 
     # Load data
     get_subject_data()
@@ -789,9 +809,9 @@ def second_page():
     # Create Bokeh plots
     EEG_p, EEG_lines, MEG_p, MEG_lines = avg_plots(
         EEG_group_avgs[0],
-        EEG_group_line_visible(),
+        EEG_group_visible(),
         MEG_group_avgs[0],
-        MEG_group_line_visible(),
+        MEG_group_visible(),
         downsampled_events[0],
         logger,
     )
@@ -850,6 +870,6 @@ def second_page():
 # ----
 # WHOLE
 # ----
-grid = panel.GridSpec(sizing_mode="stretch_both", background="#EAEAEA", margin=0)
+grid = panel.GridSpec(sizing_mode="stretch_both", background="#E8FCFF", margin=0)
 first_page(0)
 grid.servable()
