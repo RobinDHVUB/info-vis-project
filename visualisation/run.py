@@ -195,8 +195,10 @@ def change_sex_select(event):
     subject_select.options = filter_subjects(event.new, age_select.value)
     if len(subject_select.options) == 0:
         subject_select.disabled = True
+        start_analysis_button.disabled = True
     else:
         subject_select.disabled = False
+        start_analysis_button.disabled = False
 
 
 sex_select.param.watch(change_sex_select, ["value"], onlychanged=True)
@@ -214,8 +216,10 @@ def change_age_select(event):
     subject_select.options = filter_subjects(sex_select.value, event.new)
     if len(subject_select.options) == 0:
         subject_select.disabled = True
+        start_analysis_button.disabled = True
     else:
         subject_select.disabled = False
+        start_analysis_button.disabled = False
 
 
 age_select.param.watch(change_age_select, ["value"], onlychanged=True)
