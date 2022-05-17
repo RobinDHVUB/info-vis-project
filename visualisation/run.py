@@ -75,12 +75,12 @@ panel.extension(
           text-align: left;
           border: 0px black solid;
           color: white;
-          font-size: 16pt;
+          font-size: 14pt;
           font-family: monospace;
         }}
         .bk-root .bk.main-button .bk-btn {{
           color: white;
-          font-size: 12pt;
+          font-size: 10pt;
           font-family: monospace;
         }}
         .bk-root .bk.famous-button .bk-btn {{
@@ -126,14 +126,15 @@ panel.extension(
 change_subject_button = panel.widgets.Button(
     name="Change subject",
     button_type="success",
-    sizing_mode="stretch_height",
-    align="center",
+    #sizing_mode="stretch_height",
+    #align="center",
     css_classes=["main-button"],
 )
 main_title = panel.widgets.Button(
     name="A multi-subject multi-modal human neuroimaging dataset",
     sizing_mode="stretch_width",
-    align="center",
+    #align="center",
+    margin=(4,0,0,0),
     css_classes=["title-button"],
 )
 topbar = panel.Row(
@@ -244,7 +245,8 @@ def start_analysis(event):
     topbar.append(
         panel.pane.Str(
             initial_subject_select_values[subject_select.value],
-            align="center",
+            #align="center",
+            margin=0,
             style={"color": "white"},
         )
     )
@@ -702,7 +704,7 @@ EEG_group_toggles = [
         panel.widgets.Toggle(
             name=group_name.replace("lobe", ""),
             width_policy="max",
-            margin=(2, 5, 0,0),
+            margin=(2, 10, 0,0),
             css_classes=[
                 group_name.split(" ")[0].lower() + "-button"
                 if len(group_name.split(" ")) == 2
@@ -724,7 +726,7 @@ MEG_group_toggles = [
         panel.widgets.Toggle(
             name=group_name.replace("lobe", ""),
             width_policy="max",
-            margin=(2, 5, 0,0),
+            margin=(2, 10, 0,0),
             css_classes=[
                 group_name.split(" ")[0].lower() + "-button"
                 if len(group_name.split(" ")) == 2
@@ -801,7 +803,7 @@ def second_page():
     new_grid[0, :] = topbar
 
     # Add second page UI bar
-    new_grid[1, 1:] = UI_bar
+    new_grid[1, :11] = UI_bar
 
     # Load data
     get_subject_data()
@@ -870,6 +872,6 @@ def second_page():
 # ----
 # WHOLE
 # ----
-grid = panel.GridSpec(sizing_mode="stretch_both", background="#E8FCFF", margin=0)
+grid = panel.GridSpec(sizing_mode="stretch_both", background="#E8FCFF", margin=(-9,-8,0,-8))
 first_page(0)
 grid.servable()
