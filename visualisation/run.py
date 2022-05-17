@@ -150,8 +150,7 @@ topbar = panel.Row(
     main_title,
     align="center",
     sizing_mode="stretch_width",
-    background="#000000",
-    margin=(0,-14,0,0)
+    background="#000000"
 )
 
 link_code = """
