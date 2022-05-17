@@ -801,7 +801,9 @@ def second_page():
     current_data_mode = None
     psd_button.value = False
     avg_button.value = False
-    for toggle in event_toggles:
+    event_toggles[0].value=True
+    event_toggles[0].disabled=False
+    for toggle in event_toggles[1:]:
         toggle.value = False
         toggle.disabled = False
     for group_name, toggle in EEG_group_toggles + MEG_group_toggles:
