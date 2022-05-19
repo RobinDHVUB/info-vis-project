@@ -890,4 +890,4 @@ def second_page():
 # ----
 grid = panel.GridSpec(sizing_mode="stretch_both", background="#E8FCFF")
 first_page(0)
-grid.servable("Neuroimaging Dataset")
+grid.servable("InfoVis")
