@@ -250,9 +250,19 @@ def missing_meg_mesh_idx(el_names):
     return i, j, k
 
 
+# helper function to get selection-specific attributes,
+# i.e., the electrode plot attributes used to distinguish selected markers from unselected markers
+def get_marker_values(selected):
+    size = 10 if selected else 9
+    opacity = 1 if selected else 0.6
+    line_color = "black" if selected else "white"
+
+    return {"size": size, "opacity": opacity, "line_color": line_color}
+
+
 # generate a 3D visualization of an EEG or MEG "electrode cap"
 # plot_type is expected be either "eeg" or "meg" and is used to fill up "gaps" in the mesh
-def electrode_plot(el_names, el_types, el_coords, mesh_coords, plot_type):
+def electrode_plot(el_names, el_types, el_coords, mesh_coords, plot_type, group_toggles=None):
 
     # get the unique group names
     group_names = list(set(el_types))
@@ -282,6 +292,8 @@ def electrode_plot(el_names, el_types, el_coords, mesh_coords, plot_type):
         trace_names = [el_names[i] for i in electrode_indices[group_name]]
         trace_colors = [data_access.group_colors[el_types[i]] for i in electrode_indices[group_name]]
 
+        marker_values = get_marker_values(group_toggles is not None and group_toggles[group_name])
+
         electrode_traces[group_name] = go.Scatter3d(
             name=group_name, # set the group name, so we can easily select on this name for modifying specific traces
             x=trace_x,
@@ -292,10 +304,10 @@ def electrode_plot(el_names, el_types, el_coords, mesh_coords, plot_type):
             text=trace_names,
             marker=dict(
                 symbol="circle",
-                size=12,
+                size=marker_values["size"],
                 color=trace_colors,
-                opacity=0.6,
-                line=dict(color="white", width=1),
+                opacity=marker_values["opacity"],
+                line=dict(color=marker_values["line_color"], width=1),
             ),
         )
 
@@ -380,16 +392,20 @@ def electrode_plot(el_names, el_types, el_coords, mesh_coords, plot_type):
 # and False if not
 def update_electrode_plot(fig, group_toggles):
 
+    # get the attributes that should be updated to distinguish between selected and unselected markers
+    selected_markers = get_marker_values(True)
+    unselected_markers = get_marker_values(False)
+
     # update all traces with the same name as the group name in group_toggles
     for group_name, group_toggle in group_toggles.items():
         # if the group_toggle has value True, we should update the trace, so it looks selected
         if group_toggle:
             fig.update_traces(
                 marker=dict(
-                    size=14,
-                    opacity=1,
+                    size=selected_markers["size"],
+                    opacity=selected_markers["opacity"],
                     line=dict(
-                        color="black"
+                        color=selected_markers["line_color"]
                     )
                 ),
                 selector=dict(name=group_name)
@@ -398,10 +414,10 @@ def update_electrode_plot(fig, group_toggles):
             # if the group_toggle has value False, we should update the trace, so it looks unselected
             fig.update_traces(
                 marker=dict(
-                    size=12,
-                    opacity=0.6,
+                    size=unselected_markers["size"],
+                    opacity=unselected_markers["opacity"],
                     line=dict(
-                        color="white"
+                        color=unselected_markers["line_color"]
                     )
                 ),
                 selector=dict(name=group_name)

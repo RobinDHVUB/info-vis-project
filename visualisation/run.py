@@ -839,6 +839,7 @@ def second_page():
         metadata["subjects"][subject_select.value - 1]["eeg_coords"],
         metadata["subjects"][subject_select.value - 1]["mesh_coords"],
         "eeg",
+        EEG_group_visible()
     )
     EEG_head_pane = panel.Row(
         panel.pane.Plotly(
@@ -856,6 +857,7 @@ def second_page():
         metadata["meg_coords"],
         metadata["meg_mesh_coords"],
         "meg",
+        MEG_group_visible()
     )
     MEG_head_pane = panel.Row(
         panel.pane.Plotly(
