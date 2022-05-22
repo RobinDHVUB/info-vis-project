@@ -70,6 +70,9 @@ panel.extension(
             width:100%;
             background: #E8FCFF;
         }}
+        .bk.pn-loading:before {{
+            background-color: rgb(232,252,255,0.50);
+        }}
         .bk-root > .bk {{
             margin: 0 !important;
         }}
