@@ -32,11 +32,6 @@ python -m venv env
 source env/bin/activate
 ```
 
-To deactivate, use:
-```console
-deactivate
-```
-
 *Windows*
 ```console
 .\\env\Scripts\activate
