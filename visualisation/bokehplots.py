@@ -58,8 +58,8 @@ def avg_plots(EEG_avgs, EEG_line_visible, MEG_avgs, MEG_line_visible, events, lo
     EEG_p.toolbar.logo = None
     EEG_p.xaxis.ticker = [tick for tick in x_ticks.keys()]
     EEG_p.xaxis.major_label_overrides = x_ticks
-    EEG_p.yaxis.major_label_text_font = "sans-serif"
-    EEG_p.yaxis.axis_label_text_font = "sans-serif"
+    EEG_p.yaxis.major_label_text_font = "arial"
+    EEG_p.yaxis.axis_label_text_font = "arial"
     EEG_p.xgrid.grid_line_color = "#D4D4D4"
     EEG_p.ygrid.grid_line_color = "#D4D4D4"
 
@@ -99,10 +99,10 @@ def avg_plots(EEG_avgs, EEG_line_visible, MEG_avgs, MEG_line_visible, events, lo
     MEG_p.xaxis.ticker = [tick for tick in x_ticks.keys()]
     MEG_p.xaxis.major_label_overrides = x_ticks
     MEG_p.xaxis.axis_label = "Time (s)"
-    MEG_p.xaxis.axis_label_text_font = "sans-serif"
-    MEG_p.yaxis.axis_label_text_font = "sans-serif"
-    MEG_p.xaxis.major_label_text_font = "sans-serif"
-    MEG_p.yaxis.major_label_text_font = "sans-serif"
+    MEG_p.xaxis.axis_label_text_font = "arial"
+    MEG_p.yaxis.axis_label_text_font = "arial"
+    MEG_p.xaxis.major_label_text_font = "arial"
+    MEG_p.yaxis.major_label_text_font = "arial"
     MEG_p.yaxis.axis_label = "fT"
     MEG_p.toolbar.logo = None
     MEG_p.xgrid.grid_line_color = "#D4D4D4"
@@ -235,8 +235,8 @@ def window_plots(
     EEG_p.toolbar.logo = None
     EEG_p.xgrid.grid_line_color = "#D4D4D4"
     EEG_p.ygrid.grid_line_color = "#D4D4D4"
-    EEG_p.yaxis.major_label_text_font = "sans-serif"
-    EEG_p.yaxis.axis_label_text_font = "sans-serif"
+    EEG_p.yaxis.major_label_text_font = "arial"
+    EEG_p.yaxis.axis_label_text_font = "arial"
 
     EEG_lines = {group_name: [] for group_name in EEG_window_group_avgs.keys()}
     for group_name, group_data in EEG_window_group_avgs.items():
@@ -277,10 +277,10 @@ def window_plots(
     MEG_p.toolbar.logo = None
     MEG_p.xgrid.grid_line_color = "#D4D4D4"
     MEG_p.ygrid.grid_line_color = "#D4D4D4"
-    MEG_p.xaxis.axis_label_text_font = "sans-serif"
-    MEG_p.yaxis.axis_label_text_font = "sans-serif"
-    MEG_p.xaxis.major_label_text_font = "sans-serif"
-    MEG_p.yaxis.major_label_text_font = "sans-serif"
+    MEG_p.xaxis.axis_label_text_font = "arial"
+    MEG_p.yaxis.axis_label_text_font = "arial"
+    MEG_p.xaxis.major_label_text_font = "arial"
+    MEG_p.yaxis.major_label_text_font = "arial"
 
     MEG_lines = {group_name: [] for group_name in MEG_window_group_avgs.keys()}
     for group_name, group_data in MEG_window_group_avgs.items():
@@ -360,8 +360,8 @@ def psd_plots(EEG_psds, EEG_line_visible, MEG_psds, MEG_line_visible, logger):
     EEG_p.xaxis.ticker = [tick for tick in x_ticks.keys()]
     EEG_p.xaxis.major_label_overrides = x_ticks
     EEG_p.ygrid.grid_line_color = "#D4D4D4"
-    EEG_p.yaxis.major_label_text_font = "sans-serif"
-    EEG_p.yaxis.axis_label_text_font = "sans-serif"
+    EEG_p.yaxis.major_label_text_font = "arial"
+    EEG_p.yaxis.axis_label_text_font = "arial"
 
     EEG_lines = {group_name: [] for group_name in EEG_psds.keys()}
     for group_name, group_data in EEG_psds.items():
@@ -402,12 +402,12 @@ def psd_plots(EEG_psds, EEG_line_visible, MEG_psds, MEG_line_visible, logger):
     MEG_p.toolbar.logo = None
     MEG_p.xgrid.grid_line_color = "#D4D4D4"
     MEG_p.ygrid.grid_line_color = "#D4D4D4"
-    MEG_p.xaxis.axis_label_text_font = "sans-serif"
-    MEG_p.yaxis.axis_label_text_font = "sans-serif"
-    MEG_p.xaxis.major_label_text_font = "sans-serif"
+    MEG_p.xaxis.axis_label_text_font = "arial"
+    MEG_p.yaxis.axis_label_text_font = "arial"
+    MEG_p.xaxis.major_label_text_font = "arial"
     MEG_p.xaxis.ticker = [tick for tick in x_ticks.keys()]
     MEG_p.xaxis.major_label_overrides = x_ticks
-    MEG_p.yaxis.major_label_text_font = "sans-serif"
+    MEG_p.yaxis.major_label_text_font = "arial"
 
     MEG_lines = {group_name: [] for group_name in MEG_psds.keys()}
     for group_name, group_data in MEG_psds.items():
