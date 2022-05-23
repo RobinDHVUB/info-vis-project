@@ -10,7 +10,7 @@ from bokeh.palettes import Colorblind
 # ----
 def parse_metadata():
     as_dict = 0
-    with open("data/processed/subject_data.json") as subject_data:
+    with open("data/processed/metadata.json") as subject_data:
         as_dict = json.load(subject_data)
 
     return as_dict

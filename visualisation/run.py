@@ -88,44 +88,52 @@ panel.extension(
           border: 0px black solid;
           color: white;
           font-size: 14pt;
-          font-family: monospace;
+          font-family: sans-serif;
         }}
         .bk-root .bk.main-button .bk-btn {{
           color: white;
           font-size: 10pt;
-          font-family: monospace;
+          font-family: sans-serif;
         }}
         .bk-root .bk.famous-button .bk-btn {{
           border: 1px {data_access.event_colors["Famous"]} solid;
           color: {data_access.event_colors["Famous"]};
+          font-family: sans-serif;
         }}
         .bk-root .bk.scrambled-button .bk-btn {{
           border: 1px {data_access.event_colors["Scrambled"]} solid;
           color: {data_access.event_colors["Scrambled"]};
+          font-family: sans-serif;
         }}
         .bk-root .bk.unfamiliar-button .bk-btn {{
           border: 1px {data_access.event_colors["Unfamiliar"]} solid;
           color: {data_access.event_colors["Unfamiliar"]};
+          font-family: sans-serif;
         }}
         .bk-root .bk.temporalL-button .bk-btn {{
           border: 1px {data_access.group_colors["Temporal lobe (L)"]} solid;
           color: {data_access.group_colors["Temporal lobe (L)"]};
+          font-family: sans-serif;
         }}
         .bk-root .bk.temporalR-button .bk-btn {{
           border: 1px {data_access.group_colors["Temporal lobe (R)"]} solid;
           color: {data_access.group_colors["Temporal lobe (R)"]};
+          font-family: sans-serif;
         }}
         .bk-root .bk.parietal-button .bk-btn {{
           border: 1px {data_access.group_colors["Parietal lobe"]} solid;
           color: {data_access.group_colors["Parietal lobe"]};
+          font-family: sans-serif;
         }}
         .bk-root .bk.occipital-button .bk-btn {{
           border: 1px {data_access.group_colors["Occipital lobe"]} solid;
           color: {data_access.group_colors["Occipital lobe"]};
+          font-family: sans-serif;
         }}
         .bk-root .bk.frontal-button .bk-btn {{
           border: 1px {data_access.group_colors["Frontal lobe"]} solid;
           color: {data_access.group_colors["Frontal lobe"]};
+          font-family: sans-serif;
         }}
         """
     ],
@@ -138,22 +146,19 @@ panel.extension(
 change_subject_button = panel.widgets.Button(
     name="Change subject",
     button_type="success",
-    #sizing_mode="stretch_height",
-    #align="center",
+    # sizing_mode="stretch_height",
+    # align="center",
     css_classes=["main-button"],
 )
 main_title = panel.widgets.Button(
     name="A multi-subject multi-modal human neuroimaging dataset",
     sizing_mode="stretch_width",
-    #align="center",
-    margin=(4,0,0,0),
+    # align="center",
+    margin=(0, 0, 0, 0),
     css_classes=["title-button"],
 )
 topbar = panel.Row(
-    main_title,
-    align="center",
-    sizing_mode="stretch_width",
-    background="#000000"
+    main_title, align="center", sizing_mode="stretch_width", background="#000000"
 )
 
 link_code = """
@@ -164,13 +169,14 @@ main_title.js_on_click(code=link_code)
 
 # Whole
 def first_page(event):
+    global topbar
+    global grid
+
     grid.objects = {}
     new_grid = panel.GridSpec(sizing_mode="stretch_both")
 
     # Add topbar
-    if len(topbar) > 1:
-        topbar.pop(1)
-        topbar.pop(1)
+    topbar.objects = [main_title]
     new_grid[0, :] = topbar
 
     # Add subject selection pane
@@ -188,15 +194,15 @@ change_subject_button.on_click(first_page)
 # ----
 # First stage
 # ----
-title = panel.pane.Str(
+title = panel.pane.Markdown(
     "Subject selection",
     align="center",
-    style={"font-size": "12pt"},
+    style={"font-size": "12pt", "font-family": "sans-serif"},
     margin=(-15, 0, 0, 0),
 )
 
 # Sex select
-sex_select_title = panel.pane.Str("Sex:", align="center", margin=0)
+sex_select_title = panel.pane.Markdown("Sex:", align="center", margin=0, style={'font-family': "sans-serif"})
 sex_select = panel.widgets.CheckButtonGroup(
     value=["f", "m"],
     options={"Female": "f", "Male": "m"},
@@ -216,10 +222,10 @@ def change_sex_select(event):
 sex_select.param.watch(change_sex_select, ["value"], onlychanged=True)
 
 # Age select
-age_select_title = panel.pane.Str("Age:", align="center", margin=0)
-age_select_value = panel.pane.Str(f"{min_age}...{max_age}", align="center", margin=-20)
+age_select_title = panel.pane.Markdown("Age:", align="center", margin=0, style={'font-family': "sans-serif"})
+age_select_value = panel.pane.Markdown(f"{min_age}...{max_age}", align="center", margin=-20, style={'font-family': "sans-serif"})
 age_select = panel.widgets.IntRangeSlider(
-    start=min_age, end=max_age, value=(min_age, max_age), step=1, show_value=False
+    start=min_age, end=max_age, value=(min_age, max_age), step=1, show_value=False, style={'font-family': "sans-serif"}
 )
 
 
@@ -237,13 +243,13 @@ def change_age_select(event):
 age_select.param.watch(change_age_select, ["value"], onlychanged=True)
 
 # Subject select
-subject_select_title = panel.pane.Str("Subject:", align="center", margin=0)
+subject_select_title = panel.pane.Markdown("Subject:", align="center", margin=0, style={'font-family': "sans-serif"})
 initial_subject_select_options = filter_subjects(sex_select.value, age_select.value)
 initial_subject_select_values = {
     id: description for description, id in initial_subject_select_options.items()
 }
 subject_select = panel.widgets.Select(
-    options=initial_subject_select_options,
+    options=initial_subject_select_options, style={'font-family': "sans-serif"}
 )
 
 # Start analysis button
@@ -254,27 +260,6 @@ start_analysis_button = panel.widgets.Button(
     css_classes=["main-button"],
 )
 
-
-def start_analysis(event):
-
-    # Add selected subject as subtitle
-    topbar.append(
-        panel.pane.Str(
-            initial_subject_select_values[subject_select.value],
-            #align="center",
-            margin=0,
-            style={"color": "white"},
-        )
-    )
-
-    # Add change subject button
-    topbar.append(change_subject_button)
-
-    # Change page
-    second_page()
-
-
-start_analysis_button.on_click(start_analysis)
 
 # Whole
 subject_selection = panel.Column(
@@ -358,7 +343,7 @@ def get_subject_data():
 
 # Run select
 run_select = panel.widgets.Select(
-    options={"Run " + str(i): i - 1 for i in range(1, 7)}, value=0, align="center"
+    options={"Run " + str(i): i - 1 for i in range(1, 7)}, value=0, align="center", style={"font-family":"sans-serif"}
 )
 
 
@@ -407,7 +392,7 @@ run_select.param.watch(change_run, ["value"], onlychanged=True)
 
 # PSD toggle
 psd_button = panel.widgets.Toggle(
-    name="PSD", align="center", sizing_mode="stretch_width"
+    name="PSD", align="center", sizing_mode="stretch_width", style={"font-family":"sans-serif"}
 )
 
 
@@ -491,11 +476,15 @@ psd_button.param.watch(change_data, ["value"], onlychanged=True)
 
 
 # AVG toggle
-avg_text = panel.widgets.StaticText(
-    name="", value="Windowing:", align="center", sizing_mode="stretch_width"
+avg_text = panel.pane.Markdown("Windowing:", align="center", style={"font-family":"sans-serif"}
 )
 avg_button = panel.widgets.Toggle(
-    name="AVG", align="center", sizing_mode="stretch_width", disabled=True, margin=(0,0,0,20)
+    name="AVG",
+    align="center",
+    sizing_mode="stretch_width",
+    disabled=True,
+    margin=(0, 0, 0, 20), 
+    style={"font-family":"sans-serif"}
 )
 
 
@@ -504,6 +493,8 @@ def change_view(event):
     global current_data_mode
     global EEG_lines
     global MEG_lines
+    global EEG_head
+    global MEG_head
     global EEG_window_group_avgs
     global EEG_window_group_psds
     global MEG_window_group_avgs
@@ -610,6 +601,7 @@ tmin_slider = panel.widgets.FloatSlider(
     value=-0.5,
     align="center",
     sizing_mode="stretch_width",
+    style={"font-family":"sans-serif"}
 )
 tplus_slider = panel.widgets.FloatSlider(
     name="tplus",
@@ -619,6 +611,7 @@ tplus_slider = panel.widgets.FloatSlider(
     value=0.5,
     align="center",
     sizing_mode="stretch_width",
+    style={"font-family":"sans-serif"}
 )
 
 
@@ -684,7 +677,7 @@ def show_EEG_group(group_name, event):
 
     # Balls
     if EEG_head is not None:
-        update_electrode_plot(EEG_head, {group_name:event.new})
+        EEG_head_pane.objects[0].object = update_electrode_plot(EEG_head, {group_name: event.new})
 
 
 def EEG_group_visible():
@@ -704,8 +697,7 @@ def show_MEG_group(group_name, event):
 
     # Balls
     if MEG_head is not None:
-        logger.info(MEG_head)
-        update_electrode_plot(MEG_head, {group_name:event.new})
+        MEG_head_pane.objects[0].object = update_electrode_plot(MEG_head, {group_name: event.new})
 
 
 def MEG_group_visible():
@@ -720,7 +712,7 @@ EEG_group_toggles = [
         panel.widgets.Toggle(
             name=group_name.replace("lobe", ""),
             width_policy="max",
-            margin=(2, 10, 0,0),
+            margin=(2, 10, 0, 0),
             css_classes=[
                 group_name.split(" ")[0].lower() + "-button"
                 if len(group_name.split(" ")) == 2
@@ -742,7 +734,7 @@ MEG_group_toggles = [
         panel.widgets.Toggle(
             name=group_name.replace("lobe", ""),
             width_policy="max",
-            margin=(2, 10, 0,0),
+            margin=(2, 10, 0, 0),
             css_classes=[
                 group_name.split(" ")[0].lower() + "-button"
                 if len(group_name.split(" ")) == 2
@@ -779,13 +771,15 @@ for group_name, group_toggle in MEG_group_toggles:
     )
 
 
-def second_page():
+def second_page(event):
     global EEG_pane
     global EEG_lines
     global EEG_head
     global MEG_pane
+    global EEG_head_pane
     global MEG_lines
     global MEG_head
+    global MEG_head_pane
     global current_data_mode
     global current_view_mode
 
@@ -797,12 +791,28 @@ def second_page():
     # Start loading animation
     grid.loading = True
 
+    # Add selected subject as subtitle
+    topbar.pop(0)
+    topbar.append(
+        panel.pane.Markdown(
+            initial_subject_select_values[subject_select.value],
+            margin=(0,0,-18,20), 
+            sizing_mode="stretch_width",
+            align="center",
+            style={"color": "white", 'font-size':"14pt", 'font-family':"sans-serif"},
+        )
+    )
+
+    # Add change subject button
+    topbar.append(change_subject_button)
+
+
     # (Re)set state
     current_data_mode = None
     psd_button.value = False
     avg_button.value = False
-    event_toggles[0].value=True
-    event_toggles[0].disabled=False
+    event_toggles[0].value = True
+    event_toggles[0].disabled = False
     for toggle in event_toggles[1:]:
         toggle.value = False
         toggle.disabled = False
@@ -814,6 +824,7 @@ def second_page():
     tplus_slider.value = 0.5
     tplus_slider.disabled = False
     run_select.value = 0
+    run_select.disabled = False
     current_data_mode = DataMode.TIME
     current_view_mode = ViewMode.TOTAL
 
@@ -837,14 +848,14 @@ def second_page():
     )
 
     # Set layout
-    EEG_pane = panel.pane.Bokeh(EEG_p, margin=(0,0,10,0))
+    EEG_pane = panel.pane.Bokeh(EEG_p, margin=(0, 0, 10, 0))
     EEG_head = electrode_plot(
         metadata["eeg_names"],
         metadata["eeg_types"],
         metadata["subjects"][subject_select.value - 1]["eeg_coords"],
         metadata["subjects"][subject_select.value - 1]["mesh_coords"],
         "eeg",
-        EEG_group_visible()
+        EEG_group_visible(),
     )
     EEG_head_pane = panel.Row(
         panel.pane.Plotly(
@@ -855,14 +866,14 @@ def second_page():
         align="center",
         margin=0,
     )
-    MEG_pane = panel.pane.Bokeh(MEG_p, margin=(0,0,10,0))
+    MEG_pane = panel.pane.Bokeh(MEG_p, margin=(0, 0, 10, 0))
     MEG_head = electrode_plot(
         metadata["meg_names"],
         metadata["meg_types"],
         metadata["meg_coords"],
         metadata["meg_mesh_coords"],
         "meg",
-        MEG_group_visible()
+        MEG_group_visible(),
     )
     MEG_head_pane = panel.Row(
         panel.pane.Plotly(
@@ -872,7 +883,7 @@ def second_page():
         ),
         align="center",
         margin=0,
-        sizing_mode="stretch_both"
+        sizing_mode="stretch_both",
     )
 
     # Plotly panes need to be nested in a Panel pane in order to get correct scaling,
@@ -889,6 +900,7 @@ def second_page():
     grid.objects = new_grid.objects
     grid.loading = False
 
+start_analysis_button.on_click(second_page)
 
 # ----
 # WHOLE
