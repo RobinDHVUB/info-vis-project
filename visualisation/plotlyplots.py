@@ -292,7 +292,7 @@ def electrode_plot(el_names, el_types, el_coords, mesh_coords, plot_type, group_
         trace_names = [el_names[i] for i in electrode_indices[group_name]]
         trace_colors = [data_access.group_colors[el_types[i]] for i in electrode_indices[group_name]]
 
-        marker_values = get_marker_values(group_toggles is not None and group_toggles[group_name])
+        marker_values = get_marker_values(group_toggles is not None and group_name in group_toggles and group_toggles[group_name])
 
         electrode_traces[group_name] = go.Scatter3d(
             name=group_name, # set the group name, so we can easily select on this name for modifying specific traces
