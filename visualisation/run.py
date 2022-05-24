@@ -45,7 +45,7 @@ def sex_to_string(sex):
 
 def filter_subjects(sex, age):
     return {
-        f"Subject {subject['id']}; {sex_to_string(subject['sex'])}; {subject['age']}": subject[
+        f"Subject {subject['id']}: {sex_to_string(subject['sex'])}; {subject['age']}": subject[
             "id"
         ]
         for subject in metadata["subjects"]
@@ -79,7 +79,17 @@ panel.extension(
         .bk.panel-widget-box {{
           background: #f0f0f0;
           border-radius: 5px;
-          border: 1px black solid;
+        
+          -webkit-box-shadow: 0 0 10px rgba(46, 84, 129, .3);
+          -moz-box-shadow: 0 0 10px rgba(46, 84, 129, .3);
+          box-shadow: 0 0 10px rgba(46, 84, 129, .3);
+          border: solid 1px #839bb7;
+          outline: none;
+          -webkit-transition: border linear .2s,
+          box-shadow linear .2s;
+          -moz-transition: border linear .2s,
+          box-shadow linear .2s;
+          transition: border linear .2s, box-shadow linear .2s;
         }}
         .bk-root .bk.title-button .bk-btn {{
           width: 100%;
@@ -90,10 +100,10 @@ panel.extension(
           font-size: 14pt;
           font-family: arial;
         }}
-        .bk-root .bk.main-button .bk-btn {{
-          color: white;
-          font-size: 10pt;
-          font-family: arial;
+        .bk-root .bk.top-bar {{
+          -webkit-box-shadow: 0 2px 4px 1px rgba(0,0,0,0.25);
+          -moz-box-shadow: 0 2px 4px 1px rgba(0,0,0,0.25);
+          box-shadow: 0 2px 4px 1px rgba(0,0,0,0.25);
         }}
         .bk-root .bk.famous-button .bk-btn {{
           border: 1px {data_access.event_colors["Famous"]} solid;
@@ -147,7 +157,7 @@ change_subject_button = panel.widgets.Button(
     name="Change subject",
     button_type="success",
     # sizing_mode="stretch_height",
-    # align="center",
+    align="center",
     css_classes=["main-button"],
 )
 main_title = panel.widgets.Button(
@@ -158,7 +168,8 @@ main_title = panel.widgets.Button(
     css_classes=["title-button"],
 )
 topbar = panel.Row(
-    main_title, align="center", sizing_mode="stretch_width", background="#000000"
+    main_title, align="center", sizing_mode="stretch_width", background="#000000",
+    css_classes=["top-bar"]
 )
 
 link_code = """
@@ -197,12 +208,12 @@ change_subject_button.on_click(first_page)
 title = panel.pane.Markdown(
     "Subject selection",
     align="center",
-    style={"font-size": "12pt", "font-family": "arial"},
+    style={"font-size": "12pt", "font-family": "arial", "font-weight": "bold"},
     margin=(-15, 0, 0, 0),
 )
 
 # Sex select
-sex_select_title = panel.pane.Markdown("Sex:", align="center", margin=0, style={'font-family': "arial"})
+sex_select_title = panel.pane.Markdown("Sex:", align="center", margin=0, style={'font-family': "arial", "font-weight": "bold"})
 sex_select = panel.widgets.CheckButtonGroup(
     value=["f", "m"],
     options={"Female": "f", "Male": "m"},
@@ -222,7 +233,7 @@ def change_sex_select(event):
 sex_select.param.watch(change_sex_select, ["value"], onlychanged=True)
 
 # Age select
-age_select_title = panel.pane.Markdown("Age:", align="center", margin=0, style={'font-family': "arial"})
+age_select_title = panel.pane.Markdown("Age:", align="center", margin=0, style={'font-family': "arial", 'font-weight': "bold"})
 age_select_value = panel.pane.Markdown(f"{min_age}...{max_age}", align="center", margin=-20, style={'font-family': "arial"})
 age_select = panel.widgets.IntRangeSlider(
     start=min_age, end=max_age, value=(min_age, max_age), step=1, show_value=False, style={'font-family': "arial"}
@@ -243,7 +254,8 @@ def change_age_select(event):
 age_select.param.watch(change_age_select, ["value"], onlychanged=True)
 
 # Subject select
-subject_select_title = panel.pane.Markdown("Subject:", align="center", margin=0, style={'font-family': "arial"})
+subject_select_title = panel.pane.Markdown("Subject:", align="center", margin=0,
+                                           style={'font-family': "arial", 'font-weight': "bold"})
 initial_subject_select_options = filter_subjects(sex_select.value, age_select.value)
 initial_subject_select_values = {
     id: description for description, id in initial_subject_select_options.items()
@@ -476,7 +488,7 @@ psd_button.param.watch(change_data, ["value"], onlychanged=True)
 
 
 # AVG toggle
-avg_text = panel.pane.Markdown("Windowing:", align="center", style={"font-family":"arial"}
+avg_text = panel.pane.Markdown("Windowing:", align="center", style={"font-family":"arial", "font-weight": "bold"}
 )
 avg_button = panel.widgets.Toggle(
     name="AVG",
@@ -594,17 +606,17 @@ avg_button.param.watch(change_view, ["value"], onlychanged=True)
 
 # AVG sliders
 tmin_slider = panel.widgets.FloatSlider(
-    name="tmin",
+    name="-t",
     start=-1.5,
     end=-0.1,
     step=0.01,
     value=-0.5,
     align="center",
     sizing_mode="stretch_width",
-    style={"font-family":"arial"}
+    style={"font-family":"arial", "font-weight":"bold"}
 )
 tplus_slider = panel.widgets.FloatSlider(
-    name="tplus",
+    name="+t",
     start=0.1,
     end=1.5,
     step=0.01,
@@ -799,7 +811,7 @@ def second_page(event):
             margin=(0,0,-18,20), 
             sizing_mode="stretch_width",
             align="center",
-            style={"color": "white", 'font-size':"14pt", 'font-family':"arial"},
+            style={"color": "white", 'font-size':"14pt", 'font-family':"arial", 'font-weight': 'bold'},
         )
     )
 
