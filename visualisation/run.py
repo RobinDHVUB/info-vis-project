@@ -737,7 +737,7 @@ EEG_group_toggles = [
     for group_name in data_access.group_names
 ]
 EEG_group_toggles_col = panel.Column(
-    *[toggle for group_name, toggle in EEG_group_toggles], margin=0, align="center"
+    *[toggle for group_name, toggle in EEG_group_toggles], margin=(0, 0, 0, 30), align="center"
 )
 
 MEG_group_toggles = [
@@ -761,7 +761,7 @@ MEG_group_toggles = [
 MEG_group_toggles_col = panel.Column(
     *[toggle for group_name, toggle in MEG_group_toggles],
     align="center",
-    margin=0,
+    margin=(30, 0, 0, 30),
 )
 
 
@@ -894,7 +894,7 @@ def second_page(event):
             margin=0,
         ),
         align="center",
-        margin=0,
+        margin=(30, 0, 0, 0),
         sizing_mode="stretch_both",
     )
 
@@ -902,11 +902,11 @@ def second_page(event):
     # since Plotly panes default to 100% height and width instead of explicitly computing
     # a height and width that fits the grid
     new_grid[2:8, :7] = EEG_pane
-    new_grid[2:8, 7:10] = EEG_head_pane
-    new_grid[2:8, 10] = EEG_group_toggles_col
+    new_grid[2:8, 7] = EEG_group_toggles_col
+    new_grid[2:8, 8:11] = EEG_head_pane
     new_grid[8:15, :7] = MEG_pane
-    new_grid[8:14, 7:10] = MEG_head_pane
-    new_grid[8:14, 10] = MEG_group_toggles_col
+    new_grid[8:14, 7] = MEG_group_toggles_col
+    new_grid[8:14, 8:11] = MEG_head_pane
 
     # Stop loading animation and swap grid contents
     grid.objects = new_grid.objects
