@@ -105,45 +105,59 @@ panel.extension(
           -moz-box-shadow: 0 2px 4px 1px rgba(0,0,0,0.25);
           box-shadow: 0 2px 4px 1px rgba(0,0,0,0.25);
         }}
+        .bk-root .bk.famous-button .bk-btn.bk-active, .bk-root .bk.famous-button .bk-btn:hover,
+        .bk-root .bk.scrambled-button .bk-btn.bk-active, .bk-root .bk.scrambled-button .bk-btn:hover,
+        .bk-root .bk.unfamiliar-button .bk-btn.bk-active, .bk-root .bk.unfamiliar-button .bk-btn:hover,
+        .bk-root .bk.frontal-button .bk-btn.bk-active, .bk-root .bk.frontal-button .bk-btn:hover,
+        .bk-root .bk.parietal-button .bk-btn.bk-active, .bk-root .bk.parietal-button .bk-btn:hover,
+        .bk-root .bk.temporalR-button .bk-btn.bk-active, .bk-root .bk.temporalR-button .bk-btn:hover,
+        .bk-root .bk.temporalL-button .bk-btn.bk-active, .bk-root .bk.temporalL-button .bk-btn:hover,
+        .bk-root .bk.occipital-button .bk-btn.bk-active, .bk-root .bk.occipital-button .bk-btn:hover {{
+            box-shadow: inset 0 3px 5px rgb(0 0 0 / 50%);
+        }}        
         .bk-root .bk.famous-button .bk-btn {{
-          border: 1px {data_access.event_colors["Famous"]} solid;
-          color: {data_access.event_colors["Famous"]};
+          background-color: {data_access.event_colors["Famous"]};
+          color: white;
           font-family: arial;
         }}
         .bk-root .bk.scrambled-button .bk-btn {{
-          border: 1px {data_access.event_colors["Scrambled"]} solid;
-          color: {data_access.event_colors["Scrambled"]};
+          background-color: {data_access.event_colors["Scrambled"]};
+          color: white;
           font-family: arial;
         }}
         .bk-root .bk.unfamiliar-button .bk-btn {{
-          border: 1px {data_access.event_colors["Unfamiliar"]} solid;
-          color: {data_access.event_colors["Unfamiliar"]};
+          background-color: {data_access.event_colors["Unfamiliar"]};
+          color: white;
           font-family: arial;
         }}
         .bk-root .bk.temporalL-button .bk-btn {{
-          border: 1px {data_access.group_colors["Temporal lobe (L)"]} solid;
-          color: {data_access.group_colors["Temporal lobe (L)"]};
+          background-color: {data_access.group_colors["Temporal lobe (L)"]};
+          color: white;
           font-family: arial;
         }}
         .bk-root .bk.temporalR-button .bk-btn {{
-          border: 1px {data_access.group_colors["Temporal lobe (R)"]} solid;
-          color: {data_access.group_colors["Temporal lobe (R)"]};
+          background-color: {data_access.group_colors["Temporal lobe (R)"]};
+          color: white;
           font-family: arial;
+          box-shadow: 0 3px 5px rgb(0 0 0 / 50%);
         }}
         .bk-root .bk.parietal-button .bk-btn {{
-          border: 1px {data_access.group_colors["Parietal lobe"]} solid;
-          color: {data_access.group_colors["Parietal lobe"]};
+          background-color: {data_access.group_colors["Parietal lobe"]};
+          color: white;
           font-family: arial;
+          box-shadow: 0 3px 5px rgb(0 0 0 / 50%);
         }}
         .bk-root .bk.occipital-button .bk-btn {{
-          border: 1px {data_access.group_colors["Occipital lobe"]} solid;
-          color: {data_access.group_colors["Occipital lobe"]};
+          background-color: {data_access.group_colors["Occipital lobe"]};
+          color: white;
           font-family: arial;
+          box-shadow: 0 3px 5px rgb(0 0 0 / 50%);
         }}
         .bk-root .bk.frontal-button .bk-btn {{
-          border: 1px {data_access.group_colors["Frontal lobe"]} solid;
-          color: {data_access.group_colors["Frontal lobe"]};
+          background-color: {data_access.group_colors["Frontal lobe"]};
+          color: white;
           font-family: arial;
+          box-shadow: 0 3px 5px rgb(0 0 0 / 50%);
         }}
         """
     ],
