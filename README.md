@@ -16,7 +16,7 @@ Monty Python and the Three WISE Men:
 
 Download the [preprocessed data](https://vub-my.sharepoint.com/:u:/g/personal/wolf_de_wulf_vub_be/EYNaczwQxy1AtnPBvZKCL70BfQdxDtu7zbUaTHjUyH6QfA?e=aYMqek) (7.1G) and extract it into the existing `data` directory (to get a `data/processed` directory with 16 subject folders and a metadata.json file).  
 The code that was used to process the data can be found in [data/preprocessing](data/preprocessing).  
-Note that, because of the size of the dataset (+85GB), all preprocessing was ran on the [VUB Hydra HPC](https://hpc.vub.be/).
+Note that, because of the size of the dataset (+85GB), all preprocessing was run on the [VUB Hydra HPC](https://hpc.vub.be/).
 
 ## 2. Installation
 
