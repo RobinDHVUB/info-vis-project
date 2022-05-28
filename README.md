@@ -56,6 +56,8 @@ panel serve visualisation/run.py
 ```
 
 To stop the application, press `Ctrl-c`.  
+Keep in mind that the visualisation was developed and tested in the Google Chrome browser. 
+While we do not guarantee it to work in other browsers, issues should be limited to layout. 
 
 ## (4. For developers)
 
