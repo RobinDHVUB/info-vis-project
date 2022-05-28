@@ -27,7 +27,7 @@ python -m venv env
 
 ### Activate the environment
 
-*Linux*
+*Linux/Mac*
 ```console
 source env/bin/activate
 ```
